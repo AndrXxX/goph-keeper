@@ -22,8 +22,8 @@ go.work.sum
 .env
 
 # Binaries
-cmd/agent/main
-cmd/agent/agent
+cmd/client/main
+cmd/client/client
 cmd/server/main
 cmd/server/server
 
