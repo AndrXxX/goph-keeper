@@ -1,3 +1,3 @@
-module github.com/AndrXxX/pass-keeper
+module github.com/AndrXxX/goph-keeper
 
 go 1.23
