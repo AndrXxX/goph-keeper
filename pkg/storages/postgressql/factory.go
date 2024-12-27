@@ -12,6 +12,6 @@ type Factory struct {
 }
 
 // UsersStorage хранилище для модели User
-func (f *Factory) UsersStorage() *Storage[models.User] {
-	return &Storage[models.User]{f.DB}
+func (f *Factory) UsersStorage() *Storage[*models.User] {
+	return &Storage[*models.User]{f.DB}
 }
