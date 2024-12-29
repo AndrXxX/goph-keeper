@@ -52,7 +52,7 @@ func (a *app) getRouter() *chi.Mux {
 }
 
 func (a *app) runServer(r *chi.Mux) *http.Server {
-	srv := &http.Server{Addr: a.config.c.RunAddress, Handler: r}
+	srv := &http.Server{Addr: a.config.c.Host, Handler: r}
 
 	go func() {
 		if err := srv.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
@@ -60,7 +60,7 @@ func (a *app) runServer(r *chi.Mux) *http.Server {
 		}
 	}()
 
-	logger.Log.Info("listening", zap.String("host", a.config.c.RunAddress))
+	logger.Log.Info("listening", zap.String("host", a.config.c.Host))
 	return srv
 }
 

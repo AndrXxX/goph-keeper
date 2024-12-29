@@ -7,7 +7,7 @@ import (
 // NewConfig возвращает конфигурацию со значениями по умолчанию
 func NewConfig() *Config {
 	return &Config{
-		RunAddress:     defaults.RunAddress,
+		Host:           defaults.RunAddress,
 		LogLevel:       defaults.LogLevel,
 		DatabaseURI:    "",
 		AuthKey:        defaults.AuthKey,
