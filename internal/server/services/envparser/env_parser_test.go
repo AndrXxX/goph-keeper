@@ -53,7 +53,7 @@ func Test_parseEnv(t *testing.T) {
 			wantErr: true,
 		},
 	}
-	parser := EnvParser{}
+	parser := Parser{}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			os.Clearenv()

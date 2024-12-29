@@ -16,12 +16,12 @@ type conf struct {
 	PasswordKey    string `env:"PASSWORD_SECRET_KEY"`
 }
 
-// EnvParser сервис для парсинга переменных окружения
-type EnvParser struct {
+// Parser сервис для парсинга переменных окружения
+type Parser struct {
 }
 
 // Parse парсит переменные окружения и наполняет конфигурацию
-func (p EnvParser) Parse(c *config.Config) error {
+func (p Parser) Parse(c *config.Config) error {
 	cfg := conf{
 		Host:           c.Host,
 		DatabaseURI:    c.DatabaseURI,

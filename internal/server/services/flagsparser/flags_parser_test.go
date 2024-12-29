@@ -54,7 +54,7 @@ func run(t *testing.T, tt testCase) {
 		flag.CommandLine = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 		os.Args = os.Args[:1]
 		os.Args = append(os.Args[:1], tt.flags...)
-		err := FlagsParser{}.Parse(tt.config)
+		err := Parser{}.Parse(tt.config)
 		assert.Equal(t, tt.want, tt.config)
 		assert.NoError(t, err)
 	})

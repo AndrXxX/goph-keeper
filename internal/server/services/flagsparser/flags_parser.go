@@ -6,12 +6,12 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/server/config"
 )
 
-// FlagsParser сервис для парсинга аргументов командной строки
-type FlagsParser struct {
+// Parser сервис для парсинга аргументов командной строки
+type Parser struct {
 }
 
 // Parse парсит аргументы командной строки и наполняет конфигурацию
-func (p FlagsParser) Parse(c *config.Config) error {
+func (p Parser) Parse(c *config.Config) error {
 	fl.StringVar(&c.Host, "a", c.Host, "Net address host:port")
 	fl.StringVar(&c.DatabaseURI, "d", c.DatabaseURI, "Database URI")
 	fl.StringVar(&c.AuthKey, "ak", c.AuthKey, "Auth Key")
