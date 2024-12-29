@@ -15,8 +15,10 @@ import (
 
 	"github.com/AndrXxX/goph-keeper/internal/server/config"
 	"github.com/AndrXxX/goph-keeper/internal/server/controllers"
+	"github.com/AndrXxX/goph-keeper/internal/server/entities"
 	"github.com/AndrXxX/goph-keeper/pkg/hashgenerator"
 	"github.com/AndrXxX/goph-keeper/pkg/logger"
+	"github.com/AndrXxX/goph-keeper/pkg/requestjsonentity"
 	"github.com/AndrXxX/goph-keeper/pkg/token"
 )
 
@@ -95,9 +97,8 @@ func (a *app) registerAPI(r *chi.Mux) {
 	hg := hashgenerator.Factory().SHA256(a.config.c.PasswordKey)
 	ts := token.New(a.config.c.AuthKey, time.Duration(a.config.c.AuthKeyExpired)*time.Second)
 
-	ac := controllers.AuthController{US: a.storage.US, HG: hg, TS: ts}
-
 	r.Group(func(r chi.Router) {
+		ac := controllers.AuthController{US: a.storage.US, HG: hg, TS: ts, UF: &requestjsonentity.Fetcher[entities.User]{}}
 		//r.Use(middlewares.CompressGzip().Handle)
 		r.Post("/api/user/register", ac.Register)
 		r.Post("/api/user/login", ac.Login)

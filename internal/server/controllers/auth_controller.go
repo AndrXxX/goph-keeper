@@ -1,15 +1,11 @@
 package controllers
 
 import (
-	"encoding/json"
-	"fmt"
 	"net/http"
 
-	"github.com/asaskevich/govalidator"
 	"go.uber.org/zap"
 
 	"github.com/AndrXxX/goph-keeper/internal/enums"
-	"github.com/AndrXxX/goph-keeper/internal/server/entities"
 	"github.com/AndrXxX/goph-keeper/pkg/logger"
 	"github.com/AndrXxX/goph-keeper/pkg/storages/postgressql/models"
 )
@@ -18,10 +14,11 @@ type AuthController struct {
 	US userService
 	HG hashGenerator
 	TS tokenService
+	UF userJSONRequestFetcher
 }
 
 func (c *AuthController) Register(w http.ResponseWriter, r *http.Request) {
-	u, err := c.fetchUser(r)
+	u, err := c.UF.Fetch(r.Body)
 	if err != nil {
 		logger.Log.Info("failed to fetchUser", zap.Error(err))
 		w.WriteHeader(http.StatusBadRequest)
@@ -46,7 +43,7 @@ func (c *AuthController) Register(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *AuthController) Login(w http.ResponseWriter, r *http.Request) {
-	u, err := c.fetchUser(r)
+	u, err := c.UF.Fetch(r.Body)
 	if err != nil {
 		logger.Log.Info("failed to fetchUser", zap.Error(err))
 		w.WriteHeader(http.StatusBadRequest)
@@ -66,19 +63,6 @@ func (c *AuthController) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-}
-
-func (c *AuthController) fetchUser(r *http.Request) (*entities.User, error) {
-	var u *entities.User
-	dec := json.NewDecoder(r.Body)
-	err := dec.Decode(&u)
-	if err != nil {
-		return nil, fmt.Errorf("failed to decode request: %w", err)
-	}
-	if _, err := govalidator.ValidateStruct(u); err != nil {
-		return nil, fmt.Errorf("failed to validate request: %w", err)
-	}
-	return u, nil
 }
 
 func (c *AuthController) setAuthToken(w http.ResponseWriter, user *models.User) error {
