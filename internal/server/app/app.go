@@ -98,6 +98,8 @@ func (a *app) registerAPI(r *chi.Mux) {
 	hg := hashgenerator.Factory().SHA256(a.config.c.PasswordKey)
 	ts := token.New(a.config.c.AuthKey, time.Duration(a.config.c.AuthKeyExpired)*time.Second)
 
+	r.Use(middlewares.RequestLogger().Handler)
+
 	r.Group(func(r chi.Router) {
 		r.Use(middlewares.CompressGzip().Handler)
 		ac := controllers.AuthController{US: a.storage.US, HG: hg, TS: ts, UF: &requestjsonentity.Fetcher[entities.User]{}}
