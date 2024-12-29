@@ -13,6 +13,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"go.uber.org/zap"
 
+	"github.com/AndrXxX/goph-keeper/internal/server/api/middlewares"
 	"github.com/AndrXxX/goph-keeper/internal/server/config"
 	"github.com/AndrXxX/goph-keeper/internal/server/controllers"
 	"github.com/AndrXxX/goph-keeper/internal/server/entities"
@@ -98,8 +99,8 @@ func (a *app) registerAPI(r *chi.Mux) {
 	ts := token.New(a.config.c.AuthKey, time.Duration(a.config.c.AuthKeyExpired)*time.Second)
 
 	r.Group(func(r chi.Router) {
+		r.Use(middlewares.CompressGzip().Handler)
 		ac := controllers.AuthController{US: a.storage.US, HG: hg, TS: ts, UF: &requestjsonentity.Fetcher[entities.User]{}}
-		//r.Use(middlewares.CompressGzip().Handle)
 		r.Post("/api/user/register", ac.Register)
 		r.Post("/api/user/login", ac.Login)
 	})
