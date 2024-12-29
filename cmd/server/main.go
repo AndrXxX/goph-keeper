@@ -7,13 +7,15 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/asaskevich/govalidator"
 	"go.uber.org/zap"
 
 	"github.com/AndrXxX/goph-keeper/internal/server/app"
 	"github.com/AndrXxX/goph-keeper/internal/server/config"
 	"github.com/AndrXxX/goph-keeper/internal/server/services/dbprovider"
+	"github.com/AndrXxX/goph-keeper/internal/server/services/envparser"
+	"github.com/AndrXxX/goph-keeper/internal/server/services/flagsparser"
 	"github.com/AndrXxX/goph-keeper/pkg/buildformatter"
+	"github.com/AndrXxX/goph-keeper/pkg/configprovider"
 	"github.com/AndrXxX/goph-keeper/pkg/logger"
 	"github.com/AndrXxX/goph-keeper/pkg/storages/postgressql"
 )
@@ -23,19 +25,11 @@ var buildDate string
 var buildCommit string
 
 func main() {
-	c, err := initConfig()
-	if err != nil {
-		log.Fatal(err)
+	c, icErr := initConfig()
+	if icErr != nil {
+		log.Fatal(icErr)
 	}
-	buildFormatter := buildformatter.BuildFormatter{
-		Labels: []string{"Build version", "Build date", "Build commit"},
-		Values: []string{buildVersion, buildDate, buildCommit},
-	}
-	for _, bInfo := range buildFormatter.Format() {
-		logger.Log.Info(bInfo)
-	}
-	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
-	defer stop()
+	initBuildInfo()
 
 	s, err := initStorage(c)
 	if err != nil {
@@ -43,22 +37,20 @@ func main() {
 		return
 	}
 
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
 	if err := app.New(c, *s).Run(ctx); err != nil {
 		logger.Log.Fatal(err.Error())
 	}
 }
 
 func initConfig() (*config.Config, error) {
-	c := config.NewConfig()
-	if err := logger.Initialize(c.LogLevel); err != nil {
-		return nil, err
+	cp := configprovider.New[config.Config](config.NewConfig(), flagsparser.Parser{}, envparser.Parser{})
+	c, fcErr := cp.Fetch()
+	if fcErr != nil {
+		return nil, fcErr
 	}
-	//parseFlags(c) TODO: parseFlags
-	//parseEnv(c) TODO: parseEnv
-	if _, err := govalidator.ValidateStruct(c); err != nil {
-		return nil, err
-	}
-	return c, nil
+	return c, logger.Initialize(c.LogLevel)
 }
 
 func initStorage(c *config.Config) (*app.Storage, error) {
@@ -72,4 +64,14 @@ func initStorage(c *config.Config) (*app.Storage, error) {
 		DB: db,
 		US: sf.UsersStorage(),
 	}, nil
+}
+
+func initBuildInfo() {
+	buildFormatter := buildformatter.BuildFormatter{
+		Labels: []string{"Build version", "Build date", "Build commit"},
+		Values: []string{buildVersion, buildDate, buildCommit},
+	}
+	for _, bInfo := range buildFormatter.Format() {
+		logger.Log.Info(bInfo)
+	}
 }
