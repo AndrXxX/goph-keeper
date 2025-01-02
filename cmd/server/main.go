@@ -63,6 +63,7 @@ func initStorage(ctx context.Context, c *config.Config) (*app.Storage, error) {
 	return &app.Storage{
 		DB: db,
 		US: sf.UsersStorage(),
+		IS: sf.StoredItemsStorage(),
 	}, nil
 }
 
