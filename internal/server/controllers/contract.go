@@ -3,7 +3,6 @@ package controllers
 import (
 	"io"
 
-	"github.com/AndrXxX/goph-keeper/internal/server/entities"
 	"github.com/AndrXxX/goph-keeper/pkg/storages/postgressql/models"
 )
 
@@ -21,6 +20,6 @@ type tokenService interface {
 	Encrypt(userID uint) (token string, err error)
 }
 
-type userJSONRequestFetcher interface {
-	Fetch(r io.Reader) (*entities.User, error)
+type fetcher[T any] interface {
+	Fetch(r io.Reader) (*T, error)
 }

@@ -6,6 +6,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/AndrXxX/goph-keeper/internal/enums"
+	"github.com/AndrXxX/goph-keeper/internal/server/entities"
 	"github.com/AndrXxX/goph-keeper/pkg/logger"
 	"github.com/AndrXxX/goph-keeper/pkg/storages/postgressql/models"
 )
@@ -14,7 +15,7 @@ type AuthController struct {
 	US userService
 	HG hashGenerator
 	TS tokenService
-	UF userJSONRequestFetcher
+	UF fetcher[entities.User]
 }
 
 func (c *AuthController) Register(w http.ResponseWriter, r *http.Request) {
