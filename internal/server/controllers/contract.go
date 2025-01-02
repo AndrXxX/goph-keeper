@@ -12,6 +12,13 @@ type usersStorage interface {
 	QueryOne(ctx context.Context, login string) (*models.User, error)
 }
 
+type itemsStorage interface {
+	Insert(ctx context.Context, m *models.StoredItem) (*models.StoredItem, error)
+	Update(ctx context.Context, m *models.StoredItem) (*models.StoredItem, error)
+	QueryOneById(ctx context.Context, m *models.StoredItem) (*models.StoredItem, error)
+	Query(ctx context.Context, m *models.StoredItem) ([]models.StoredItem, error)
+}
+
 type hashGenerator interface {
 	Generate(data []byte) string
 }
@@ -23,4 +30,8 @@ type tokenService interface {
 
 type fetcher[T any] interface {
 	Fetch(r io.Reader) (*T, error)
+}
+
+type sliceFetcher[T any] interface {
+	FetchSlice(r io.Reader) ([]T, error)
 }

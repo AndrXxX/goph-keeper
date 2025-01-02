@@ -24,8 +24,8 @@ func (c *Fetcher[T]) Fetch(r io.Reader) (*T, error) {
 	return entity, nil
 }
 
-func (c *Fetcher[T]) FetchSlice(r io.Reader) ([]*T, error) {
-	var list []*T
+func (c *Fetcher[T]) FetchSlice(r io.Reader) ([]T, error) {
+	var list []T
 	dec := json.NewDecoder(r)
 	err := dec.Decode(&list)
 	if err != nil {
