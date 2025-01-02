@@ -31,10 +31,20 @@ func (s *Storage[T]) Create(m T) (T, error) {
 }
 
 func (s *Storage[T]) Update(m T) error {
-	err := s.db.Updates(m)
+	err := s.db.Model(m).Updates(m)
 	if err.Error != nil {
 		logger.Log.Info("update model", zap.Error(err), zap.Any("model", m))
 		return err
 	}
 	return nil
+}
+
+func (s *Storage[T]) List(m T) ([]T, error) {
+	var l []T
+	err := s.db.Model(m).Scan(&l)
+	if err.Error != nil {
+		logger.Log.Info("fetch list models", zap.Error(err), zap.Any("model", m))
+		return l, err
+	}
+	return l, nil
 }
