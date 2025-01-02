@@ -1,17 +1,15 @@
 package postgressql
 
 import (
-	"github.com/galeone/igor"
-
-	"github.com/AndrXxX/goph-keeper/pkg/storages/postgressql/models"
+	"github.com/vingarcia/ksql"
 )
 
 // Factory фабрика для хранилищ моделей
 type Factory struct {
-	DB *igor.Database
+	DB ksql.Provider
 }
 
 // UsersStorage хранилище для модели User
-func (f *Factory) UsersStorage() *Storage[*models.User] {
-	return &Storage[*models.User]{f.DB}
+func (f *Factory) UsersStorage() *usersStorage {
+	return &usersStorage{f.DB}
 }

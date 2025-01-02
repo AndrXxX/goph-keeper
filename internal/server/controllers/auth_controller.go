@@ -12,7 +12,7 @@ import (
 )
 
 type AuthController struct {
-	US userService
+	US usersStorage
 	HG hashGenerator
 	TS tokenService
 	UF fetcher[entities.User]
@@ -25,14 +25,17 @@ func (c *AuthController) Register(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	exist, err := c.US.Find(&models.User{Login: u.Login})
+	exist, err := c.US.QueryOne(r.Context(), u.Login)
+	if err != nil {
+		logger.Log.Info("Register QueryOne", zap.Error(err))
+	}
 	if exist != nil {
 		w.WriteHeader(http.StatusConflict)
 		return
 	}
-	created, err := c.US.Create(&models.User{Login: u.Login, Password: c.HG.Generate([]byte(u.Password))})
+	created, err := c.US.Insert(r.Context(), &models.User{Login: u.Login, Password: c.HG.Generate([]byte(u.Password))})
 	if err != nil {
-		logger.Log.Info("failed to create user on register request", zap.Error(err))
+		logger.Log.Info("create user on register request", zap.Error(err))
 		w.WriteHeader(http.StatusConflict)
 		return
 	}
@@ -46,11 +49,14 @@ func (c *AuthController) Register(w http.ResponseWriter, r *http.Request) {
 func (c *AuthController) Login(w http.ResponseWriter, r *http.Request) {
 	u, err := c.UF.Fetch(r.Body)
 	if err != nil {
-		logger.Log.Info("failed to fetchUser", zap.Error(err))
+		logger.Log.Info("fetchUser", zap.Error(err))
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	exist, err := c.US.Find(&models.User{Login: u.Login})
+	exist, err := c.US.QueryOne(r.Context(), u.Login)
+	if err != nil {
+		logger.Log.Info("Login QueryOne", zap.Error(err))
+	}
 	if exist == nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
@@ -72,6 +78,7 @@ func (c *AuthController) setAuthToken(w http.ResponseWriter, user *models.User) 
 		logger.Log.Info("failed to encrypt token on request", zap.Error(err))
 		return err
 	}
+	w.Header().Set("Authorization", "Bearer "+token)
 	http.SetCookie(w, &http.Cookie{Name: enums.AuthToken, Value: token})
 	return err
 }

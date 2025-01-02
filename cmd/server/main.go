@@ -31,13 +31,13 @@ func main() {
 	}
 	initBuildInfo()
 
-	s, err := initStorage(c)
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	s, err := initStorage(ctx, c)
 	if err != nil {
 		logger.Log.Error("init storage", zap.Error(err))
 		return
 	}
 
-	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 	if err := app.New(c, *s).Run(ctx); err != nil {
 		logger.Log.Fatal(err.Error())
@@ -53,9 +53,9 @@ func initConfig() (*config.Config, error) {
 	return c, logger.Initialize(c.LogLevel)
 }
 
-func initStorage(c *config.Config) (*app.Storage, error) {
+func initStorage(ctx context.Context, c *config.Config) (*app.Storage, error) {
 	p := &dbprovider.DBProvider{DSN: c.DatabaseURI}
-	db, err := p.DB()
+	db, err := p.DB(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}

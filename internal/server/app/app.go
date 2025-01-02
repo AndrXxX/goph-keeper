@@ -11,6 +11,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/vingarcia/ksql"
 	"go.uber.org/zap"
 
 	"github.com/AndrXxX/goph-keeper/internal/server/api/middlewares"
@@ -77,8 +78,7 @@ func (a *app) shutdown(srv *http.Server) error {
 
 	shutdown := make(chan struct{}, 1)
 	go func() {
-		if a.storage.DB != nil {
-			db := a.storage.DB.DB()
+		if db, ok := a.storage.DB.(ksql.DB); ok {
 			_ = db.Close()
 		}
 		shutdown <- struct{}{}

@@ -1,14 +1,15 @@
 package controllers
 
 import (
+	"context"
 	"io"
 
 	"github.com/AndrXxX/goph-keeper/pkg/storages/postgressql/models"
 )
 
-type userService interface {
-	Find(u *models.User) (*models.User, error)
-	Create(u *models.User) (*models.User, error)
+type usersStorage interface {
+	Insert(ctx context.Context, m *models.User) (*models.User, error)
+	QueryOne(ctx context.Context, login string) (*models.User, error)
 }
 
 type hashGenerator interface {
