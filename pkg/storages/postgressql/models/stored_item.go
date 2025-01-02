@@ -11,7 +11,7 @@ type StoredItem struct {
 	Type        string
 	Description string
 	Value       string
-	UserId      uint
+	UserID      uint
 }
 
 func (u StoredItem) TableName() string {
