@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS stored_items
     type varchar(30),
     description text,
     value text,
-    userId BIGINT references users(id)
+    user_id BIGINT references users(id)
 );
 -- +goose StatementEnd
 
