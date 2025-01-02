@@ -5,13 +5,13 @@ import (
 )
 
 type StoredItem struct {
-	ID          uint      `igor:"primary_key"`
-	CreatedAt   time.Time `sql:"default:(now() at time zone 'utc')"`
-	UpdatedAt   time.Time `sql:"default:(now() at time zone 'utc')"`
-	Type        string
-	Description string
-	Value       string
-	UserID      uint
+	ID          uint       `ksql:"id"`
+	CreatedAt   *time.Time `ksql:"created_at"`
+	UpdatedAt   *time.Time `ksql:"updated_at"`
+	Type        string     `ksql:"type"`
+	Description string     `ksql:"description"`
+	Value       string     `ksql:"value"`
+	UserID      uint       `ksql:"user_id"`
 }
 
 func (u StoredItem) TableName() string {
