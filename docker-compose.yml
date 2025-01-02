@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+  goph-keeper-db:
+    image: postgres:16.3
+    container_name: goph-keeper-db
+    environment:
+      - POSTGRES_DB=${DB_NAME:-goph_keeper_db}
+      - POSTGRES_USER=${DB_USERNAME:-goph_keeper_user}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-goph_keeper_pass}
+    volumes:
+      - ./db/postgresql/:/var/lib/postgresql/data/
+    ports:
+      - "5051:5432"
+    networks:
+      - default
+
+  goph-keeper-server:
+    image: golang:1.23
+    container_name: goph-keeper-server
+    volumes:
+      - ./:/go/src/github.com/AndrXxX/goph-keeper/
+    working_dir: /go/src/github.com/AndrXxX/goph-keeper/
+    environment:
+      - HOST=:8080
+      - DATABASE_URI=host=goph-keeper-db user=${DB_USERNAME:-goph_keeper_user} password=${DB_PASSWORD:-goph_keeper_pass} dbname=${DB_NAME:-goph_keeper_db} sslmode=disable
+      - AUTH_SECRET_KEY=${AUTH_SECRET_KEY:-auth-secret-key}
+      - PASSWORD_SECRET_KEY=${PASSWORD_SECRET_KEY:-password-secret-key}
+    ports:
+      - ${GOPH_KEEPER_SERVER_PORT:-8081}:8080
+    entrypoint: go run github.com/AndrXxX/goph-keeper/cmd/server
+    depends_on:
+      - goph-keeper-db
+
+networks:
+  default:
+    driver: bridge
+
