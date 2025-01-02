@@ -1,6 +1,8 @@
 package postgressql
 
 import (
+	"time"
+
 	"github.com/galeone/igor"
 	"go.uber.org/zap"
 
@@ -39,9 +41,13 @@ func (s *Storage[T]) Update(m T) error {
 	return nil
 }
 
-func (s *Storage[T]) List(m T) ([]T, error) {
+func (s *Storage[T]) List(m T, updatedFrom *time.Time) ([]T, error) {
 	var l []T
-	err := s.db.Model(m).Scan(&l)
+	q := s.db.Model(m)
+	if updatedFrom != nil {
+		q = q.Where("updated_at > ?", updatedFrom)
+	}
+	err := q.Scan(&l)
 	if err.Error != nil {
 		logger.Log.Info("fetch list models", zap.Error(err), zap.Any("model", m))
 		return l, err
