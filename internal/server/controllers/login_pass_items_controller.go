@@ -14,12 +14,12 @@ import (
 	"github.com/AndrXxX/goph-keeper/pkg/storages/postgressql/models"
 )
 
-type LoginPassStoreController struct {
+type LoginPassItemsController struct {
 	IF sliceFetcher[entities.LoginPassItem]
 	IS itemsStorage
 }
 
-func (c *LoginPassStoreController) Update(w http.ResponseWriter, r *http.Request) {
+func (c *LoginPassItemsController) Update(w http.ResponseWriter, r *http.Request) {
 	list, err := c.IF.FetchSlice(r.Body)
 	if err != nil {
 		logger.Log.Info("failed to Update", zap.Error(err))
@@ -62,7 +62,7 @@ func (c *LoginPassStoreController) Update(w http.ResponseWriter, r *http.Request
 	w.WriteHeader(http.StatusOK)
 }
 
-func (c *LoginPassStoreController) Updates(w http.ResponseWriter, r *http.Request) {
+func (c *LoginPassItemsController) Updates(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	userID := r.Context().Value(enums.UserID).(uint)
 	mList, err := c.IS.Query(r.Context(), &models.StoredItem{Type: datatypes.LoginPass, UserID: userID})
