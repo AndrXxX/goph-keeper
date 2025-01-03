@@ -21,7 +21,7 @@ type usersStorage interface {
 type itemsStorage interface {
 	Insert(ctx context.Context, m *models.StoredItem) (*models.StoredItem, error)
 	Update(ctx context.Context, m *models.StoredItem) (*models.StoredItem, error)
-	QueryOneById(ctx context.Context, m *models.StoredItem) (*models.StoredItem, error)
+	QueryOneById(ctx context.Context, id uint) (*models.StoredItem, error)
 	Query(ctx context.Context, m *models.StoredItem) ([]models.StoredItem, error)
 }
 

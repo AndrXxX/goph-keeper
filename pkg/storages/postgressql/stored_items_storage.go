@@ -25,9 +25,9 @@ func (s *storedItemsStorage) Insert(ctx context.Context, m *models.StoredItem) (
 }
 
 // QueryOneById извлекает одну запись
-func (s *storedItemsStorage) QueryOneById(ctx context.Context, m *models.StoredItem) (*models.StoredItem, error) {
+func (s *storedItemsStorage) QueryOneById(ctx context.Context, id uint) (*models.StoredItem, error) {
 	res := models.StoredItem{}
-	err := s.db.QueryOne(ctx, &res, "FROM stored_items WHERE id = $1", m.ID)
+	err := s.db.QueryOne(ctx, &res, "FROM stored_items WHERE id = $1", id)
 	if err != nil {
 		return nil, fmt.Errorf("queryOne StoredItem %w", err)
 	}

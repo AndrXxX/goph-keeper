@@ -36,7 +36,7 @@ func (c *ItemsController[T]) Update(w http.ResponseWriter, r *http.Request) {
 		}
 		var cErr error
 		if item.GetID() > 0 {
-			exist, _ := c.IS.QueryOneById(r.Context(), &models.StoredItem{ID: item.GetID()})
+			exist, _ := c.IS.QueryOneById(r.Context(), item.GetID())
 			if exist != nil && exist.UserID != userID {
 				w.WriteHeader(http.StatusForbidden)
 				return
