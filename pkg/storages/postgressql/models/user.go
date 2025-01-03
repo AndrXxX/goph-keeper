@@ -11,7 +11,3 @@ type User struct {
 	Login     string    `ksql:"login"`
 	Password  string    `ksql:"password"`
 }
-
-func (u User) TableName() string {
-	return "users"
-}

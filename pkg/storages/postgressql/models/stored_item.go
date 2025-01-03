@@ -13,7 +13,3 @@ type StoredItem struct {
 	Value       string     `ksql:"value"`
 	UserID      uint       `ksql:"user_id"`
 }
-
-func (u StoredItem) TableName() string {
-	return "stored_items"
-}
