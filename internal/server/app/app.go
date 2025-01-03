@@ -127,5 +127,13 @@ func (a *app) registerAPI(r *chi.Mux) {
 		}
 		r.Post("/api/update/text", tc.Update)
 		r.Get("/api/updates/text", tc.Updates)
+
+		bcc := controllers.BankCardItemsController{
+			IF: &requestjsonentity.Fetcher[entities.BankCardItem]{},
+			IS: a.storage.IS,
+			IC: entityconvertors.Factory{}.BankCard(valueconvertors.Factory{}.BankCard()),
+		}
+		r.Post("/api/update/bank-card", bcc.Update)
+		r.Get("/api/updates/bank-card", bcc.Updates)
 	})
 }
