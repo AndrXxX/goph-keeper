@@ -9,10 +9,11 @@ type Factory struct {
 }
 
 func (f Factory) LoginPass(vc ValueConvertor[entities.LoginPassItem, values.LoginPassValue]) Convertor[entities.LoginPassItem] {
-	return loginPassItemConvertor{
-		sic: f.StoredItem(),
-		vc:  vc,
-	}
+	return loginPassItemConvertor{sic: f.StoredItem(), vc: vc}
+}
+
+func (f Factory) Text(vc ValueConvertor[entities.TextItem, values.TextValue]) Convertor[entities.TextItem] {
+	return textItemConvertor{sic: f.StoredItem(), vc: vc}
 }
 
 func (f Factory) StoredItem() SIConvertor[entities.StoredItem] {
