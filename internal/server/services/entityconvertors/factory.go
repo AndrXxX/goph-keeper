@@ -20,6 +20,10 @@ func (f Factory) BankCard(vc ValueConvertor[entities.BankCardItem, values.BankCa
 	return bankCardItemConvertor{sic: f.StoredItem(), vc: vc}
 }
 
+func (f Factory) Binary(vc ValueConvertor[entities.BinaryItem, values.BinaryValue]) Convertor[entities.BinaryItem] {
+	return binaryItemConvertor{sic: f.StoredItem(), vc: vc}
+}
+
 func (f Factory) StoredItem() SIConvertor[entities.StoredItem] {
 	return storedItemConvertor{}
 }

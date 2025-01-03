@@ -19,3 +19,7 @@ func (f Factory) Text() ValueConvertor[entities.TextItem, values.TextValue] {
 func (f Factory) BankCard() ValueConvertor[entities.BankCardItem, values.BankCardValue] {
 	return &bankCardValueConvertor{}
 }
+
+func (f Factory) Binary() ValueConvertor[entities.BinaryItem, values.BinaryValue] {
+	return &binaryValueConvertor{}
+}
