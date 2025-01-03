@@ -80,7 +80,11 @@ func (c *LoginPassItemsController) Updates(w http.ResponseWriter, r *http.Reques
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		rawItem.StoredItem = entities.StoredItem{ID: item.ID, Description: item.Description}
+		rawItem.StoredItem = entities.StoredItem{
+			ID:          item.ID,
+			Description: item.Description,
+			UpdatedAt:   item.UpdatedAt,
+		}
 		list[i] = rawItem
 	}
 	res, mErr := json.Marshal(list)
