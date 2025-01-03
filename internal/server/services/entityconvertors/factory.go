@@ -16,6 +16,10 @@ func (f Factory) Text(vc ValueConvertor[entities.TextItem, values.TextValue]) Co
 	return textItemConvertor{sic: f.StoredItem(), vc: vc}
 }
 
+func (f Factory) BankCard(vc ValueConvertor[entities.BankCardItem, values.BankCardValue]) Convertor[entities.BankCardItem] {
+	return bankCardItemConvertor{sic: f.StoredItem(), vc: vc}
+}
+
 func (f Factory) StoredItem() SIConvertor[entities.StoredItem] {
 	return storedItemConvertor{}
 }

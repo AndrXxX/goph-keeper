@@ -15,3 +15,7 @@ func (f Factory) LoginPass() ValueConvertor[entities.LoginPassItem, values.Login
 func (f Factory) Text() ValueConvertor[entities.TextItem, values.TextValue] {
 	return &textValueConvertor{}
 }
+
+func (f Factory) BankCard() ValueConvertor[entities.BankCardItem, values.BankCardValue] {
+	return &bankCardValueConvertor{}
+}
