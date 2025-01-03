@@ -8,18 +8,18 @@ import (
 
 	"github.com/AndrXxX/goph-keeper/internal/enums"
 	"github.com/AndrXxX/goph-keeper/internal/enums/datatypes"
-	"github.com/AndrXxX/goph-keeper/internal/server/entities"
 	"github.com/AndrXxX/goph-keeper/pkg/logger"
 	"github.com/AndrXxX/goph-keeper/pkg/storages/postgressql/models"
 )
 
-type TextItemsController struct {
-	IF sliceFetcher[entities.TextItem]
-	IS itemsStorage
-	IC itemConvertor[entities.TextItem]
+type ItemsController[T idItem] struct {
+	Type string
+	IF   sliceFetcher[T]
+	IS   itemsStorage
+	IC   itemConvertor[T]
 }
 
-func (c *TextItemsController) Update(w http.ResponseWriter, r *http.Request) {
+func (c *ItemsController[T]) Update(w http.ResponseWriter, r *http.Request) {
 	list, err := c.IF.FetchSlice(r.Body)
 	if err != nil {
 		logger.Log.Info("Update", zap.Error(err))
@@ -35,8 +35,8 @@ func (c *TextItemsController) Update(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		var cErr error
-		if item.ID > 0 {
-			exist, _ := c.IS.QueryOneById(r.Context(), &models.StoredItem{ID: item.ID})
+		if item.GetID() > 0 {
+			exist, _ := c.IS.QueryOneById(r.Context(), &models.StoredItem{ID: item.GetID()})
 			if exist != nil && exist.UserID != userID {
 				w.WriteHeader(http.StatusForbidden)
 				return
@@ -55,7 +55,7 @@ func (c *TextItemsController) Update(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (c *TextItemsController) Updates(w http.ResponseWriter, r *http.Request) {
+func (c *ItemsController[T]) Updates(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	userID := r.Context().Value(enums.UserID).(uint)
 	mList, err := c.IS.Query(r.Context(), &models.StoredItem{Type: datatypes.Text, UserID: userID})
@@ -64,7 +64,7 @@ func (c *TextItemsController) Updates(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	list := make([]entities.TextItem, len(mList))
+	list := make([]T, len(mList))
 	for i, item := range mList {
 		rawItem, err := c.IC.ToEntity(&item)
 		if err != nil {

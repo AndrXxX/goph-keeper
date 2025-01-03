@@ -7,3 +7,7 @@ type StoredItem struct {
 	Description string     `json:"description"`
 	UpdatedAt   *time.Time `json:"updated_at"`
 }
+
+func (si StoredItem) GetID() uint {
+	return si.ID
+}

@@ -40,3 +40,7 @@ type itemConvertor[E any] interface {
 	ToModel(e *E, userID uint) (*models.StoredItem, error)
 	ToEntity(e *models.StoredItem) (*E, error)
 }
+
+type idItem interface {
+	GetID() uint
+}
