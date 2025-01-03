@@ -93,11 +93,9 @@ func (c *LoginPassItemsController) Updates(w http.ResponseWriter, r *http.Reques
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	w.WriteHeader(http.StatusOK)
 	_, wErr := w.Write(res)
 	if wErr != nil {
-		logger.Log.Info("w.Write", zap.Error(wErr))
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+		logger.Log.Info("w.Write on Updates LoginPassItems", zap.Error(wErr))
 	}
-	w.WriteHeader(http.StatusOK)
 }
