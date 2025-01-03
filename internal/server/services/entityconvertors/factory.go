@@ -1,6 +1,7 @@
 package entityconvertors
 
 import (
+	"github.com/AndrXxX/goph-keeper/internal/enums/datatypes"
 	"github.com/AndrXxX/goph-keeper/internal/server/entities"
 	"github.com/AndrXxX/goph-keeper/internal/server/entities/values"
 )
@@ -9,21 +10,21 @@ type Factory struct {
 }
 
 func (f Factory) LoginPass(vc ValueConvertor[entities.LoginPassItem, values.LoginPassValue]) Convertor[entities.LoginPassItem] {
-	return loginPassItemConvertor{sic: f.StoredItem(), vc: vc}
+	return loginPassItemConvertor{sic: f.StoredItem(datatypes.LoginPass), vc: vc}
 }
 
 func (f Factory) Text(vc ValueConvertor[entities.TextItem, values.TextValue]) Convertor[entities.TextItem] {
-	return textItemConvertor{sic: f.StoredItem(), vc: vc}
+	return textItemConvertor{sic: f.StoredItem(datatypes.Text), vc: vc}
 }
 
 func (f Factory) BankCard(vc ValueConvertor[entities.BankCardItem, values.BankCardValue]) Convertor[entities.BankCardItem] {
-	return bankCardItemConvertor{sic: f.StoredItem(), vc: vc}
+	return bankCardItemConvertor{sic: f.StoredItem(datatypes.BankCard), vc: vc}
 }
 
 func (f Factory) Binary(vc ValueConvertor[entities.BinaryItem, values.BinaryValue]) Convertor[entities.BinaryItem] {
-	return binaryItemConvertor{sic: f.StoredItem(), vc: vc}
+	return binaryItemConvertor{sic: f.StoredItem(datatypes.Binary), vc: vc}
 }
 
-func (f Factory) StoredItem() SIConvertor[entities.StoredItem] {
-	return storedItemConvertor{}
+func (f Factory) StoredItem(t string) SIConvertor[entities.StoredItem] {
+	return storedItemConvertor{Type: t}
 }
