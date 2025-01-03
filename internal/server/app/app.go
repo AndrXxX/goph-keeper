@@ -14,6 +14,7 @@ import (
 	"github.com/vingarcia/ksql"
 	"go.uber.org/zap"
 
+	"github.com/AndrXxX/goph-keeper/internal/enums/datatypes"
 	"github.com/AndrXxX/goph-keeper/internal/server/api/middlewares"
 	"github.com/AndrXxX/goph-keeper/internal/server/config"
 	"github.com/AndrXxX/goph-keeper/internal/server/controllers"
@@ -113,33 +114,37 @@ func (a *app) registerAPI(r *chi.Mux) {
 		r.Use(middlewares.IsAuthorized(ts).Handler)
 		r.Use(middlewares.CompressGzip().Handler)
 		lpc := controllers.ItemsController[entities.LoginPassItem]{
-			IF: &requestjsonentity.Fetcher[entities.LoginPassItem]{},
-			IS: a.storage.IS,
-			IC: entityconvertors.Factory{}.LoginPass(valueconvertors.Factory{}.LoginPass()),
+			Type: datatypes.LoginPass,
+			IF:   &requestjsonentity.Fetcher[entities.LoginPassItem]{},
+			IS:   a.storage.IS,
+			IC:   entityconvertors.Factory{}.LoginPass(valueconvertors.Factory{}.LoginPass()),
 		}
 		r.Post("/api/update/login-pass", lpc.Update)
 		r.Get("/api/updates/login-pass", lpc.Updates)
 
 		tc := controllers.ItemsController[entities.TextItem]{
-			IF: &requestjsonentity.Fetcher[entities.TextItem]{},
-			IS: a.storage.IS,
-			IC: entityconvertors.Factory{}.Text(valueconvertors.Factory{}.Text()),
+			Type: datatypes.Text,
+			IF:   &requestjsonentity.Fetcher[entities.TextItem]{},
+			IS:   a.storage.IS,
+			IC:   entityconvertors.Factory{}.Text(valueconvertors.Factory{}.Text()),
 		}
 		r.Post("/api/update/text", tc.Update)
 		r.Get("/api/updates/text", tc.Updates)
 
 		bcc := controllers.ItemsController[entities.BankCardItem]{
-			IF: &requestjsonentity.Fetcher[entities.BankCardItem]{},
-			IS: a.storage.IS,
-			IC: entityconvertors.Factory{}.BankCard(valueconvertors.Factory{}.BankCard()),
+			Type: datatypes.BankCard,
+			IF:   &requestjsonentity.Fetcher[entities.BankCardItem]{},
+			IS:   a.storage.IS,
+			IC:   entityconvertors.Factory{}.BankCard(valueconvertors.Factory{}.BankCard()),
 		}
 		r.Post("/api/update/bank-card", bcc.Update)
 		r.Get("/api/updates/bank-card", bcc.Updates)
 
 		bc := controllers.ItemsController[entities.BinaryItem]{
-			IF: &requestjsonentity.Fetcher[entities.BinaryItem]{},
-			IS: a.storage.IS,
-			IC: entityconvertors.Factory{}.Binary(valueconvertors.Factory{}.Binary()),
+			Type: datatypes.Binary,
+			IF:   &requestjsonentity.Fetcher[entities.BinaryItem]{},
+			IS:   a.storage.IS,
+			IC:   entityconvertors.Factory{}.Binary(valueconvertors.Factory{}.Binary()),
 		}
 		r.Post("/api/update/binary", bc.Update)
 		r.Get("/api/updates/binary", bc.Updates)

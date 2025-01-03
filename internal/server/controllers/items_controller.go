@@ -7,7 +7,6 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/AndrXxX/goph-keeper/internal/enums"
-	"github.com/AndrXxX/goph-keeper/internal/enums/datatypes"
 	"github.com/AndrXxX/goph-keeper/pkg/logger"
 	"github.com/AndrXxX/goph-keeper/pkg/storages/postgressql/models"
 )
@@ -35,9 +34,9 @@ func (c *ItemsController[T]) Update(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		var cErr error
-		if item.GetID() > 0 {
-			exist, _ := c.IS.QueryOneById(r.Context(), item.GetID())
-			if exist != nil && exist.UserID != userID {
+
+		if exist, _ := c.IS.QueryOneById(r.Context(), item.GetID()); exist != nil {
+			if exist.UserID != userID {
 				w.WriteHeader(http.StatusForbidden)
 				return
 			}
@@ -58,7 +57,7 @@ func (c *ItemsController[T]) Update(w http.ResponseWriter, r *http.Request) {
 func (c *ItemsController[T]) Updates(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	userID := r.Context().Value(enums.UserID).(uint)
-	mList, err := c.IS.Query(r.Context(), &models.StoredItem{Type: datatypes.Text, UserID: userID})
+	mList, err := c.IS.Query(r.Context(), &models.StoredItem{Type: c.Type, UserID: userID})
 	if err != nil {
 		logger.Log.Info("c.IS.Query", zap.Error(err))
 		w.WriteHeader(http.StatusInternalServerError)
