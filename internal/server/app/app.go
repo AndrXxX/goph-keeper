@@ -113,5 +113,9 @@ func (a *app) registerAPI(r *chi.Mux) {
 		lpc := controllers.LoginPassItemsController{IF: &requestjsonentity.Fetcher[entities.LoginPassItem]{}, IS: a.storage.IS}
 		r.Post("/api/update/login-pass", lpc.Update)
 		r.Get("/api/updates/login-pass", lpc.Updates)
+
+		tc := controllers.TextItemsController{IF: &requestjsonentity.Fetcher[entities.TextItem]{}, IS: a.storage.IS}
+		r.Post("/api/update/text", tc.Update)
+		r.Get("/api/updates/text", tc.Updates)
 	})
 }
