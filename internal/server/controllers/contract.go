@@ -35,3 +35,8 @@ type fetcher[T any] interface {
 type sliceFetcher[T any] interface {
 	FetchSlice(r io.Reader) ([]T, error)
 }
+
+type itemConvertor[E any] interface {
+	ToModel(e *E, userID uint) (*models.StoredItem, error)
+	ToEntity(e *models.StoredItem) (*E, error)
+}

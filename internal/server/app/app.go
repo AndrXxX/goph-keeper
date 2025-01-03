@@ -18,6 +18,8 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/server/config"
 	"github.com/AndrXxX/goph-keeper/internal/server/controllers"
 	"github.com/AndrXxX/goph-keeper/internal/server/entities"
+	"github.com/AndrXxX/goph-keeper/internal/server/services/entityconvertors"
+	"github.com/AndrXxX/goph-keeper/internal/server/services/valueconvertors"
 	"github.com/AndrXxX/goph-keeper/pkg/hashgenerator"
 	"github.com/AndrXxX/goph-keeper/pkg/logger"
 	"github.com/AndrXxX/goph-keeper/pkg/requestjsonentity"
@@ -110,11 +112,19 @@ func (a *app) registerAPI(r *chi.Mux) {
 	r.Group(func(r chi.Router) {
 		r.Use(middlewares.IsAuthorized(ts).Handler)
 		r.Use(middlewares.CompressGzip().Handler)
-		lpc := controllers.LoginPassItemsController{IF: &requestjsonentity.Fetcher[entities.LoginPassItem]{}, IS: a.storage.IS}
+		lpc := controllers.LoginPassItemsController{
+			IF: &requestjsonentity.Fetcher[entities.LoginPassItem]{},
+			IS: a.storage.IS,
+			IC: entityconvertors.Factory{}.LoginPass(valueconvertors.Factory{}.LoginPass()),
+		}
 		r.Post("/api/update/login-pass", lpc.Update)
 		r.Get("/api/updates/login-pass", lpc.Updates)
 
-		tc := controllers.TextItemsController{IF: &requestjsonentity.Fetcher[entities.TextItem]{}, IS: a.storage.IS}
+		tc := controllers.TextItemsController{
+			IF: &requestjsonentity.Fetcher[entities.TextItem]{},
+			IS: a.storage.IS,
+			IC: entityconvertors.Factory{}.Text(valueconvertors.Factory{}.Text()),
+		}
 		r.Post("/api/update/text", tc.Update)
 		r.Get("/api/updates/text", tc.Updates)
 	})

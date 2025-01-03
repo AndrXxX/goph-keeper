@@ -9,7 +9,6 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/enums"
 	"github.com/AndrXxX/goph-keeper/internal/enums/datatypes"
 	"github.com/AndrXxX/goph-keeper/internal/server/entities"
-	"github.com/AndrXxX/goph-keeper/internal/server/entities/values"
 	"github.com/AndrXxX/goph-keeper/pkg/logger"
 	"github.com/AndrXxX/goph-keeper/pkg/storages/postgressql/models"
 )
@@ -17,29 +16,23 @@ import (
 type TextItemsController struct {
 	IF sliceFetcher[entities.TextItem]
 	IS itemsStorage
+	IC itemConvertor[entities.TextItem]
 }
 
 func (c *TextItemsController) Update(w http.ResponseWriter, r *http.Request) {
 	list, err := c.IF.FetchSlice(r.Body)
 	if err != nil {
-		logger.Log.Info("failed to Update", zap.Error(err))
+		logger.Log.Info("Update", zap.Error(err))
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	userID := r.Context().Value(enums.UserID).(uint)
 	for _, item := range list {
-		val, err := json.Marshal(values.TextValue{Text: item.Text})
+		toSave, err := c.IC.ToModel(&item, userID)
 		if err != nil {
-			logger.Log.Info("json.Marshal on Update text items", zap.Error(err))
+			logger.Log.Info("c.IC.ToModel on ", zap.Error(err), zap.Any("item", item))
 			w.WriteHeader(http.StatusInternalServerError)
 			return
-		}
-		toSave := models.StoredItem{
-			ID:          item.ID,
-			Type:        datatypes.Text,
-			Description: item.Description,
-			Value:       string(val),
-			UserID:      userID,
 		}
 		var cErr error
 		if item.ID > 0 {
@@ -48,9 +41,9 @@ func (c *TextItemsController) Update(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusForbidden)
 				return
 			}
-			_, cErr = c.IS.Update(r.Context(), &toSave)
+			_, cErr = c.IS.Update(r.Context(), toSave)
 		} else {
-			_, cErr = c.IS.Insert(r.Context(), &toSave)
+			_, cErr = c.IS.Insert(r.Context(), toSave)
 		}
 
 		if cErr != nil {
@@ -73,19 +66,13 @@ func (c *TextItemsController) Updates(w http.ResponseWriter, r *http.Request) {
 	}
 	list := make([]entities.TextItem, len(mList))
 	for i, item := range mList {
-		var rawItem entities.TextItem
-		err := json.Unmarshal([]byte(item.Value), &rawItem)
+		rawItem, err := c.IC.ToEntity(&item)
 		if err != nil {
-			logger.Log.Info("json.Unmarshal", zap.Error(err))
+			logger.Log.Info("c.IC.ToEntity", zap.Error(err), zap.Any("item", item))
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		rawItem.StoredItem = entities.StoredItem{
-			ID:          item.ID,
-			Description: item.Description,
-			UpdatedAt:   item.UpdatedAt,
-		}
-		list[i] = rawItem
+		list[i] = *rawItem
 	}
 	res, mErr := json.Marshal(list)
 	if mErr != nil {
