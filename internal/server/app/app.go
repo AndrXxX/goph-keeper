@@ -110,7 +110,7 @@ func (a *app) registerAPI(r *chi.Mux) {
 	r.Group(func(r chi.Router) {
 		r.Use(middlewares.IsAuthorized(ts).Handler)
 		r.Use(middlewares.CompressGzip().Handler)
-		lpc := controllers.LoginPassStoreController{IF: &requestjsonentity.Fetcher[entities.LoginPass]{}, IS: a.storage.IS}
+		lpc := controllers.LoginPassStoreController{IF: &requestjsonentity.Fetcher[entities.LoginPassItem]{}, IS: a.storage.IS}
 		r.Post("/api/update/login-pass", lpc.Update)
 		r.Get("/api/updates/login-pass", lpc.Updates)
 	})

@@ -1,4 +1,4 @@
-package entities
+package values
 
 type LoginPassValue struct {
 	Login    string `json:"login"`

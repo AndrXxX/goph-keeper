@@ -9,12 +9,13 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/enums"
 	"github.com/AndrXxX/goph-keeper/internal/enums/datatypes"
 	"github.com/AndrXxX/goph-keeper/internal/server/entities"
+	"github.com/AndrXxX/goph-keeper/internal/server/entities/values"
 	"github.com/AndrXxX/goph-keeper/pkg/logger"
 	"github.com/AndrXxX/goph-keeper/pkg/storages/postgressql/models"
 )
 
 type LoginPassStoreController struct {
-	IF sliceFetcher[entities.LoginPass]
+	IF sliceFetcher[entities.LoginPassItem]
 	IS itemsStorage
 }
 
@@ -27,7 +28,7 @@ func (c *LoginPassStoreController) Update(w http.ResponseWriter, r *http.Request
 	}
 	userID := r.Context().Value(enums.UserID).(uint)
 	for _, item := range list {
-		val, err := json.Marshal(entities.LoginPassValue{Login: item.Login, Password: item.Password})
+		val, err := json.Marshal(values.LoginPassValue{Login: item.Login, Password: item.Password})
 		if err != nil {
 			logger.Log.Info("json.Marshal", zap.Error(err))
 			w.WriteHeader(http.StatusInternalServerError)
@@ -70,9 +71,9 @@ func (c *LoginPassStoreController) Updates(w http.ResponseWriter, r *http.Reques
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	list := make([]entities.LoginPass, len(mList))
+	list := make([]entities.LoginPassItem, len(mList))
 	for i, item := range mList {
-		var rawItem entities.LoginPass
+		var rawItem entities.LoginPassItem
 		err := json.Unmarshal([]byte(item.Value), &rawItem)
 		if err != nil {
 			logger.Log.Info("json.Unmarshal", zap.Error(err))
