@@ -111,13 +111,16 @@ func (a *app) registerAPI(r *chi.Mux) {
 	})
 
 	r.Group(func(r chi.Router) {
+		ecf := entityconvertors.Factory{}
+		vcf := valueconvertors.Factory{}
+
 		r.Use(middlewares.IsAuthorized(ts).Handler)
 		r.Use(middlewares.CompressGzip().Handler)
 		lpc := controllers.ItemsController[entities.PasswordItem]{
 			Type: datatypes.Passwords,
 			IF:   &requestjsonentity.Fetcher[entities.PasswordItem]{},
 			IS:   a.storage.IS,
-			IC:   entityconvertors.Factory{}.Password(valueconvertors.Factory{}.Password()),
+			IC:   ecf.Password(vcf.Password()),
 		}
 		r.Post(fmt.Sprintf("/api/updates/%s", datatypes.Passwords), lpc.StoreUpdates)
 		r.Get(fmt.Sprintf("/api/updates/%s", datatypes.Passwords), lpc.FetchUpdates)
@@ -126,7 +129,7 @@ func (a *app) registerAPI(r *chi.Mux) {
 			Type: datatypes.Notes,
 			IF:   &requestjsonentity.Fetcher[entities.NoteItem]{},
 			IS:   a.storage.IS,
-			IC:   entityconvertors.Factory{}.Note(valueconvertors.Factory{}.Note()),
+			IC:   ecf.Note(vcf.Note()),
 		}
 		r.Post(fmt.Sprintf("/api/updates/%s", datatypes.Notes), tc.StoreUpdates)
 		r.Get(fmt.Sprintf("/api/updates/%s", datatypes.Notes), tc.FetchUpdates)
@@ -135,7 +138,7 @@ func (a *app) registerAPI(r *chi.Mux) {
 			Type: datatypes.BankCards,
 			IF:   &requestjsonentity.Fetcher[entities.BankCardItem]{},
 			IS:   a.storage.IS,
-			IC:   entityconvertors.Factory{}.BankCard(valueconvertors.Factory{}.BankCard()),
+			IC:   ecf.BankCard(vcf.BankCard()),
 		}
 		r.Post(fmt.Sprintf("/api/updates/%s", datatypes.BankCards), bcc.StoreUpdates)
 		r.Get(fmt.Sprintf("/api/updates/%s", datatypes.BankCards), bcc.FetchUpdates)
@@ -144,7 +147,7 @@ func (a *app) registerAPI(r *chi.Mux) {
 			Type: datatypes.Files,
 			IF:   &requestjsonentity.Fetcher[entities.FileItem]{},
 			IS:   a.storage.IS,
-			IC:   entityconvertors.Factory{}.File(valueconvertors.Factory{}.File()),
+			IC:   ecf.File(vcf.File()),
 		}
 		r.Post(fmt.Sprintf("/api/updates/%s", datatypes.Files), bc.StoreUpdates)
 		r.Get(fmt.Sprintf("/api/updates/%s", datatypes.Files), bc.FetchUpdates)
