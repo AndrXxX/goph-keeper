@@ -14,7 +14,7 @@ func (c storedItemConvertor) ToModel(e *entities.StoredItem, userID uint, v stri
 		ID:          e.ID,
 		Type:        c.Type,
 		UpdatedAt:   e.UpdatedAt,
-		Description: e.Description,
+		Description: e.Desc,
 		Value:       v,
 		UserID:      userID,
 	}
@@ -22,8 +22,8 @@ func (c storedItemConvertor) ToModel(e *entities.StoredItem, userID uint, v stri
 
 func (c storedItemConvertor) ToEntity(e *models.StoredItem) *entities.StoredItem {
 	return &entities.StoredItem{
-		ID:          e.ID,
-		Description: e.Description,
-		UpdatedAt:   e.UpdatedAt,
+		ID:        e.ID,
+		Desc:      e.Description,
+		UpdatedAt: e.UpdatedAt,
 	}
 }
