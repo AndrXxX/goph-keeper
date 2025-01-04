@@ -1,5 +1,5 @@
 package values
 
-type BinaryValue struct {
+type FileValue struct {
 	Data string `json:"data"`
 }

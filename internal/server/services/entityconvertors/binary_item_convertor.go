@@ -10,10 +10,10 @@ import (
 
 type binaryItemConvertor struct {
 	sic SIConvertor[entities.StoredItem]
-	vc  ValueConvertor[entities.BinaryItem, values.BinaryValue]
+	vc  ValueConvertor[entities.FileItem, values.FileValue]
 }
 
-func (c binaryItemConvertor) ToModel(e *entities.BinaryItem, userID uint) (*models.StoredItem, error) {
+func (c binaryItemConvertor) ToModel(e *entities.FileItem, userID uint) (*models.StoredItem, error) {
 	v, err := c.vc.ToString(e)
 	if err != nil {
 		return nil, fmt.Errorf("binaryItemConvertor ToModel: %w", err)
@@ -21,14 +21,14 @@ func (c binaryItemConvertor) ToModel(e *entities.BinaryItem, userID uint) (*mode
 	return c.sic.ToModel(&e.StoredItem, userID, v), nil
 }
 
-func (c binaryItemConvertor) ToEntity(e *models.StoredItem) (*entities.BinaryItem, error) {
+func (c binaryItemConvertor) ToEntity(e *models.StoredItem) (*entities.FileItem, error) {
 	si := c.sic.ToEntity(e)
 	v, err := c.vc.ToValue(e.Value)
 	if err != nil {
 		return nil, fmt.Errorf("binaryItemConvertor ToEntity: %w", err)
 	}
-	return &entities.BinaryItem{
-		StoredItem:  *si,
-		BinaryValue: *v,
+	return &entities.FileItem{
+		StoredItem: *si,
+		FileValue:  *v,
 	}, nil
 }

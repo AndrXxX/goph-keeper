@@ -8,11 +8,11 @@ import (
 type Factory struct {
 }
 
-func (f Factory) LoginPass() ValueConvertor[entities.LoginPassItem, values.LoginPassValue] {
+func (f Factory) Password() ValueConvertor[entities.PasswordItem, values.PasswordValue] {
 	return &loginPassValueConvertor{}
 }
 
-func (f Factory) Text() ValueConvertor[entities.TextItem, values.TextValue] {
+func (f Factory) Note() ValueConvertor[entities.NoteItem, values.NoteValue] {
 	return &textValueConvertor{}
 }
 
@@ -20,6 +20,6 @@ func (f Factory) BankCard() ValueConvertor[entities.BankCardItem, values.BankCar
 	return &bankCardValueConvertor{}
 }
 
-func (f Factory) Binary() ValueConvertor[entities.BinaryItem, values.BinaryValue] {
+func (f Factory) File() ValueConvertor[entities.FileItem, values.FileValue] {
 	return &binaryValueConvertor{}
 }

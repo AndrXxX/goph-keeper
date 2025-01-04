@@ -1,5 +1,5 @@
 package values
 
-type TextValue struct {
+type NoteValue struct {
 	Text string `json:"text"`
 }

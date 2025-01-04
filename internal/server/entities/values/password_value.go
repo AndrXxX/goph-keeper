@@ -1,6 +1,6 @@
 package values
 
-type LoginPassValue struct {
+type PasswordValue struct {
 	Login    string `json:"login"`
 	Password string `json:"password"`
 }

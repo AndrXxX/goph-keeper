@@ -113,20 +113,20 @@ func (a *app) registerAPI(r *chi.Mux) {
 	r.Group(func(r chi.Router) {
 		r.Use(middlewares.IsAuthorized(ts).Handler)
 		r.Use(middlewares.CompressGzip().Handler)
-		lpc := controllers.ItemsController[entities.LoginPassItem]{
+		lpc := controllers.ItemsController[entities.PasswordItem]{
 			Type: datatypes.Passwords,
-			IF:   &requestjsonentity.Fetcher[entities.LoginPassItem]{},
+			IF:   &requestjsonentity.Fetcher[entities.PasswordItem]{},
 			IS:   a.storage.IS,
-			IC:   entityconvertors.Factory{}.LoginPass(valueconvertors.Factory{}.LoginPass()),
+			IC:   entityconvertors.Factory{}.Password(valueconvertors.Factory{}.Password()),
 		}
 		r.Post("/api/update/login-pass", lpc.Update)
 		r.Get("/api/updates/login-pass", lpc.Updates)
 
-		tc := controllers.ItemsController[entities.TextItem]{
+		tc := controllers.ItemsController[entities.NoteItem]{
 			Type: datatypes.Notes,
-			IF:   &requestjsonentity.Fetcher[entities.TextItem]{},
+			IF:   &requestjsonentity.Fetcher[entities.NoteItem]{},
 			IS:   a.storage.IS,
-			IC:   entityconvertors.Factory{}.Text(valueconvertors.Factory{}.Text()),
+			IC:   entityconvertors.Factory{}.Note(valueconvertors.Factory{}.Note()),
 		}
 		r.Post("/api/update/text", tc.Update)
 		r.Get("/api/updates/text", tc.Updates)
@@ -140,11 +140,11 @@ func (a *app) registerAPI(r *chi.Mux) {
 		r.Post("/api/update/bank-card", bcc.Update)
 		r.Get("/api/updates/bank-card", bcc.Updates)
 
-		bc := controllers.ItemsController[entities.BinaryItem]{
+		bc := controllers.ItemsController[entities.FileItem]{
 			Type: datatypes.Files,
-			IF:   &requestjsonentity.Fetcher[entities.BinaryItem]{},
+			IF:   &requestjsonentity.Fetcher[entities.FileItem]{},
 			IS:   a.storage.IS,
-			IC:   entityconvertors.Factory{}.Binary(valueconvertors.Factory{}.Binary()),
+			IC:   entityconvertors.Factory{}.File(valueconvertors.Factory{}.File()),
 		}
 		r.Post("/api/update/binary", bc.Update)
 		r.Get("/api/updates/binary", bc.Updates)

@@ -2,7 +2,7 @@ package entities
 
 import "github.com/AndrXxX/goph-keeper/internal/server/entities/values"
 
-type BinaryItem struct {
+type PasswordItem struct {
 	StoredItem
-	values.BinaryValue
+	values.PasswordValue
 }

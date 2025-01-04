@@ -11,8 +11,8 @@ import (
 type loginPassValueConvertor struct {
 }
 
-func (c loginPassValueConvertor) ToValue(v string) (*values.LoginPassValue, error) {
-	var converted values.LoginPassValue
+func (c loginPassValueConvertor) ToValue(v string) (*values.PasswordValue, error) {
+	var converted values.PasswordValue
 	err := json.Unmarshal([]byte(v), &converted)
 	if err != nil {
 		return nil, fmt.Errorf("unmarshal login_pass value: %w", err)
@@ -20,8 +20,8 @@ func (c loginPassValueConvertor) ToValue(v string) (*values.LoginPassValue, erro
 	return &converted, nil
 }
 
-func (c loginPassValueConvertor) ToString(item *entities.LoginPassItem) (string, error) {
-	val, err := json.Marshal(values.LoginPassValue{Login: item.Login, Password: item.Password})
+func (c loginPassValueConvertor) ToString(item *entities.PasswordItem) (string, error) {
+	val, err := json.Marshal(values.PasswordValue{Login: item.Login, Password: item.Password})
 	if err != nil {
 		return "", fmt.Errorf("marshal login_pass value: %w", err)
 	}

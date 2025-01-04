@@ -2,7 +2,7 @@ package entities
 
 import "github.com/AndrXxX/goph-keeper/internal/server/entities/values"
 
-type LoginPassItem struct {
+type FileItem struct {
 	StoredItem
-	values.LoginPassValue
+	values.FileValue
 }

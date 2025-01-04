@@ -9,11 +9,11 @@ import (
 type Factory struct {
 }
 
-func (f Factory) LoginPass(vc ValueConvertor[entities.LoginPassItem, values.LoginPassValue]) Convertor[entities.LoginPassItem] {
+func (f Factory) Password(vc ValueConvertor[entities.PasswordItem, values.PasswordValue]) Convertor[entities.PasswordItem] {
 	return loginPassItemConvertor{sic: f.StoredItem(datatypes.Passwords), vc: vc}
 }
 
-func (f Factory) Text(vc ValueConvertor[entities.TextItem, values.TextValue]) Convertor[entities.TextItem] {
+func (f Factory) Note(vc ValueConvertor[entities.NoteItem, values.NoteValue]) Convertor[entities.NoteItem] {
 	return textItemConvertor{sic: f.StoredItem(datatypes.Notes), vc: vc}
 }
 
@@ -21,7 +21,7 @@ func (f Factory) BankCard(vc ValueConvertor[entities.BankCardItem, values.BankCa
 	return bankCardItemConvertor{sic: f.StoredItem(datatypes.BankCards), vc: vc}
 }
 
-func (f Factory) Binary(vc ValueConvertor[entities.BinaryItem, values.BinaryValue]) Convertor[entities.BinaryItem] {
+func (f Factory) File(vc ValueConvertor[entities.FileItem, values.FileValue]) Convertor[entities.FileItem] {
 	return binaryItemConvertor{sic: f.StoredItem(datatypes.Files), vc: vc}
 }
 

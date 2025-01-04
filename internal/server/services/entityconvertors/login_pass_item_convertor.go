@@ -10,10 +10,10 @@ import (
 
 type loginPassItemConvertor struct {
 	sic SIConvertor[entities.StoredItem]
-	vc  ValueConvertor[entities.LoginPassItem, values.LoginPassValue]
+	vc  ValueConvertor[entities.PasswordItem, values.PasswordValue]
 }
 
-func (c loginPassItemConvertor) ToModel(e *entities.LoginPassItem, userID uint) (*models.StoredItem, error) {
+func (c loginPassItemConvertor) ToModel(e *entities.PasswordItem, userID uint) (*models.StoredItem, error) {
 	v, err := c.vc.ToString(e)
 	if err != nil {
 		return nil, fmt.Errorf("loginPassItemConvertor ToModel: %w", err)
@@ -21,14 +21,14 @@ func (c loginPassItemConvertor) ToModel(e *entities.LoginPassItem, userID uint) 
 	return c.sic.ToModel(&e.StoredItem, userID, v), nil
 }
 
-func (c loginPassItemConvertor) ToEntity(e *models.StoredItem) (*entities.LoginPassItem, error) {
+func (c loginPassItemConvertor) ToEntity(e *models.StoredItem) (*entities.PasswordItem, error) {
 	si := c.sic.ToEntity(e)
 	v, err := c.vc.ToValue(e.Value)
 	if err != nil {
 		return nil, fmt.Errorf("loginPassItemConvertor ToEntity: %w", err)
 	}
-	return &entities.LoginPassItem{
-		StoredItem:     *si,
-		LoginPassValue: *v,
+	return &entities.PasswordItem{
+		StoredItem:    *si,
+		PasswordValue: *v,
 	}, nil
 }
