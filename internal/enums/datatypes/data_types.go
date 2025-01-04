@@ -1,6 +1,6 @@
 package datatypes
 
-const LoginPass = "loginPass"
-const Text = "text"
-const Binary = "binary"
-const BankCard = "bankCard"
+const Passwords = "passwords"
+const Notes = "notes"
+const Files = "files"
+const BankCards = "bankCards"

@@ -10,19 +10,19 @@ type Factory struct {
 }
 
 func (f Factory) LoginPass(vc ValueConvertor[entities.LoginPassItem, values.LoginPassValue]) Convertor[entities.LoginPassItem] {
-	return loginPassItemConvertor{sic: f.StoredItem(datatypes.LoginPass), vc: vc}
+	return loginPassItemConvertor{sic: f.StoredItem(datatypes.Passwords), vc: vc}
 }
 
 func (f Factory) Text(vc ValueConvertor[entities.TextItem, values.TextValue]) Convertor[entities.TextItem] {
-	return textItemConvertor{sic: f.StoredItem(datatypes.Text), vc: vc}
+	return textItemConvertor{sic: f.StoredItem(datatypes.Notes), vc: vc}
 }
 
 func (f Factory) BankCard(vc ValueConvertor[entities.BankCardItem, values.BankCardValue]) Convertor[entities.BankCardItem] {
-	return bankCardItemConvertor{sic: f.StoredItem(datatypes.BankCard), vc: vc}
+	return bankCardItemConvertor{sic: f.StoredItem(datatypes.BankCards), vc: vc}
 }
 
 func (f Factory) Binary(vc ValueConvertor[entities.BinaryItem, values.BinaryValue]) Convertor[entities.BinaryItem] {
-	return binaryItemConvertor{sic: f.StoredItem(datatypes.Binary), vc: vc}
+	return binaryItemConvertor{sic: f.StoredItem(datatypes.Files), vc: vc}
 }
 
 func (f Factory) StoredItem(t string) SIConvertor[entities.StoredItem] {
