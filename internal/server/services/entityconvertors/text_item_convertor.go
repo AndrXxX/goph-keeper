@@ -3,8 +3,8 @@ package entityconvertors
 import (
 	"fmt"
 
-	"github.com/AndrXxX/goph-keeper/internal/server/entities"
-	"github.com/AndrXxX/goph-keeper/internal/server/entities/values"
+	entities "github.com/AndrXxX/goph-keeper/pkg/entities"
+	"github.com/AndrXxX/goph-keeper/pkg/entities/values"
 	"github.com/AndrXxX/goph-keeper/pkg/storages/postgressql/models"
 )
 

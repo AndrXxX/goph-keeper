@@ -6,7 +6,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/AndrXxX/goph-keeper/internal/enums"
-	"github.com/AndrXxX/goph-keeper/internal/server/entities"
+	"github.com/AndrXxX/goph-keeper/pkg/entities"
 	"github.com/AndrXxX/goph-keeper/pkg/logger"
 	"github.com/AndrXxX/goph-keeper/pkg/storages/postgressql/models"
 )

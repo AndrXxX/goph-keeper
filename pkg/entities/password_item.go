@@ -1,6 +1,8 @@
 package entities
 
-import "github.com/AndrXxX/goph-keeper/internal/server/entities/values"
+import (
+	"github.com/AndrXxX/goph-keeper/pkg/entities/values"
+)
 
 type PasswordItem struct {
 	StoredItem

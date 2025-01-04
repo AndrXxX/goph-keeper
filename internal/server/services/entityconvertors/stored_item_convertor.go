@@ -1,7 +1,7 @@
 package entityconvertors
 
 import (
-	"github.com/AndrXxX/goph-keeper/internal/server/entities"
+	"github.com/AndrXxX/goph-keeper/pkg/entities"
 	"github.com/AndrXxX/goph-keeper/pkg/storages/postgressql/models"
 )
 

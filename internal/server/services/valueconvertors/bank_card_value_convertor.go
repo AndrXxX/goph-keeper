@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/AndrXxX/goph-keeper/internal/server/entities"
-	"github.com/AndrXxX/goph-keeper/internal/server/entities/values"
+	"github.com/AndrXxX/goph-keeper/pkg/entities"
+	"github.com/AndrXxX/goph-keeper/pkg/entities/values"
 )
 
 type bankCardValueConvertor struct {
