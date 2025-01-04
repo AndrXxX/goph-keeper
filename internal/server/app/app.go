@@ -117,37 +117,37 @@ func (a *app) registerAPI(r *chi.Mux) {
 		r.Use(middlewares.IsAuthorized(ts).Handler)
 		r.Use(middlewares.CompressGzip().Handler)
 		lpc := controllers.ItemsController[entities.PasswordItem]{
-			Type: datatypes.Passwords,
-			IF:   &requestjsonentity.Fetcher[entities.PasswordItem]{},
-			IS:   a.storage.IS,
-			IC:   ecf.Password(vcf.Password()),
+			Type:      datatypes.Passwords,
+			Fetcher:   &requestjsonentity.Fetcher[entities.PasswordItem]{},
+			Storage:   a.storage.IS,
+			Convertor: ecf.Password(vcf.Password()),
 		}
 		r.Post(fmt.Sprintf("/api/updates/%s", datatypes.Passwords), lpc.StoreUpdates)
 		r.Get(fmt.Sprintf("/api/updates/%s", datatypes.Passwords), lpc.FetchUpdates)
 
 		tc := controllers.ItemsController[entities.NoteItem]{
-			Type: datatypes.Notes,
-			IF:   &requestjsonentity.Fetcher[entities.NoteItem]{},
-			IS:   a.storage.IS,
-			IC:   ecf.Note(vcf.Note()),
+			Type:      datatypes.Notes,
+			Fetcher:   &requestjsonentity.Fetcher[entities.NoteItem]{},
+			Storage:   a.storage.IS,
+			Convertor: ecf.Note(vcf.Note()),
 		}
 		r.Post(fmt.Sprintf("/api/updates/%s", datatypes.Notes), tc.StoreUpdates)
 		r.Get(fmt.Sprintf("/api/updates/%s", datatypes.Notes), tc.FetchUpdates)
 
 		bcc := controllers.ItemsController[entities.BankCardItem]{
-			Type: datatypes.BankCards,
-			IF:   &requestjsonentity.Fetcher[entities.BankCardItem]{},
-			IS:   a.storage.IS,
-			IC:   ecf.BankCard(vcf.BankCard()),
+			Type:      datatypes.BankCards,
+			Fetcher:   &requestjsonentity.Fetcher[entities.BankCardItem]{},
+			Storage:   a.storage.IS,
+			Convertor: ecf.BankCard(vcf.BankCard()),
 		}
 		r.Post(fmt.Sprintf("/api/updates/%s", datatypes.BankCards), bcc.StoreUpdates)
 		r.Get(fmt.Sprintf("/api/updates/%s", datatypes.BankCards), bcc.FetchUpdates)
 
 		bc := controllers.ItemsController[entities.FileItem]{
-			Type: datatypes.Files,
-			IF:   &requestjsonentity.Fetcher[entities.FileItem]{},
-			IS:   a.storage.IS,
-			IC:   ecf.File(vcf.File()),
+			Type:      datatypes.Files,
+			Fetcher:   &requestjsonentity.Fetcher[entities.FileItem]{},
+			Storage:   a.storage.IS,
+			Convertor: ecf.File(vcf.File()),
 		}
 		r.Post(fmt.Sprintf("/api/updates/%s", datatypes.Files), bc.StoreUpdates)
 		r.Get(fmt.Sprintf("/api/updates/%s", datatypes.Files), bc.FetchUpdates)
