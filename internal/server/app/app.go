@@ -119,8 +119,8 @@ func (a *app) registerAPI(r *chi.Mux) {
 			IS:   a.storage.IS,
 			IC:   entityconvertors.Factory{}.Password(valueconvertors.Factory{}.Password()),
 		}
-		r.Post("/api/update/login-pass", lpc.Update)
-		r.Get("/api/updates/login-pass", lpc.Updates)
+		r.Post(fmt.Sprintf("/api/updates/%s", datatypes.Passwords), lpc.StoreUpdates)
+		r.Get(fmt.Sprintf("/api/updates/%s", datatypes.Passwords), lpc.FetchUpdates)
 
 		tc := controllers.ItemsController[entities.NoteItem]{
 			Type: datatypes.Notes,
@@ -128,8 +128,8 @@ func (a *app) registerAPI(r *chi.Mux) {
 			IS:   a.storage.IS,
 			IC:   entityconvertors.Factory{}.Note(valueconvertors.Factory{}.Note()),
 		}
-		r.Post("/api/update/text", tc.Update)
-		r.Get("/api/updates/text", tc.Updates)
+		r.Post(fmt.Sprintf("/api/updates/%s", datatypes.Notes), tc.StoreUpdates)
+		r.Get(fmt.Sprintf("/api/updates/%s", datatypes.Notes), tc.FetchUpdates)
 
 		bcc := controllers.ItemsController[entities.BankCardItem]{
 			Type: datatypes.BankCards,
@@ -137,8 +137,8 @@ func (a *app) registerAPI(r *chi.Mux) {
 			IS:   a.storage.IS,
 			IC:   entityconvertors.Factory{}.BankCard(valueconvertors.Factory{}.BankCard()),
 		}
-		r.Post("/api/update/bank-card", bcc.Update)
-		r.Get("/api/updates/bank-card", bcc.Updates)
+		r.Post(fmt.Sprintf("/api/updates/%s", datatypes.BankCards), bcc.StoreUpdates)
+		r.Get(fmt.Sprintf("/api/updates/%s", datatypes.BankCards), bcc.FetchUpdates)
 
 		bc := controllers.ItemsController[entities.FileItem]{
 			Type: datatypes.Files,
@@ -146,7 +146,7 @@ func (a *app) registerAPI(r *chi.Mux) {
 			IS:   a.storage.IS,
 			IC:   entityconvertors.Factory{}.File(valueconvertors.Factory{}.File()),
 		}
-		r.Post("/api/update/binary", bc.Update)
-		r.Get("/api/updates/binary", bc.Updates)
+		r.Post(fmt.Sprintf("/api/updates/%s", datatypes.Files), bc.StoreUpdates)
+		r.Get(fmt.Sprintf("/api/updates/%s", datatypes.Files), bc.FetchUpdates)
 	})
 }

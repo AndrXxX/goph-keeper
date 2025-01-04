@@ -18,10 +18,10 @@ type ItemsController[T idItem] struct {
 	IC   itemConvertor[T]
 }
 
-func (c *ItemsController[T]) Update(w http.ResponseWriter, r *http.Request) {
+func (c *ItemsController[T]) StoreUpdates(w http.ResponseWriter, r *http.Request) {
 	list, err := c.IF.FetchSlice(r.Body)
 	if err != nil {
-		logger.Log.Info("Update", zap.Error(err))
+		logger.Log.Info("StoreUpdates", zap.Error(err))
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -54,7 +54,7 @@ func (c *ItemsController[T]) Update(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (c *ItemsController[T]) Updates(w http.ResponseWriter, r *http.Request) {
+func (c *ItemsController[T]) FetchUpdates(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	userID := r.Context().Value(enums.UserID).(uint)
 	mList, err := c.IS.Query(r.Context(), &models.StoredItem{Type: c.Type, UserID: userID})
@@ -82,6 +82,6 @@ func (c *ItemsController[T]) Updates(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	_, wErr := w.Write(res)
 	if wErr != nil {
-		logger.Log.Info("w.Write on Updates TextItems", zap.Error(wErr))
+		logger.Log.Info("w.Write on FetchUpdates TextItems", zap.Error(wErr))
 	}
 }
