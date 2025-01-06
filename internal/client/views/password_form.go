@@ -1,7 +1,6 @@
 package views
 
 import (
-	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -23,12 +22,9 @@ var passwordFormKeys = kb.KeyMap{
 }
 
 type passwordForm struct {
-	focusIndex int
-	help       help.Model
-	inputs     []textinput.Model
-	item       *entities.PasswordItem
-	creating   bool
-	fu         form.FieldsUpdater
+	item     *entities.PasswordItem
+	creating bool
+	fu       form.FieldsUpdater
 	*baseForm
 }
 
@@ -38,6 +34,7 @@ func NewPasswordForm(item *entities.PasswordItem) *passwordForm {
 		creating: item == nil,
 		item:     item,
 	}
+	m.baseForm.keys = &passwordFormKeys
 	if m.creating {
 		m.item = &entities.PasswordItem{}
 	}
@@ -57,10 +54,6 @@ func NewPasswordForm(item *entities.PasswordItem) *passwordForm {
 
 func (f *passwordForm) Init() tea.Cmd {
 	return textinput.Blink
-}
-
-func (f *passwordForm) kbKeys() kb.KeyMap {
-	return passwordFormKeys
 }
 
 func (f *passwordForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -90,7 +83,7 @@ func (f *passwordForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case key.Matches(msg, kb.Keys.Copy):
 			c := clipboard.New()
-			err := c.CopyText(f.inputs[f.focusIndex].Value())
+			err := c.CopyText(f.baseForm.inputs[f.baseForm.focusIndex].Value())
 			if err != nil {
 				println(err.Error())
 			}

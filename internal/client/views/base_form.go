@@ -1,6 +1,7 @@
 package views
 
 import (
+	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -12,14 +13,17 @@ import (
 )
 
 type baseForm struct {
+	help       help.Model
 	title      string
 	focusIndex int
 	inputs     []textinput.Model
 	fu         form.FieldsUpdater
+	keys       *kb.KeyMap
 }
 
 func NewBaseForm(title string, inputs []textinput.Model, fu form.FieldsUpdater) *baseForm {
 	f := baseForm{
+		help:   help.New(),
 		title:  title,
 		inputs: inputs,
 		fu:     fu,
@@ -75,6 +79,9 @@ func (f *baseForm) View() string {
 	}
 	for i := range f.inputs {
 		vList = append(vList, f.inputs[i].View())
+	}
+	if f.keys != nil {
+		vList = append(vList, f.help.View(*f.keys))
 	}
 	return lipgloss.JoinVertical(lipgloss.Left, vList...)
 }
