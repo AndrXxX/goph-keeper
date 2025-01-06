@@ -8,7 +8,8 @@ func NewMap() Map {
 	return Map{
 		names.AuthMenu:     NewAuthMenu(),
 		names.AuthForm:     NewAuthForm(),
-		names.PasswordList: NewPasswordList(),
 		names.MainMenu:     NewMainMenu(),
+		names.PasswordList: NewPasswordList(),
+		names.NotesList:    NewNoteList(),
 	}
 }
