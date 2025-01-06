@@ -3,11 +3,11 @@ package messages
 import (
 	tea "github.com/charmbracelet/bubbletea"
 
-	"github.com/AndrXxX/goph-keeper/internal/client/views/list"
+	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 )
 
 type ChangeView struct {
-	Name list.ViewName
+	Name names.ViewName
 	View tea.Model
 	Msg  tea.Msg
 }

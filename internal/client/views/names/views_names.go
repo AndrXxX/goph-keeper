@@ -1,4 +1,4 @@
-package list
+package names
 
 type ViewName string
 
