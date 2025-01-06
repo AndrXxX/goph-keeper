@@ -25,7 +25,7 @@ type authForm struct {
 
 func NewAuthForm() *authForm {
 	m := authForm{
-		baseForm: NewBaseForm("Create a new password", make([]textinput.Model, 2), form.FieldsUpdater{}),
+		baseForm: NewBaseForm("Enter an exist account", make([]textinput.Model, 2), form.FieldsUpdater{}),
 	}
 	m.baseForm.keys = &authFormKeys
 	m.baseForm.inputs[0].Prompt = "Login: "
