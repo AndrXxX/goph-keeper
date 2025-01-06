@@ -1,19 +1,16 @@
 package views
 
 import (
-	"github.com/charmbracelet/bubbles/cursor"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 	"github.com/tiagomelo/go-clipboard/clipboard"
 
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/form"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
-	"github.com/AndrXxX/goph-keeper/internal/client/views/styles"
 	"github.com/AndrXxX/goph-keeper/pkg/entities"
 )
 
@@ -29,47 +26,32 @@ type passwordForm struct {
 	focusIndex int
 	help       help.Model
 	inputs     []textinput.Model
-	cursorMode cursor.Mode
 	item       *entities.PasswordItem
 	creating   bool
 	fu         form.FieldsUpdater
+	*baseForm
 }
 
 func NewPasswordForm(item *entities.PasswordItem) *passwordForm {
 	m := passwordForm{
-		inputs:   make([]textinput.Model, 3),
-		item:     item,
+		baseForm: NewBaseForm("Create a new password", make([]textinput.Model, 3), form.FieldsUpdater{}),
 		creating: item == nil,
-		fu:       form.FieldsUpdater{},
+		item:     item,
 	}
 	if m.creating {
 		m.item = &entities.PasswordItem{}
 	}
 
-	var t textinput.Model
-	for i := range m.inputs {
-		t = textinput.New()
-		t.Cursor.Style = styles.Cursor
-		t.CharLimit = 150
+	m.baseForm.inputs[0].Prompt = "Login: "
+	m.baseForm.inputs[0].SetValue(m.item.Login)
 
-		switch i {
-		case 0:
-			t.Prompt = "Login: "
-			t.SetValue(m.item.Login)
-		case 1:
-			t.Prompt = "Password: "
-			t.SetValue(m.item.Password)
-			//t.EchoMode = textinput.EchoPassword
-			//t.EchoCharacter = '•'
-		case 2:
-			t.Prompt = "Description: "
-			t.SetValue(m.item.Desc)
-		}
+	m.baseForm.inputs[1].Prompt = "Password: "
+	m.baseForm.inputs[1].SetValue(m.item.Password)
+	//m.baseForm.inputs[1].EchoMode = textinput.EchoPassword
+	//m.baseForm.inputs[1].EchoCharacter = '•'
 
-		m.inputs[i] = t
-	}
-	m.fu.Set(m.inputs, &m.focusIndex)
-
+	m.baseForm.inputs[2].Prompt = "Description: "
+	m.baseForm.inputs[2].SetValue(m.item.Desc)
 	return &m
 }
 
@@ -114,45 +96,19 @@ func (f *passwordForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			// TODO: process error
 			return f, nil
-		case key.Matches(msg, kb.Keys.Up):
-			f.focusIndex--
-			if f.focusIndex < 0 {
-				f.focusIndex = len(f.inputs) - 1
-			}
-			return f, tea.Batch(f.fu.Set(f.inputs, &f.focusIndex)...)
-		case key.Matches(msg, kb.Keys.Down, kb.Keys.Enter):
-			f.focusIndex++
-			if f.focusIndex >= len(f.inputs) {
-				f.focusIndex = 0
-			}
-			return f, tea.Batch(f.fu.Set(f.inputs, &f.focusIndex)...)
 		}
 	}
-	cmd := f.updateInputs(msg)
+	_, cmd := f.baseForm.Update(msg)
 	return f, cmd
 }
 
 func (f *passwordForm) getPasswordItem() *entities.PasswordItem {
-	f.item.Login = f.inputs[0].Value()
-	f.item.Password = f.inputs[1].Value()
-	f.item.Desc = f.inputs[2].Value()
+	f.item.Login = f.baseForm.inputs[0].Value()
+	f.item.Password = f.baseForm.inputs[1].Value()
+	f.item.Desc = f.baseForm.inputs[2].Value()
 	return f.item
 }
 
-func (f *passwordForm) updateInputs(msg tea.Msg) tea.Cmd {
-	cmds := make([]tea.Cmd, len(f.inputs))
-	for i := range f.inputs {
-		f.inputs[i], cmds[i] = f.inputs[i].Update(msg)
-	}
-	return tea.Batch(cmds...)
-}
-
 func (f *passwordForm) View() string {
-	return lipgloss.JoinVertical(
-		lipgloss.Left,
-		styles.Title.Margin(1).Render("Create a new password"),
-		f.inputs[0].View(),
-		f.inputs[1].View(),
-		f.inputs[2].View(),
-	)
+	return f.baseForm.View()
 }
