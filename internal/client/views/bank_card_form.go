@@ -104,6 +104,7 @@ func (f *bankCardForm) getBankCardItem() *entities.BankCardItem {
 	f.item.CVCCode = f.baseForm.inputs[1].Value()
 	f.item.Validity = f.baseForm.inputs[2].Value()
 	f.item.Cardholder = f.baseForm.inputs[3].Value()
+	f.item.Desc = f.baseForm.inputs[4].Value()
 	return f.item
 }
 
