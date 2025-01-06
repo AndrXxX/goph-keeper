@@ -30,7 +30,7 @@ type noteForm struct {
 
 func NewNoteForm(item *entities.NoteItem) *noteForm {
 	m := noteForm{
-		baseForm: NewBaseForm("Create a new note", make([]textinput.Model, 1), form.FieldsUpdater{}),
+		baseForm: NewBaseForm("Create a new note", make([]textinput.Model, 2), form.FieldsUpdater{}),
 		creating: item == nil,
 		item:     item,
 	}
@@ -41,6 +41,9 @@ func NewNoteForm(item *entities.NoteItem) *noteForm {
 
 	m.baseForm.inputs[0].Prompt = "Text: "
 	m.baseForm.inputs[0].SetValue(m.item.Text)
+
+	m.baseForm.inputs[1].Prompt = "Description: "
+	m.baseForm.inputs[1].SetValue(m.item.Desc)
 
 	return &m
 }
