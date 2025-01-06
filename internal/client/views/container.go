@@ -12,10 +12,6 @@ import (
 )
 
 var margin = 5
-var containerKeys = kb.KeyMap{
-	Short: []key.Binding{kb.Quit},
-	Full:  [][]key.Binding{{kb.Quit}},
-}
 
 type Container struct {
 	help     help.Model
@@ -78,12 +74,7 @@ func (m *Container) View() string {
 		lipgloss.Left,
 		m.views[m.current].View(),
 	)
-	var km = containerKeys
-	if kk, ok := m.views[m.current].(keyboardKeys); ok {
-		km = kk.kbKeys()
-	}
-
-	return lipgloss.JoinVertical(lipgloss.Left, m.getStyle().Render(board), m.help.View(km))
+	return lipgloss.JoinVertical(lipgloss.Left, m.getStyle().Render(board))
 }
 
 func (m *Container) getStyle() lipgloss.Style {
