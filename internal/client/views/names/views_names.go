@@ -12,4 +12,6 @@ const (
 	FilesList     = ViewName("filesList")
 	FilesForm     = ViewName("filesForm")
 	TypesList     = ViewName("typesList")
+	AuthMenu      = ViewName("authMenu")
+	AuthForm      = ViewName("authForm")
 )
