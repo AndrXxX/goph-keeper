@@ -66,9 +66,9 @@ func (m *mainMenu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						Name: names.NotesList,
 					}
 				case datatypes.BankCards:
-					//return messages.ChangeView{
-					//	Name: names.BankCardList,
-					//}
+					return messages.ChangeView{
+						Name: names.BankCardList,
+					}
 				case datatypes.Files:
 					//return messages.ChangeView{
 					//	Name: names.FileList,
