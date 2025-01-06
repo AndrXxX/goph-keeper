@@ -44,10 +44,6 @@ func (m *authMenu) Init() tea.Cmd {
 	return nil
 }
 
-func (m *authMenu) kbKeys() kb.KeyMap {
-	return passwordListKeys
-}
-
 func (m *authMenu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {

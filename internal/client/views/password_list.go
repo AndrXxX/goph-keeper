@@ -41,10 +41,6 @@ func (pl *passwordList) Init() tea.Cmd {
 	return nil
 }
 
-func (pl *passwordList) kbKeys() kb.KeyMap {
-	return passwordListKeys
-}
-
 func (pl *passwordList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
@@ -107,13 +103,4 @@ func (pl *passwordList) DeleteCurrent() tea.Cmd {
 func (pl *passwordList) setSize(width, height int) {
 	pl.width = width / margin
 	pl.height = height
-}
-
-func (pl *passwordList) getStyle() lipgloss.Style {
-	return lipgloss.NewStyle().
-		Padding(1, 2).
-		Border(lipgloss.RoundedBorder()).
-		BorderForeground(lipgloss.Color("62")).
-		Height(pl.height).
-		Width(pl.width)
 }
