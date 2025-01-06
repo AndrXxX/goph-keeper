@@ -9,5 +9,6 @@ func NewMap() Map {
 		names.AuthMenu:     NewAuthMenu(),
 		names.AuthForm:     NewAuthForm(),
 		names.PasswordList: NewPasswordList(),
+		names.MainMenu:     NewMainMenu(),
 	}
 }

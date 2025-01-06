@@ -62,12 +62,12 @@ func (f *authForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			}
 		case key.Matches(msg, kb.Keys.Enter):
-			// todo:
-			//return f, func() tea.Msg {
-			//	return messages.ChangeView{
-			//		Name: names.MainMenu,
-			//	}
-			//}
+			// TODO: check login/pass
+			return f, func() tea.Msg {
+				return messages.ChangeView{
+					Name: names.MainMenu,
+				}
+			}
 		}
 	}
 	_, cmd := f.baseForm.Update(msg)

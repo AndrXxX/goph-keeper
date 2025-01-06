@@ -76,6 +76,12 @@ func (pl *passwordList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					View: f,
 				}
 			}
+		case key.Matches(msg, kb.Keys.Back):
+			return pl, func() tea.Msg {
+				return messages.ChangeView{
+					Name: names.MainMenu,
+				}
+			}
 		case key.Matches(msg, kb.Keys.Delete):
 			return pl, pl.DeleteCurrent()
 		}

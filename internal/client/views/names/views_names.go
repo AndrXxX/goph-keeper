@@ -11,7 +11,7 @@ const (
 	BankCardsForm = ViewName("bankCardsForm")
 	FilesList     = ViewName("filesList")
 	FilesForm     = ViewName("filesForm")
-	TypesList     = ViewName("typesList")
+	MainMenu      = ViewName("mainMenu")
 	AuthMenu      = ViewName("authMenu")
 	AuthForm      = ViewName("authForm")
 )
