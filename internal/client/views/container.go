@@ -30,7 +30,7 @@ func NewContainer(cols Map) *Container {
 }
 
 func (m *Container) Init() tea.Cmd {
-	m.current = names.PasswordList //TODO
+	m.current = names.AuthMenu
 	return nil
 }
 
@@ -39,14 +39,14 @@ func (m *Container) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		var cmd tea.Cmd
-		var cmds []tea.Cmd
+		var cmdList []tea.Cmd
 		m.help.Width = msg.Width - margin
 		for i := range m.views {
 			_, cmd = m.views[i].Update(msg)
-			cmds = append(cmds, cmd)
+			cmdList = append(cmdList, cmd)
 		}
 		m.loaded = true
-		return m, tea.Batch(cmds...)
+		return m, tea.Batch(cmdList...)
 
 	case tea.KeyMsg:
 		switch {
