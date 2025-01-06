@@ -12,5 +12,6 @@ func NewMap() Map {
 		names.PasswordList: NewPasswordList(),
 		names.NotesList:    NewNoteList(),
 		names.BankCardList: NewBankCardList(),
+		names.FileList:     NewFileList(),
 	}
 }

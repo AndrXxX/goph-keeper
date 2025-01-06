@@ -70,11 +70,10 @@ func (m *mainMenu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						Name: names.BankCardList,
 					}
 				case datatypes.Files:
-					//return messages.ChangeView{
-					//	Name: names.FileList,
-					//}
+					return messages.ChangeView{
+						Name: names.FileList,
+					}
 				}
-				// TODO
 				return nil
 			}
 		}
