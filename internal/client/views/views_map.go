@@ -6,6 +6,8 @@ type Map map[names.ViewName]View
 
 func NewMap() Map {
 	return Map{
-		//names.PasswordList: NewPasswordList(),
+		names.AuthMenu:     NewAuthMenu(),
+		names.AuthForm:     NewAuthForm(),
+		names.PasswordList: NewPasswordList(),
 	}
 }
