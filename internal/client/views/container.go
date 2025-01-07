@@ -26,6 +26,7 @@ type Container struct {
 	views    Map
 	quitting bool
 	errors   sync.Map
+	messages sync.Map
 }
 
 func NewContainer(cols Map) *Container {
@@ -63,6 +64,12 @@ func (m *Container) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			time.Sleep(errorsTimeout)
 			m.errors.Clear()
 		}()
+	case messages.ShowMessage:
+		m.messages.Store(msg.Message, msg.Message)
+		go func() {
+			time.Sleep(errorsTimeout)
+			m.messages.Clear()
+		}()
 	case messages.ChangeView:
 		m.current = msg.Name
 		if msg.View != nil {
@@ -88,16 +95,34 @@ func (m *Container) View() string {
 		m.views[m.current].View(),
 	)
 	eb := strings.Builder{}
+	mb := strings.Builder{}
 
 	m.errors.Range(func(_, v any) bool {
 		eb.WriteString(fmt.Sprintf("%s\n", v.(string)))
 		return true
 	})
-	err := eb.String()
+	m.messages.Range(func(_, v any) bool {
+		mb.WriteString(fmt.Sprintf("%s\n", v.(string)))
+		return true
+	})
+	err := m.collectMessages(&m.errors)
 	if err != "" {
 		err = styles.Error.Render(err)
 	}
-	return m.getStyle().Render(lipgloss.JoinVertical(lipgloss.Left, board, err))
+	mes := m.collectMessages(&m.messages)
+	if mes != "" {
+		mes = styles.Info.Render(mes)
+	}
+	return m.getStyle().Render(lipgloss.JoinVertical(lipgloss.Left, board, err, mes))
+}
+
+func (m *Container) collectMessages(l *sync.Map) string {
+	b := strings.Builder{}
+	l.Range(func(_, v any) bool {
+		b.WriteString(fmt.Sprintf("%s\n", v.(string)))
+		return true
+	})
+	return b.String()
 }
 
 func (m *Container) getStyle() lipgloss.Style {

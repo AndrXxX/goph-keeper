@@ -66,12 +66,16 @@ func (f *registerForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			f.s.User.Login = u.Login
 			f.s.User.Password = u.Password
 			f.s.User.Token = token
-			return f, func() tea.Msg {
+			changeCmd := func() tea.Msg {
 				return messages.ChangeView{
 					Name: names.MasterPassForm,
 					View: f.f.MasterPassForm(),
 				}
 			}
+			infoCmd := func() tea.Msg {
+				return messages.ShowMessage{Message: "Successfully logged in"}
+			}
+			return f, tea.Batch(changeCmd, infoCmd)
 		}
 	}
 	_, cmd := f.baseForm.Update(msg)
