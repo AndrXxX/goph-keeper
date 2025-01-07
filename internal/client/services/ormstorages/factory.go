@@ -1,4 +1,4 @@
-package storages
+package ormstorages
 
 import (
 	"context"
