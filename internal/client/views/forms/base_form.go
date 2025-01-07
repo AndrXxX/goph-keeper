@@ -1,4 +1,4 @@
-package views
+package forms
 
 import (
 	"github.com/charmbracelet/bubbles/help"

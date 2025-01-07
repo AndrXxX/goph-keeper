@@ -1,4 +1,4 @@
-package views
+package forms
 
 import (
 	"github.com/charmbracelet/bubbles/key"
@@ -23,7 +23,7 @@ var registerFormKeys = kb.KeyMap{
 
 type registerForm struct {
 	*baseForm
-	r registerer
+	r Registerer
 	s *state.AppState
 	f *Factory
 }

@@ -1,4 +1,4 @@
-package views
+package forms
 
 import (
 	"github.com/charmbracelet/bubbles/key"
@@ -10,10 +10,9 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/client/state"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/form"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
-	"github.com/AndrXxX/goph-keeper/pkg/entities"
 )
 
-var loginFormKeys = kb.KeyMap{
+var masterPassFormKeys = kb.KeyMap{
 	Short: []key.Binding{kb.Back, kb.Enter},
 	Full: [][]key.Binding{
 		{kb.Back, kb.Enter},
@@ -21,28 +20,25 @@ var loginFormKeys = kb.KeyMap{
 	},
 }
 
-type loginForm struct {
+type masterPassForm struct {
 	*baseForm
-	l loginer
 	s *state.AppState
-	f *Factory
 }
 
-func newLoginForm() *loginForm {
-	m := loginForm{
-		baseForm: NewBaseForm("Enter an exist account", make([]textinput.Model, 2), form.FieldsUpdater{}),
+func newMasterPassForm() *masterPassForm {
+	m := masterPassForm{
+		baseForm: NewBaseForm("Enter a master password to access", make([]textinput.Model, 1), form.FieldsUpdater{}),
 	}
-	m.baseForm.keys = &loginFormKeys
-	m.baseForm.inputs[0].Prompt = "Login: "
-	m.baseForm.inputs[1].Prompt = "Password: "
+	m.baseForm.keys = &masterPassFormKeys
+	m.baseForm.inputs[0].Prompt = "Password: "
 	return &m
 }
 
-func (f *loginForm) Init() tea.Cmd {
+func (f *masterPassForm) Init() tea.Cmd {
 	return textinput.Blink
 }
 
-func (f *loginForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (f *masterPassForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch {
@@ -54,22 +50,10 @@ func (f *loginForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			}
 		case key.Matches(msg, kb.Keys.Enter):
-			u := entities.User{Login: f.inputs[0].Value(), Password: f.inputs[1].Value()}
-			token, err := f.l.Login(&u)
-			if err != nil {
-				return f, func() tea.Msg {
-					return messages.ShowError{
-						Err: err.Error(),
-					}
-				}
-			}
-			f.s.User.Login = u.Login
-			f.s.User.Password = u.Password
-			f.s.User.Token = token
+			// TODO: check login/pass
 			return f, func() tea.Msg {
 				return messages.ChangeView{
-					Name: names.MasterPassForm,
-					View: f.f.MasterPassForm(),
+					Name: names.MainMenu,
 				}
 			}
 		}
@@ -78,6 +62,6 @@ func (f *loginForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return f, cmd
 }
 
-func (f *loginForm) View() string {
+func (f *masterPassForm) View() string {
 	return f.baseForm.View()
 }

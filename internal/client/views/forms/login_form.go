@@ -1,4 +1,4 @@
-package views
+package forms
 
 import (
 	"github.com/charmbracelet/bubbles/key"
@@ -10,9 +10,10 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/client/state"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/form"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
+	"github.com/AndrXxX/goph-keeper/pkg/entities"
 )
 
-var masterPassFormKeys = kb.KeyMap{
+var loginFormKeys = kb.KeyMap{
 	Short: []key.Binding{kb.Back, kb.Enter},
 	Full: [][]key.Binding{
 		{kb.Back, kb.Enter},
@@ -20,25 +21,28 @@ var masterPassFormKeys = kb.KeyMap{
 	},
 }
 
-type masterPassForm struct {
+type loginForm struct {
 	*baseForm
+	l Loginer
 	s *state.AppState
+	f *Factory
 }
 
-func newMasterPassForm() *masterPassForm {
-	m := masterPassForm{
-		baseForm: NewBaseForm("Enter a master password to access", make([]textinput.Model, 1), form.FieldsUpdater{}),
+func newLoginForm() *loginForm {
+	m := loginForm{
+		baseForm: NewBaseForm("Enter an exist account", make([]textinput.Model, 2), form.FieldsUpdater{}),
 	}
-	m.baseForm.keys = &masterPassFormKeys
-	m.baseForm.inputs[0].Prompt = "Password: "
+	m.baseForm.keys = &loginFormKeys
+	m.baseForm.inputs[0].Prompt = "Login: "
+	m.baseForm.inputs[1].Prompt = "Password: "
 	return &m
 }
 
-func (f *masterPassForm) Init() tea.Cmd {
+func (f *loginForm) Init() tea.Cmd {
 	return textinput.Blink
 }
 
-func (f *masterPassForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (f *loginForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch {
@@ -50,10 +54,22 @@ func (f *masterPassForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			}
 		case key.Matches(msg, kb.Keys.Enter):
-			// TODO: check login/pass
+			u := entities.User{Login: f.inputs[0].Value(), Password: f.inputs[1].Value()}
+			token, err := f.l.Login(&u)
+			if err != nil {
+				return f, func() tea.Msg {
+					return messages.ShowError{
+						Err: err.Error(),
+					}
+				}
+			}
+			f.s.User.Login = u.Login
+			f.s.User.Password = u.Password
+			f.s.User.Token = token
 			return f, func() tea.Msg {
 				return messages.ChangeView{
-					Name: names.MainMenu,
+					Name: names.MasterPassForm,
+					View: f.f.MasterPassForm(),
 				}
 			}
 		}
@@ -62,6 +78,6 @@ func (f *masterPassForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return f, cmd
 }
 
-func (f *masterPassForm) View() string {
+func (f *loginForm) View() string {
 	return f.baseForm.View()
 }

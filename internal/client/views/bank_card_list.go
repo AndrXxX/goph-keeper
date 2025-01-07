@@ -9,6 +9,7 @@ import (
 
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
+	"github.com/AndrXxX/goph-keeper/internal/client/views/forms"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/styles"
 	"github.com/AndrXxX/goph-keeper/pkg/entities"
@@ -56,7 +57,7 @@ func (pl *bankCardList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, kb.Keys.Edit, kb.Keys.Enter):
 			if len(pl.list.VisibleItems()) != 0 {
 				e := pl.list.SelectedItem().(*entities.BankCardItem)
-				f := NewBankCardForm(e)
+				f := forms.NewBankCardForm(e)
 				return f, func() tea.Msg {
 					return messages.ChangeView{
 						Name: names.BankCardForm,
@@ -65,7 +66,7 @@ func (pl *bankCardList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			}
 		case key.Matches(msg, kb.Keys.New):
-			f := NewBankCardForm(nil)
+			f := forms.NewBankCardForm(nil)
 			return f, func() tea.Msg {
 				return messages.ChangeView{
 					Name: names.BankCardForm,

@@ -1,11 +1,11 @@
-package views
+package forms
 
 import "github.com/AndrXxX/goph-keeper/pkg/entities"
 
-type registerer interface {
+type Registerer interface {
 	Register(u *entities.User) (string, error)
 }
 
-type loginer interface {
+type Loginer interface {
 	Login(u *entities.User) (string, error)
 }
