@@ -11,6 +11,7 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
 	"github.com/AndrXxX/goph-keeper/internal/client/state"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/form"
+	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 )
 
@@ -52,34 +53,25 @@ func (f *masterPassForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, kb.Keys.Back):
-			println("kb.Keys.Back")
-			return f, func() tea.Msg {
-				return messages.ChangeView{
-					Name: names.AuthMenu,
-				}
-			}
+			return f, helpers.GenCmd(messages.ChangeView{
+				Name: names.AuthMenu,
+			})
 		case key.Matches(msg, kb.Keys.Enter):
 			if len(f.baseForm.inputs[mpFormPassword].Value()) < minPassLength {
-				return f, func() tea.Msg {
-					return messages.ShowError{
-						Err: fmt.Sprintf("password must be at least %d characters long", minPassLength),
-					}
-				}
+				return f, helpers.GenCmd(messages.ShowError{
+					Err: fmt.Sprintf("password must be at least %d characters long", minPassLength),
+				})
 			}
 			if f.baseForm.inputs[mpFormPassword].Value() != f.baseForm.inputs[mpFormRepeat].Value() {
-				return f, func() tea.Msg {
-					return messages.ShowError{
-						Err: "passwords must be equal",
-					}
-				}
+				return f, helpers.GenCmd(messages.ShowError{Err: "passwords must be equal"})
 			}
 			f.s.User.MasterPassword = f.baseForm.inputs[mpFormPassword].Value()
 			// TODO: access to local DB
-			return f, func() tea.Msg {
-				return messages.ChangeView{
-					Name: names.MainMenu,
-				}
+			cmdList := []tea.Cmd{
+				helpers.GenCmd(messages.ChangeView{Name: names.MainMenu}),
+				helpers.GenCmd(messages.ShowMessage{Message: "Successfully!"}), // TODO
 			}
+			return f, tea.Batch(cmdList...)
 		}
 	}
 	_, cmd := f.baseForm.Update(msg)
