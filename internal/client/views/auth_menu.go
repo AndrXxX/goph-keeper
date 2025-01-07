@@ -32,7 +32,7 @@ func NewAuthMenu() *authMenu {
 	defaultList := list.New([]list.Item{
 		menuitems.AuthItem{Name: "Register", Code: "register", Desc: "Create a new account"},
 		menuitems.AuthItem{Name: "Login", Code: "login", Desc: "Enter an exist account"},
-		menuitems.AuthItem{Name: "Enter", Code: "enter", Desc: "Enter a master password to access"},
+		menuitems.AuthItem{Name: "Enter", Code: "master_pass", Desc: "Enter a master password to access"},
 	}, list.NewDefaultDelegate(), 0, 0)
 	defaultList.SetShowHelp(false)
 	defaultList.Title = "Goph Keeper"
@@ -53,10 +53,22 @@ func (m *authMenu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch {
 		case key.Matches(msg, kb.Keys.Enter):
 			return m, func() tea.Msg {
-				return messages.ChangeView{
-					Name: names.LoginForm,
-					View: NewLoginForm(),
+				selected := m.list.SelectedItem().(menuitems.AuthItem)
+				switch selected.Code {
+				case "register":
+					return messages.ChangeView{
+						Name: names.RegisterForm,
+					}
+				case "login":
+					return messages.ChangeView{
+						Name: names.LoginForm,
+					}
+				case "master_pass":
+					return messages.ChangeView{
+						Name: names.MasterPassForm,
+					}
 				}
+				return nil
 			}
 		}
 		m.list, cmd = m.list.Update(msg)
