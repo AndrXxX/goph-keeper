@@ -9,6 +9,7 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
 	"github.com/AndrXxX/goph-keeper/internal/client/state"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/form"
+	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 	"github.com/AndrXxX/goph-keeper/pkg/entities"
 )
@@ -47,35 +48,21 @@ func (f *loginForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, kb.Keys.Back):
-			println("kb.Keys.Back")
-			return f, func() tea.Msg {
-				return messages.ChangeView{
-					Name: names.AuthMenu,
-				}
-			}
+			return f, helpers.GenCmd(messages.ChangeView{Name: names.AuthMenu})
 		case key.Matches(msg, kb.Keys.Enter):
 			u := entities.User{Login: f.inputs[0].Value(), Password: f.inputs[1].Value()}
 			token, err := f.l.Login(&u)
 			if err != nil {
-				return f, func() tea.Msg {
-					return messages.ShowError{
-						Err: err.Error(),
-					}
-				}
+				return f, helpers.GenCmd(messages.ShowError{Err: err.Error()})
 			}
 			f.s.User.Login = u.Login
 			f.s.User.Password = u.Password
 			f.s.User.Token = token
-			changeCmd := func() tea.Msg {
-				return messages.ChangeView{
-					Name: names.MasterPassForm,
-					View: f.f.MasterPassForm(),
-				}
+			cmdList := []tea.Cmd{
+				helpers.GenCmd(messages.ChangeView{Name: names.MasterPassForm, View: f.f.MasterPassForm()}),
+				helpers.GenCmd(messages.ShowMessage{Message: "Successfully logged in"}),
 			}
-			infoCmd := func() tea.Msg {
-				return messages.ShowMessage{Message: "Successfully logged in"}
-			}
-			return f, tea.Batch(changeCmd, infoCmd)
+			return f, tea.Batch(cmdList...)
 		}
 	}
 	_, cmd := f.baseForm.Update(msg)
