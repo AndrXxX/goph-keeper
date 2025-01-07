@@ -18,19 +18,19 @@ func Factory(db *gorm.DB) *storagesFactory {
 	return &storagesFactory{db}
 }
 
-func (f *storagesFactory) UserStorage(ctx context.Context) *ormStorage[ormmodels.User] {
+func (f *storagesFactory) User(ctx context.Context) *ormStorage[ormmodels.User] {
 	return getStorage[ormmodels.User](ctx, f.db, new(ormmodels.User))
 }
 
-func (f *storagesFactory) PasswordStorage(ctx context.Context) *ormStorage[ormmodels.PasswordItem] {
+func (f *storagesFactory) Password(ctx context.Context) *ormStorage[ormmodels.PasswordItem] {
 	return getStorage[ormmodels.PasswordItem](ctx, f.db, new(ormmodels.PasswordItem))
 }
 
-func (f *storagesFactory) NoteStorage(ctx context.Context) *ormStorage[ormmodels.NoteItem] {
+func (f *storagesFactory) Note(ctx context.Context) *ormStorage[ormmodels.NoteItem] {
 	return getStorage[ormmodels.NoteItem](ctx, f.db, new(ormmodels.NoteItem))
 }
 
-func (f *storagesFactory) BankCardItemStorage(ctx context.Context) *ormStorage[ormmodels.BankCardItem] {
+func (f *storagesFactory) BankCard(ctx context.Context) *ormStorage[ormmodels.BankCardItem] {
 	return getStorage[ormmodels.BankCardItem](ctx, f.db, new(ormmodels.BankCardItem))
 }
 
