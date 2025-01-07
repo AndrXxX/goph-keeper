@@ -1,6 +1,8 @@
 package forms
 
 import (
+	"fmt"
+
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -20,6 +22,12 @@ var masterPassFormKeys = kb.KeyMap{
 	},
 }
 
+const (
+	mpFormPassword = iota
+	mpFormRepeat
+)
+const minPassLength = 5
+
 type masterPassForm struct {
 	*baseForm
 	s *state.AppState
@@ -27,10 +35,11 @@ type masterPassForm struct {
 
 func newMasterPassForm() *masterPassForm {
 	m := masterPassForm{
-		baseForm: NewBaseForm("Enter a master password to access", make([]textinput.Model, 1), form.FieldsUpdater{}),
+		baseForm: NewBaseForm("Enter a master password to access", make([]textinput.Model, 2), form.FieldsUpdater{}),
 	}
 	m.baseForm.keys = &masterPassFormKeys
-	m.baseForm.inputs[0].Prompt = "Password: "
+	m.baseForm.inputs[mpFormPassword].Prompt = "Password: "
+	m.baseForm.inputs[mpFormRepeat].Prompt = "Repeat password: "
 	return &m
 }
 
@@ -50,7 +59,22 @@ func (f *masterPassForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			}
 		case key.Matches(msg, kb.Keys.Enter):
-			// TODO: check login/pass
+			if len(f.baseForm.inputs[mpFormPassword].Value()) < minPassLength {
+				return f, func() tea.Msg {
+					return messages.ShowError{
+						Err: fmt.Sprintf("password must be at least %d characters long", minPassLength),
+					}
+				}
+			}
+			if f.baseForm.inputs[mpFormPassword].Value() != f.baseForm.inputs[mpFormRepeat].Value() {
+				return f, func() tea.Msg {
+					return messages.ShowError{
+						Err: "passwords must be equal",
+					}
+				}
+			}
+			f.s.User.MasterPassword = f.baseForm.inputs[mpFormPassword].Value()
+			// TODO: access to local DB
 			return f, func() tea.Msg {
 				return messages.ChangeView{
 					Name: names.MainMenu,
