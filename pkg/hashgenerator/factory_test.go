@@ -1,8 +1,9 @@
 package hashgenerator
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestFactory(t *testing.T) {
@@ -17,7 +18,7 @@ func TestFactory(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, Factory(), tt.want)
+			assert.Equal(t, tt.want, Factory())
 		})
 	}
 }
@@ -35,7 +36,7 @@ func TestFactorySHA256(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			f := Factory()
-			assert.Equal(t, f.SHA256("test"), tt.want)
+			assert.Equal(t, tt.want, f.SHA256("test"))
 		})
 	}
 }
