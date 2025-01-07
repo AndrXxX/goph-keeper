@@ -8,6 +8,8 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/client/app"
 	"github.com/AndrXxX/goph-keeper/internal/client/ormmodels"
 	"github.com/AndrXxX/goph-keeper/internal/client/services/auth"
+	"github.com/AndrXxX/goph-keeper/internal/client/services/dbprovider"
+	"github.com/AndrXxX/goph-keeper/internal/client/services/ormstorages"
 	"github.com/AndrXxX/goph-keeper/internal/client/state"
 	"github.com/AndrXxX/goph-keeper/internal/client/views"
 	"github.com/AndrXxX/goph-keeper/pkg/logger"
@@ -23,7 +25,9 @@ func main() {
 	}
 	viewsFactory := views.Factory{
 		AppState: &state.AppState{
-			User: &ormmodels.User{},
+			User:            &ormmodels.User{},
+			DBProvider:      &dbprovider.DBProvider{},
+			StorageProvider: ormstorages.Factory(),
 		},
 		Loginer:    ap,
 		Registerer: ap,

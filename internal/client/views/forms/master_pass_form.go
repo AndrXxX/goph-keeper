@@ -1,6 +1,7 @@
 package forms
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/charmbracelet/bubbles/key"
@@ -57,6 +58,9 @@ func (f *masterPassForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				Name: names.AuthMenu,
 			})
 		case key.Matches(msg, kb.Keys.Enter):
+			if f.s.User.Login == "" && f.s.DBProvider.IsDBExist() {
+				return f, helpers.GenCmd(messages.ShowError{Err: "local database not exist, need to auth by login/pass"})
+			}
 			if len(f.baseForm.inputs[mpFormPassword].Value()) < minPassLength {
 				return f, helpers.GenCmd(messages.ShowError{
 					Err: fmt.Sprintf("password must be at least %d characters long", minPassLength),
@@ -66,12 +70,19 @@ func (f *masterPassForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return f, helpers.GenCmd(messages.ShowError{Err: "passwords must be equal"})
 			}
 			f.s.User.MasterPassword = f.baseForm.inputs[mpFormPassword].Value()
-			// TODO: access to local DB
-			cmdList := []tea.Cmd{
-				helpers.GenCmd(messages.ChangeView{Name: names.MainMenu}),
-				helpers.GenCmd(messages.ShowMessage{Message: "Successfully!"}), // TODO
+			db, err := f.s.DBProvider.DB(f.s.User.MasterPassword)
+			if err != nil {
+				return f, helpers.GenCmd(messages.ShowError{Err: fmt.Sprintf("error opening local database connection: %s", err.Error())})
 			}
-			return f, tea.Batch(cmdList...)
+			f.s.InitStorages(context.TODO(), db)
+			if f.s.User.Login != "" && f.s.User.ID == 0 {
+				created, err := f.s.Storages.User.Create(f.s.User)
+				if err != nil {
+					return f, helpers.GenCmd(messages.ShowError{Err: fmt.Sprintf("error saving user: %s", err.Error())})
+				}
+				f.s.User = created
+			}
+			return f, tea.Batch(helpers.GenCmd(messages.ChangeView{Name: names.MainMenu}))
 		}
 	}
 	_, cmd := f.baseForm.Update(msg)
