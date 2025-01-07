@@ -7,6 +7,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/AndrXxX/goph-keeper/internal/enums"
+	"github.com/AndrXxX/goph-keeper/internal/enums/contenttypes"
 	"github.com/AndrXxX/goph-keeper/pkg/logger"
 	"github.com/AndrXxX/goph-keeper/pkg/storages/postgressql/models"
 )
@@ -55,7 +56,7 @@ func (c *ItemsController[T]) StoreUpdates(w http.ResponseWriter, r *http.Request
 }
 
 func (c *ItemsController[T]) FetchUpdates(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", contenttypes.ApplicationJSON)
 	userID := r.Context().Value(enums.UserID).(uint)
 	mList, err := c.Storage.Query(r.Context(), &models.StoredItem{Type: c.Type, UserID: userID})
 	if err != nil {
