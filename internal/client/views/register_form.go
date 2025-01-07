@@ -7,8 +7,10 @@ import (
 
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
+	"github.com/AndrXxX/goph-keeper/internal/client/state"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/form"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
+	"github.com/AndrXxX/goph-keeper/pkg/entities"
 )
 
 var registerFormKeys = kb.KeyMap{
@@ -22,6 +24,8 @@ var registerFormKeys = kb.KeyMap{
 type registerForm struct {
 	*baseForm
 	r registerer
+	s *state.AppState
+	f *Factory
 }
 
 func newRegisterForm() *registerForm {
@@ -50,10 +54,22 @@ func (f *registerForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			}
 		case key.Matches(msg, kb.Keys.Enter):
-			// TODO: check login/pass
+			u := entities.User{Login: f.inputs[0].Value(), Password: f.inputs[1].Value()}
+			token, err := f.r.Register(&u)
+			if err != nil {
+				return f, func() tea.Msg {
+					return messages.ShowError{
+						Err: err.Error(),
+					}
+				}
+			}
+			f.s.User.Login = u.Login
+			f.s.User.Password = u.Password
+			f.s.User.Token = token
 			return f, func() tea.Msg {
 				return messages.ChangeView{
-					Name: names.MainMenu,
+					Name: names.MasterPassForm,
+					View: f.f.MasterPassForm(),
 				}
 			}
 		}
