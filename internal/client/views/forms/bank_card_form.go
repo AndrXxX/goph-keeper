@@ -9,6 +9,7 @@ import (
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/form"
+	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 	"github.com/AndrXxX/goph-keeper/pkg/entities"
 )
@@ -72,19 +73,15 @@ func (f *bankCardForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			}
 		case key.Matches(msg, kb.Keys.Save):
-			// TODO: сделать уведомление
 			var nMsg tea.Msg
 			if f.creating {
-				nMsg = messages.AddBankCard{
-					Item: f.getBankCardItem(),
-				}
+				nMsg = messages.AddBankCard{Item: f.getBankCardItem()}
 			}
-			return f, func() tea.Msg {
-				return messages.ChangeView{
-					Name: names.BankCardList,
-					Msg:  nMsg,
-				}
+			cmdList := []tea.Cmd{
+				helpers.GenCmd(messages.ChangeView{Name: names.BankCardList, Msg: nMsg}),
+				helpers.GenCmd(messages.ShowMessage{Message: "bank card saved"}),
 			}
+			return f, tea.Batch(cmdList...)
 		case key.Matches(msg, kb.Keys.Copy):
 			c := clipboard.New()
 			err := c.CopyText(f.baseForm.inputs[f.baseForm.focusIndex].Value())
