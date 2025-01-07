@@ -16,8 +16,9 @@ const (
 )
 
 var (
-	ExistUser = fmt.Errorf("такой пользователь уже есть")
-	WrongCred = fmt.Errorf("неверные логин или пароль")
+	ExistUser      = fmt.Errorf("user already exists")
+	WrongCred      = fmt.Errorf("wrong login or password")
+	BadCredentials = fmt.Errorf("check credentials")
 )
 
 type Provider struct {
@@ -53,6 +54,8 @@ func (p *Provider) send(u *entities.User, url string) (string, error) {
 		return "", WrongCred
 	case http.StatusConflict:
 		return "", ExistUser
+	case http.StatusBadRequest:
+		return "", BadCredentials
 	}
 	return "", fmt.Errorf("unexpected status code %d", resp.StatusCode)
 }
