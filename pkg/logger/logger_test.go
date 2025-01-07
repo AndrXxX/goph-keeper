@@ -45,7 +45,7 @@ func TestInitialize(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			require.Equal(t, tt.wantErr, Initialize(tt.level) != nil)
+			require.Equal(t, tt.wantErr, Initialize(tt.level, nil) != nil)
 			if !tt.wantErr {
 				require.Equal(t, tt.level, Log.Level().String())
 			}

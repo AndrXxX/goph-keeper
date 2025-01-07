@@ -8,13 +8,16 @@ import (
 var Log = zap.NewNop()
 
 // Initialize метод инициализации логгера
-func Initialize(level string) error {
+func Initialize(level string, output []string) error {
 	lvl, err := zap.ParseAtomicLevel(level)
 	if err != nil {
 		return err
 	}
 	cfg := zap.NewProductionConfig()
 	cfg.Level = lvl
+	if output != nil {
+		cfg.OutputPaths = output
+	}
 	zl, err := cfg.Build()
 	if err != nil {
 		return err

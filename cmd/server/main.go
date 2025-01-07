@@ -50,7 +50,7 @@ func initConfig() (*config.Config, error) {
 	if fcErr != nil {
 		return nil, fcErr
 	}
-	return c, logger.Initialize(c.LogLevel)
+	return c, logger.Initialize(c.LogLevel, nil)
 }
 
 func initStorage(ctx context.Context, c *config.Config) (*app.Storage, error) {
