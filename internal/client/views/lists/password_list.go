@@ -28,7 +28,7 @@ type passwordList struct {
 	help help.Model
 }
 
-func NewPasswordList() *passwordList {
+func newPasswordList() *passwordList {
 	defaultList := list.New([]list.Item{}, list.NewDefaultDelegate(), 0, 0)
 	defaultList.SetShowHelp(false)
 	defaultList.Title = "Passwords"

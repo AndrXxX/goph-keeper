@@ -28,7 +28,7 @@ type fileList struct {
 	help help.Model
 }
 
-func NewFileList() *fileList {
+func newFileList() *fileList {
 	defaultList := list.New([]list.Item{}, list.NewDefaultDelegate(), 0, 0)
 	defaultList.SetShowHelp(false)
 	defaultList.Title = "Files"

@@ -28,7 +28,7 @@ type bankCardList struct {
 	help help.Model
 }
 
-func NewBankCardList() *bankCardList {
+func newBankCardList() *bankCardList {
 	defaultList := list.New([]list.Item{}, list.NewDefaultDelegate(), 0, 0)
 	defaultList.SetShowHelp(false)
 	defaultList.Title = "Bank cards"

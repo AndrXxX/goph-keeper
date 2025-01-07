@@ -28,7 +28,7 @@ type noteList struct {
 	help help.Model
 }
 
-func NewNoteList() *noteList {
+func newNoteList() *noteList {
 	defaultList := list.New([]list.Item{}, list.NewDefaultDelegate(), 0, 0)
 	defaultList.SetShowHelp(false)
 	defaultList.Title = "Notes"

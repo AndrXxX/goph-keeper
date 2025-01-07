@@ -27,7 +27,7 @@ type mainMenu struct {
 	help help.Model
 }
 
-func NewMainMenu() *mainMenu {
+func newMainMenu() *mainMenu {
 	defaultList := list.New([]list.Item{
 		menuitems.MainMenuItem{Name: "Passwords", Code: datatypes.Passwords, Desc: "Manage passwords"},
 		menuitems.MainMenuItem{Name: "Notes", Code: datatypes.Notes, Desc: "Manage notes"},
