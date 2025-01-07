@@ -10,6 +10,11 @@ var (
 	Cursor  = Focused
 	Empty   = lipgloss.NewStyle()
 	Help    = Blurred
+	Error   = lipgloss.NewStyle().
+		Background(lipgloss.Color("#f12929")).
+		Foreground(lipgloss.Color("#ffffff")).
+		Margin(1, 0).
+		Padding(1, 1, 0, 1)
 
 	Title = lipgloss.NewStyle().
 		Foreground(lipgloss.Color("#FFFDF5")).

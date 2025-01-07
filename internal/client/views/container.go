@@ -1,6 +1,11 @@
 package views
 
 import (
+	"fmt"
+	"strings"
+	"sync"
+	"time"
+
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
@@ -9,9 +14,12 @@ import (
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
+	"github.com/AndrXxX/goph-keeper/internal/client/views/styles"
 )
 
 var margin = 5
+
+const errorsTimeout = 2 * time.Second
 
 type Container struct {
 	help     help.Model
@@ -19,10 +27,11 @@ type Container struct {
 	current  names.ViewName
 	views    Map
 	quitting bool
+	errors   sync.Map
 }
 
 func NewContainer(cols Map) *Container {
-	return &Container{help: help.New(), views: cols}
+	return &Container{help: help.New(), views: cols, errors: sync.Map{}}
 }
 
 func (m *Container) Init() tea.Cmd {
@@ -50,6 +59,12 @@ func (m *Container) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.quitting = true
 			return m, tea.Quit
 		}
+	case messages.ShowError:
+		m.errors.Store(msg.Err, msg.Err)
+		go func() {
+			time.Sleep(errorsTimeout)
+			m.errors.Clear()
+		}()
 	case messages.ChangeView:
 		m.current = msg.Name
 		if msg.View != nil {
@@ -74,7 +89,17 @@ func (m *Container) View() string {
 		lipgloss.Left,
 		m.views[m.current].View(),
 	)
-	return lipgloss.JoinVertical(lipgloss.Left, m.getStyle().Render(board))
+	eb := strings.Builder{}
+
+	m.errors.Range(func(_, v any) bool {
+		eb.WriteString(fmt.Sprintf("%s\n", v.(string)))
+		return true
+	})
+	err := eb.String()
+	if err != "" {
+		err = styles.Error.Render(err)
+	}
+	return m.getStyle().Render(lipgloss.JoinVertical(lipgloss.Left, board, err))
 }
 
 func (m *Container) getStyle() lipgloss.Style {
