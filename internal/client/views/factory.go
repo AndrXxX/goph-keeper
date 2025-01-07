@@ -3,6 +3,7 @@ package views
 import (
 	"github.com/AndrXxX/goph-keeper/internal/client/state"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/forms"
+	"github.com/AndrXxX/goph-keeper/internal/client/views/lists"
 )
 
 type Factory struct {
@@ -19,8 +20,8 @@ func (f *Factory) FormsFactory() *forms.Factory {
 	}
 }
 
-func (f *Factory) AuthMenu() *authMenu {
-	m := newAuthMenu()
-	m.f = f.FormsFactory()
-	return m
+func (f *Factory) MenusFactory() *lists.Factory {
+	return &lists.Factory{
+		FF: f.FormsFactory(),
+	}
 }

@@ -17,8 +17,6 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/client/views/styles"
 )
 
-var margin = 5
-
 const errorsTimeout = 2 * time.Second
 
 type Container struct {
@@ -45,7 +43,7 @@ func (m *Container) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		var cmd tea.Cmd
 		var cmdList []tea.Cmd
-		m.help.Width = msg.Width - margin
+		m.help.Width = msg.Width - styles.InnerMargin
 		for i := range m.views {
 			_, cmd = m.views[i].Update(msg)
 			cmdList = append(cmdList, cmd)

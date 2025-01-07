@@ -1,4 +1,4 @@
-package views
+package lists
 
 import (
 	"github.com/charmbracelet/bubbles/help"
@@ -23,11 +23,9 @@ var authMenuKeys = kb.KeyMap{
 }
 
 type authMenu struct {
-	list   list.Model
-	help   help.Model
-	height int
-	width  int
-	f      *forms.Factory
+	list list.Model
+	help help.Model
+	f    *forms.Factory
 }
 
 func newAuthMenu() *authMenu {
@@ -50,7 +48,7 @@ func (m *authMenu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		m.list.SetSize(msg.Width/margin, msg.Height/2)
+		m.list.SetSize(msg.Width/styles.InnerMargin, msg.Height/2)
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, kb.Keys.Enter):

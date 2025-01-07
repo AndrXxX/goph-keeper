@@ -1,4 +1,4 @@
-package views
+package lists
 
 import (
 	"github.com/charmbracelet/bubbles/help"
@@ -24,10 +24,8 @@ var passwordListKeys = kb.KeyMap{
 }
 
 type passwordList struct {
-	list   list.Model
-	help   help.Model
-	height int
-	width  int
+	list list.Model
+	help help.Model
 }
 
 func NewPasswordList() *passwordList {
@@ -46,8 +44,7 @@ func (pl *passwordList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		pl.setSize(msg.Width, msg.Height)
-		pl.list.SetSize(msg.Width/margin, msg.Height/2)
+		pl.list.SetSize(msg.Width/styles.InnerMargin, msg.Height/2)
 	case messages.AddPassword:
 		pl.list.InsertItem(-1, msg.Item)
 		pl.View()
@@ -99,9 +96,4 @@ func (pl *passwordList) DeleteCurrent() tea.Cmd {
 	var cmd tea.Cmd
 	pl.list, cmd = pl.list.Update(nil)
 	return cmd
-}
-
-func (pl *passwordList) setSize(width, height int) {
-	pl.width = width / margin
-	pl.height = height
 }

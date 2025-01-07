@@ -1,4 +1,4 @@
-package views
+package lists
 
 import (
 	"github.com/charmbracelet/bubbles/help"
@@ -24,10 +24,8 @@ var noteListKeys = kb.KeyMap{
 }
 
 type noteList struct {
-	list   list.Model
-	help   help.Model
-	height int
-	width  int
+	list list.Model
+	help help.Model
 }
 
 func NewNoteList() *noteList {
@@ -46,8 +44,7 @@ func (pl *noteList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		pl.setSize(msg.Width, msg.Height)
-		pl.list.SetSize(msg.Width/margin, msg.Height/2)
+		pl.list.SetSize(msg.Width/styles.InnerMargin, msg.Height/2)
 	case messages.AddNote:
 		pl.list.InsertItem(-1, msg.Item)
 		pl.View()
@@ -99,9 +96,4 @@ func (pl *noteList) DeleteCurrent() tea.Cmd {
 	var cmd tea.Cmd
 	pl.list, cmd = pl.list.Update(nil)
 	return cmd
-}
-
-func (pl *noteList) setSize(width, height int) {
-	pl.width = width / margin
-	pl.height = height
 }
