@@ -10,8 +10,15 @@ import (
 	"github.com/AndrXxX/goph-keeper/pkg/entities"
 )
 
-const loginUrl = "/api/user/login"
-const registerUrl = "/api/user/register"
+const (
+	loginUrl    = "/api/user/login"
+	registerUrl = "/api/user/register"
+)
+
+var (
+	ExistUser = fmt.Errorf("такой пользователь уже есть")
+	WrongCred = fmt.Errorf("неверные логин или пароль")
+)
 
 type Provider struct {
 	Sender requestSender
@@ -35,14 +42,19 @@ func (p *Provider) send(u *entities.User, url string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("send request: %v", err)
 	}
-	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("неверный логин или пароль")
+	switch resp.StatusCode {
+	case http.StatusOK:
+		token := p.getTokenFromHeaders(resp)
+		if token == "" {
+			return "", fmt.Errorf("token is empty")
+		}
+		return token, nil
+	case http.StatusUnauthorized:
+		return "", WrongCred
+	case http.StatusConflict:
+		return "", ExistUser
 	}
-	token := p.getTokenFromHeaders(resp)
-	if token == "" {
-		return "", fmt.Errorf("token is empty")
-	}
-	return token, nil
+	return "", fmt.Errorf("unexpected status code %d", resp.StatusCode)
 }
 
 func (p *Provider) getTokenFromHeaders(r *http.Response) string {
