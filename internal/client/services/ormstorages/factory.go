@@ -6,35 +6,35 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 
+	"github.com/AndrXxX/goph-keeper/internal/client/interfaces"
 	"github.com/AndrXxX/goph-keeper/internal/client/ormmodels"
 	"github.com/AndrXxX/goph-keeper/pkg/logger"
 )
 
 type storagesFactory struct {
-	db *gorm.DB
 }
 
-func Factory(db *gorm.DB) *storagesFactory {
-	return &storagesFactory{db}
+func Factory() *storagesFactory {
+	return &storagesFactory{}
 }
 
-func (f *storagesFactory) User(ctx context.Context) *ormStorage[ormmodels.User] {
-	return getStorage[ormmodels.User](ctx, f.db, new(ormmodels.User))
+func (f *storagesFactory) User(ctx context.Context, db *gorm.DB) interfaces.Storage[ormmodels.User] {
+	return getStorage[ormmodels.User](ctx, db, new(ormmodels.User))
 }
 
-func (f *storagesFactory) Password(ctx context.Context) *ormStorage[ormmodels.PasswordItem] {
-	return getStorage[ormmodels.PasswordItem](ctx, f.db, new(ormmodels.PasswordItem))
+func (f *storagesFactory) Password(ctx context.Context, db *gorm.DB) interfaces.Storage[ormmodels.PasswordItem] {
+	return getStorage[ormmodels.PasswordItem](ctx, db, new(ormmodels.PasswordItem))
 }
 
-func (f *storagesFactory) Note(ctx context.Context) *ormStorage[ormmodels.NoteItem] {
-	return getStorage[ormmodels.NoteItem](ctx, f.db, new(ormmodels.NoteItem))
+func (f *storagesFactory) Note(ctx context.Context, db *gorm.DB) interfaces.Storage[ormmodels.NoteItem] {
+	return getStorage[ormmodels.NoteItem](ctx, db, new(ormmodels.NoteItem))
 }
 
-func (f *storagesFactory) BankCard(ctx context.Context) *ormStorage[ormmodels.BankCardItem] {
-	return getStorage[ormmodels.BankCardItem](ctx, f.db, new(ormmodels.BankCardItem))
+func (f *storagesFactory) BankCard(ctx context.Context, db *gorm.DB) interfaces.Storage[ormmodels.BankCardItem] {
+	return getStorage[ormmodels.BankCardItem](ctx, db, new(ormmodels.BankCardItem))
 }
 
-func getStorage[T interface{}](ctx context.Context, db *gorm.DB, m *T) *ormStorage[T] {
+func getStorage[T interface{}](ctx context.Context, db *gorm.DB, m *T) interfaces.Storage[T] {
 	s := &ormStorage[T]{db}
 	err := s.init(ctx, m)
 	if err != nil {
