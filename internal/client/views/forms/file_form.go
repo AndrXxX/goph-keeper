@@ -8,6 +8,7 @@ import (
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/form"
+	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 	"github.com/AndrXxX/goph-keeper/pkg/entities"
 )
@@ -56,25 +57,19 @@ func (f *fileForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, kb.Keys.Back):
-			return f, func() tea.Msg {
-				return messages.ChangeView{
-					Name: names.FileList,
-				}
-			}
+			return f, helpers.GenCmd(messages.ChangeView{
+				Name: names.FileList,
+			})
 		case key.Matches(msg, kb.Keys.Save):
-			// TODO: сделать уведомление
 			var nMsg tea.Msg
 			if f.creating {
-				nMsg = messages.AddFile{
-					Item: f.getFileItem(),
-				}
+				nMsg = messages.AddFile{Item: f.getFileItem()}
 			}
-			return f, func() tea.Msg {
-				return messages.ChangeView{
-					Name: names.FileList,
-					Msg:  nMsg,
-				}
+			cmdList := []tea.Cmd{
+				helpers.GenCmd(messages.ChangeView{Name: names.FileList, Msg: nMsg}),
+				helpers.GenCmd(messages.ShowMessage{Message: "file saved"}),
 			}
+			return f, tea.Batch(cmdList...)
 		}
 	}
 	_, cmd := f.baseForm.Update(msg)
