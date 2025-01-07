@@ -10,6 +10,7 @@ import (
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/forms"
+	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/styles"
 	"github.com/AndrXxX/goph-keeper/pkg/entities"
@@ -55,28 +56,15 @@ func (pl *bankCardList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if len(pl.list.VisibleItems()) != 0 {
 				e := pl.list.SelectedItem().(*entities.BankCardItem)
 				f := forms.NewBankCardForm(e)
-				return f, func() tea.Msg {
-					return messages.ChangeView{
-						Name: names.BankCardForm,
-						View: f,
-					}
-				}
+				return f, helpers.GenCmd(messages.ChangeView{Name: names.BankCardForm, View: f})
 			}
 		case key.Matches(msg, kb.Keys.New):
 			f := forms.NewBankCardForm(nil)
-			return f, func() tea.Msg {
-				return messages.ChangeView{
-					Name: names.BankCardForm,
-					View: f,
-				}
-			}
+			return f, helpers.GenCmd(messages.ChangeView{Name: names.BankCardForm, View: f})
 		case key.Matches(msg, kb.Keys.Back):
-			return pl, func() tea.Msg {
-				return messages.ChangeView{
-					Name: names.MainMenu,
-				}
-			}
+			return pl, helpers.GenCmd(messages.ChangeView{Name: names.MainMenu})
 		case key.Matches(msg, kb.Keys.Delete):
+			// TODO: approve + action
 			return pl, pl.DeleteCurrent()
 		}
 	}
