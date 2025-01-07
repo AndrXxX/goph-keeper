@@ -14,4 +14,5 @@ const (
 	MainMenu     = ViewName("mainMenu")
 	AuthMenu     = ViewName("authMenu")
 	LoginForm    = ViewName("loginForm")
+	RegisterForm = ViewName("registerForm")
 )
