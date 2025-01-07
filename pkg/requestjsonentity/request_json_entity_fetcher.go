@@ -18,8 +18,12 @@ func (c *Fetcher[T]) Fetch(r io.Reader) (*T, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode request: %w", err)
 	}
-	if _, err := govalidator.ValidateStruct(entity); err != nil {
-		return nil, fmt.Errorf("failed to validate request: %w", err)
+	validated, err := govalidator.ValidateStruct(entity)
+	if err != nil {
+		return nil, fmt.Errorf("validate request: %w", err)
+	}
+	if !validated {
+		return nil, fmt.Errorf("validate request")
 	}
 	return entity, nil
 }
