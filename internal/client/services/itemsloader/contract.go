@@ -7,7 +7,7 @@ import (
 
 type requestSender interface {
 	Get(url string, contentType string) (*http.Response, error)
-	Post(url string, contentType string, data []byte) error
+	Post(url string, contentType string, data []byte) (*http.Response, error)
 }
 
 type urlBuilder interface {

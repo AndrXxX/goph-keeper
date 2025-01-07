@@ -43,9 +43,12 @@ func (c *ItemsLoader[T]) Upload(itemType string, list []T) error {
 		return fmt.Errorf("marshal data with itemType (%s) %w", itemType, mErr)
 	}
 
-	sErr := c.Sender.Post(url, contenttypes.ApplicationJSON, data)
+	resp, sErr := c.Sender.Post(url, contenttypes.ApplicationJSON, data)
 	if sErr != nil {
 		return fmt.Errorf("post request with itemType (%s) %w", itemType, sErr)
+	}
+	if resp != nil && resp.Body != nil {
+		return resp.Body.Close()
 	}
 	return nil
 }

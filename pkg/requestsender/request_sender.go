@@ -19,7 +19,7 @@ func New(c client, opts ...Option) *RequestSender {
 }
 
 // Post отправляет запрос методом Post
-func (s *RequestSender) Post(url string, contentType string, data []byte) error {
+func (s *RequestSender) Post(url string, contentType string, data []byte) (*http.Response, error) {
 	params := dto.ParamsDto{
 		Buf:     bytes.NewBuffer(data),
 		Headers: map[string]string{"Content-Type": contentType},
@@ -27,12 +27,12 @@ func (s *RequestSender) Post(url string, contentType string, data []byte) error 
 	for _, opt := range s.opts {
 		err := opt(&params)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 	r, err := http.NewRequest("POST", url, params.Buf)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	for k, v := range params.Headers {
 		r.Header.Set(k, v)
@@ -40,12 +40,9 @@ func (s *RequestSender) Post(url string, contentType string, data []byte) error 
 
 	resp, err := s.c.Do(r)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	if resp != nil && resp.Body != nil {
-		return resp.Body.Close()
-	}
-	return nil
+	return resp, nil
 }
 
 // Get отправляет запрос методом Get
