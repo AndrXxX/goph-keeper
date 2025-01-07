@@ -1,6 +1,8 @@
 package forms
 
 import (
+	"fmt"
+
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -9,8 +11,15 @@ import (
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/form"
+	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 	"github.com/AndrXxX/goph-keeper/pkg/entities"
+)
+
+const (
+	pfLogin = iota
+	pfPass
+	pfDesc
 )
 
 var passwordFormKeys = kb.KeyMap{
@@ -39,16 +48,16 @@ func NewPasswordForm(item *entities.PasswordItem) *passwordForm {
 		m.item = &entities.PasswordItem{}
 	}
 
-	m.baseForm.inputs[0].Prompt = "Login: "
-	m.baseForm.inputs[0].SetValue(m.item.Login)
+	m.baseForm.inputs[pfLogin].Prompt = "Login: "
+	m.baseForm.inputs[pfLogin].SetValue(m.item.Login)
 
-	m.baseForm.inputs[1].Prompt = "Password: "
-	m.baseForm.inputs[1].SetValue(m.item.Password)
-	//m.baseForm.inputs[1].EchoMode = textinput.EchoPassword
-	//m.baseForm.inputs[1].EchoCharacter = '•'
+	m.baseForm.inputs[pfPass].Prompt = "Password: "
+	m.baseForm.inputs[pfPass].SetValue(m.item.Password)
+	//m.baseForm.inputs[pfPass].EchoMode = textinput.EchoPassword
+	//m.baseForm.inputs[pfPass].EchoCharacter = '•'
 
-	m.baseForm.inputs[2].Prompt = "Description: "
-	m.baseForm.inputs[2].SetValue(m.item.Desc)
+	m.baseForm.inputs[pfDesc].Prompt = "Description: "
+	m.baseForm.inputs[pfDesc].SetValue(m.item.Desc)
 	return &m
 }
 
@@ -61,34 +70,26 @@ func (f *passwordForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, kb.Keys.Back):
-			println("kb.Keys.Back")
-			return f, func() tea.Msg {
-				return messages.ChangeView{
-					Name: names.PasswordList,
-				}
-			}
+			return f, helpers.GenCmd(messages.ChangeView{Name: names.PasswordList})
 		case key.Matches(msg, kb.Keys.Save):
-			// TODO: сделать уведомление
 			var nMsg tea.Msg
 			if f.creating {
-				nMsg = messages.AddPassword{
-					Item: f.getPasswordItem(),
-				}
+				nMsg = messages.AddPassword{Item: f.getPasswordItem()}
 			}
-			return f, func() tea.Msg {
-				return messages.ChangeView{
-					Name: names.PasswordList,
-					Msg:  nMsg,
-				}
+			cmdList := []tea.Cmd{
+				helpers.GenCmd(messages.ChangeView{Name: names.PasswordList, Msg: nMsg}),
+				helpers.GenCmd(messages.ShowMessage{Message: "Password successfully saved"}),
 			}
+			return f, tea.Batch(cmdList...)
 		case key.Matches(msg, kb.Keys.Copy):
 			c := clipboard.New()
 			err := c.CopyText(f.baseForm.inputs[f.baseForm.focusIndex].Value())
 			if err != nil {
-				println(err.Error())
+				return f, helpers.GenCmd(messages.ShowError{
+					Err: fmt.Sprintf("failed to copy: %s", err.Error()),
+				})
 			}
-			// TODO: process error
-			return f, nil
+			return f, helpers.GenCmd(messages.ShowMessage{Message: "value copied to clipboard"})
 		}
 	}
 	_, cmd := f.baseForm.Update(msg)
