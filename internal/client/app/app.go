@@ -3,12 +3,13 @@ package app
 import (
 	tea "github.com/charmbracelet/bubbletea"
 
+	"github.com/AndrXxX/goph-keeper/internal/client/state"
 	"github.com/AndrXxX/goph-keeper/internal/client/views"
 )
 
 type App struct {
 	TUI   *tea.Program
-	State *State
+	State *state.AppState
 	//sync   *SyncManager
 	//crypto *CryptoManager
 	Views map[string]views.View
