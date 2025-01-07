@@ -6,13 +6,14 @@ type Map map[names.ViewName]View
 
 func NewMap() Map {
 	return Map{
-		names.AuthMenu:     NewAuthMenu(),
-		names.LoginForm:    NewLoginForm(),
-		names.RegisterForm: NewRegisterForm(),
-		names.MainMenu:     NewMainMenu(),
-		names.PasswordList: NewPasswordList(),
-		names.NotesList:    NewNoteList(),
-		names.BankCardList: NewBankCardList(),
-		names.FileList:     NewFileList(),
+		names.AuthMenu:       NewAuthMenu(),
+		names.LoginForm:      NewLoginForm(),
+		names.MasterPassForm: NewMasterPassForm(),
+		names.RegisterForm:   NewRegisterForm(),
+		names.MainMenu:       NewMainMenu(),
+		names.PasswordList:   NewPasswordList(),
+		names.NotesList:      NewNoteList(),
+		names.BankCardList:   NewBankCardList(),
+		names.FileList:       NewFileList(),
 	}
 }
