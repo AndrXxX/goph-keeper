@@ -48,7 +48,6 @@ func (f *registerForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, kb.Keys.Back):
-			println("kb.Keys.Back")
 			return f, helpers.GenCmd(messages.ChangeView{
 				Name: names.AuthMenu,
 			})
@@ -63,12 +62,11 @@ func (f *registerForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			f.s.User.Login = u.Login
 			f.s.User.Password = u.Password
 			f.s.User.Token = token
-			changeCmd := helpers.GenCmd(messages.ChangeView{
-				Name: names.MasterPassForm,
-				View: f.f.MasterPassForm(),
-			})
-			infoCmd := helpers.GenCmd(messages.ShowMessage{Message: "Successfully logged in"})
-			return f, tea.Batch(changeCmd, infoCmd)
+			cmdList := []tea.Cmd{
+				helpers.GenCmd(messages.ChangeView{Name: names.MasterPassForm, View: f.f.MasterPassForm()}),
+				helpers.GenCmd(messages.ShowMessage{Message: "Successfully logged in"}),
+			}
+			return f, tea.Batch(cmdList...)
 		}
 	}
 	_, cmd := f.baseForm.Update(msg)
