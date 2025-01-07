@@ -10,6 +10,7 @@ import (
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/forms"
+	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/menuitems"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/styles"
@@ -52,27 +53,16 @@ func (m *authMenu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, kb.Keys.Enter):
-			return m, func() tea.Msg {
-				selected := m.list.SelectedItem().(menuitems.AuthItem)
-				switch selected.Code {
-				case "register":
-					return messages.ChangeView{
-						Name: names.RegisterForm,
-						View: m.f.RegisterForm(),
-					}
-				case "login":
-					return messages.ChangeView{
-						Name: names.LoginForm,
-						View: m.f.LoginForm(),
-					}
-				case "master_pass":
-					return messages.ChangeView{
-						Name: names.MasterPassForm,
-						View: m.f.MasterPassForm(),
-					}
-				}
-				return nil
+			selected := m.list.SelectedItem().(menuitems.AuthItem)
+			switch selected.Code {
+			case "register":
+				return m, helpers.GenCmd(messages.ChangeView{Name: names.RegisterForm, View: m.f.RegisterForm()})
+			case "login":
+				return m, helpers.GenCmd(messages.ChangeView{Name: names.LoginForm, View: m.f.LoginForm()})
+			case "master_pass":
+				return m, helpers.GenCmd(messages.ChangeView{Name: names.MasterPassForm, View: m.f.MasterPassForm()})
 			}
+			return m, nil
 		}
 		m.list, cmd = m.list.Update(msg)
 		return m, cmd
