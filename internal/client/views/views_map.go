@@ -7,7 +7,7 @@ type Map map[names.ViewName]View
 func NewMap() Map {
 	return Map{
 		names.AuthMenu:     NewAuthMenu(),
-		names.AuthForm:     NewAuthForm(),
+		names.LoginForm:    NewLoginForm(),
 		names.MainMenu:     NewMainMenu(),
 		names.PasswordList: NewPasswordList(),
 		names.NotesList:    NewNoteList(),

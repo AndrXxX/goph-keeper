@@ -54,8 +54,8 @@ func (m *authMenu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, kb.Keys.Enter):
 			return m, func() tea.Msg {
 				return messages.ChangeView{
-					Name: names.AuthForm,
-					View: NewAuthForm(),
+					Name: names.LoginForm,
+					View: NewLoginForm(),
 				}
 			}
 		}

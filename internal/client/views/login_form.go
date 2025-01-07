@@ -11,7 +11,7 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 )
 
-var authFormKeys = kb.KeyMap{
+var loginFormKeys = kb.KeyMap{
 	Short: []key.Binding{kb.Back, kb.Enter},
 	Full: [][]key.Binding{
 		{kb.Back, kb.Enter},
@@ -19,26 +19,26 @@ var authFormKeys = kb.KeyMap{
 	},
 }
 
-type authForm struct {
+type loginForm struct {
 	*baseForm
 }
 
-func NewAuthForm() *authForm {
-	m := authForm{
+func NewLoginForm() *loginForm {
+	m := loginForm{
 		baseForm: NewBaseForm("Enter an exist account", make([]textinput.Model, 2), form.FieldsUpdater{}),
 	}
-	m.baseForm.keys = &authFormKeys
+	m.baseForm.keys = &loginFormKeys
 	m.baseForm.inputs[0].Prompt = "Login: "
 	m.baseForm.inputs[1].Prompt = "Password: "
 
 	return &m
 }
 
-func (f *authForm) Init() tea.Cmd {
+func (f *loginForm) Init() tea.Cmd {
 	return textinput.Blink
 }
 
-func (f *authForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (f *loginForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch {
@@ -62,6 +62,6 @@ func (f *authForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return f, cmd
 }
 
-func (f *authForm) View() string {
+func (f *loginForm) View() string {
 	return f.baseForm.View()
 }

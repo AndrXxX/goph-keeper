@@ -13,5 +13,5 @@ const (
 	FileForm     = ViewName("fileForm")
 	MainMenu     = ViewName("mainMenu")
 	AuthMenu     = ViewName("authMenu")
-	AuthForm     = ViewName("authForm")
+	LoginForm    = ViewName("loginForm")
 )
