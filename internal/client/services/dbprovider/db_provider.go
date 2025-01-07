@@ -17,12 +17,13 @@ type DBProvider struct {
 
 func (p *DBProvider) IsDBExist() bool {
 	_, e := os.Stat(path)
-	if e != nil && os.IsNotExist(e) {
-		return false
-	}
-	return true
+	return e == nil || !os.IsNotExist(e)
 }
 
 func (p *DBProvider) DB(masterPass string) (*gorm.DB, error) {
 	return gorm.Open(sqlite.Open(path+params+masterPass), &gorm.Config{})
+}
+
+func (p *DBProvider) RemoveDB() error {
+	return os.RemoveAll(path)
 }
