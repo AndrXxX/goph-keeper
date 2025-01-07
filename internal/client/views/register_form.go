@@ -21,9 +21,10 @@ var registerFormKeys = kb.KeyMap{
 
 type registerForm struct {
 	*baseForm
+	r registerer
 }
 
-func NewRegisterForm() *registerForm {
+func newRegisterForm() *registerForm {
 	m := registerForm{
 		baseForm: NewBaseForm("Create a new account", make([]textinput.Model, 2), form.FieldsUpdater{}),
 	}

@@ -7,8 +7,10 @@ import (
 
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
+	"github.com/AndrXxX/goph-keeper/internal/client/state"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/form"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
+	"github.com/AndrXxX/goph-keeper/pkg/entities"
 )
 
 var loginFormKeys = kb.KeyMap{
@@ -21,16 +23,18 @@ var loginFormKeys = kb.KeyMap{
 
 type loginForm struct {
 	*baseForm
+	l loginer
+	s *state.AppState
+	f *Factory
 }
 
-func NewLoginForm() *loginForm {
+func newLoginForm() *loginForm {
 	m := loginForm{
 		baseForm: NewBaseForm("Enter an exist account", make([]textinput.Model, 2), form.FieldsUpdater{}),
 	}
 	m.baseForm.keys = &loginFormKeys
 	m.baseForm.inputs[0].Prompt = "Login: "
 	m.baseForm.inputs[1].Prompt = "Password: "
-
 	return &m
 }
 
@@ -50,10 +54,22 @@ func (f *loginForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			}
 		case key.Matches(msg, kb.Keys.Enter):
-			// TODO: check login/pass
+			u := entities.User{Login: f.inputs[0].Value(), Password: f.inputs[1].Value()}
+			token, err := f.l.Login(&u)
+			if err != nil {
+				return f, func() tea.Msg {
+					return messages.ShowError{
+						Err: err.Error(),
+					}
+				}
+			}
+			f.s.User.Login = u.Login
+			f.s.User.Password = u.Password
+			f.s.User.Token = token
 			return f, func() tea.Msg {
 				return messages.ChangeView{
-					Name: names.MainMenu,
+					Name: names.MasterPassForm,
+					View: f.f.MasterPassForm(),
 				}
 			}
 		}

@@ -26,9 +26,10 @@ type authMenu struct {
 	help   help.Model
 	height int
 	width  int
+	f      *Factory
 }
 
-func NewAuthMenu() *authMenu {
+func newAuthMenu() *authMenu {
 	defaultList := list.New([]list.Item{
 		menuitems.AuthItem{Name: "Register", Code: "register", Desc: "Create a new account"},
 		menuitems.AuthItem{Name: "Login", Code: "login", Desc: "Enter an exist account"},
@@ -62,10 +63,12 @@ func (m *authMenu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				case "login":
 					return messages.ChangeView{
 						Name: names.LoginForm,
+						View: m.f.LoginForm(),
 					}
 				case "master_pass":
 					return messages.ChangeView{
 						Name: names.MasterPassForm,
+						View: m.f.MasterPassForm(),
 					}
 				}
 				return nil

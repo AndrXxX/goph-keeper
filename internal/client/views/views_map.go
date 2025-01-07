@@ -4,16 +4,14 @@ import "github.com/AndrXxX/goph-keeper/internal/client/views/names"
 
 type Map map[names.ViewName]View
 
-func NewMap() Map {
+func NewMap(f Factory) Map {
 	return Map{
-		names.AuthMenu:       NewAuthMenu(),
-		names.LoginForm:      NewLoginForm(),
-		names.MasterPassForm: NewMasterPassForm(),
-		names.RegisterForm:   NewRegisterForm(),
-		names.MainMenu:       NewMainMenu(),
-		names.PasswordList:   NewPasswordList(),
-		names.NotesList:      NewNoteList(),
-		names.BankCardList:   NewBankCardList(),
-		names.FileList:       NewFileList(),
+		names.AuthMenu:     f.AuthMenu(),
+		names.RegisterForm: f.RegisterForm(),
+		names.MainMenu:     NewMainMenu(),
+		names.PasswordList: NewPasswordList(),
+		names.NotesList:    NewNoteList(),
+		names.BankCardList: NewBankCardList(),
+		names.FileList:     NewFileList(),
 	}
 }

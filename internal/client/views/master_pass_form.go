@@ -7,6 +7,7 @@ import (
 
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
+	"github.com/AndrXxX/goph-keeper/internal/client/state"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/form"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 )
@@ -21,9 +22,10 @@ var masterPassFormKeys = kb.KeyMap{
 
 type masterPassForm struct {
 	*baseForm
+	s *state.AppState
 }
 
-func NewMasterPassForm() *masterPassForm {
+func newMasterPassForm() *masterPassForm {
 	m := masterPassForm{
 		baseForm: NewBaseForm("Enter a master password to access", make([]textinput.Model, 1), form.FieldsUpdater{}),
 	}
