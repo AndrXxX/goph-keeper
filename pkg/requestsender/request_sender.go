@@ -47,3 +47,26 @@ func (s *RequestSender) Post(url string, contentType string, data []byte) error 
 	}
 	return nil
 }
+
+// Get отправляет запрос методом Get
+func (s *RequestSender) Get(url string, contentType string) (*http.Response, error) {
+	params := dto.ParamsDto{
+		Headers: map[string]string{"Content-Type": contentType},
+	}
+	for _, opt := range s.opts {
+		err := opt(&params)
+		if err != nil {
+			return nil, err
+		}
+	}
+	r, err := http.NewRequest("GET", url, params.Buf)
+	if err != nil {
+		return nil, err
+	}
+	for k, v := range params.Headers {
+		r.Header.Set(k, v)
+	}
+
+	resp, err := s.c.Do(r)
+	return resp, err
+}
