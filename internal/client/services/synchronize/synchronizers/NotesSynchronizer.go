@@ -13,7 +13,7 @@ import (
 type NotesSynchronizer struct {
 	LC convertors.ListConvertor[entities.NoteItem]
 	L  loader[entities.NoteItem]
-	s  interfaces.Storage[entities.NoteItem]
+	S  interfaces.Storage[entities.NoteItem]
 }
 
 func (s *NotesSynchronizer) Sync(updates []any) error {
@@ -38,9 +38,9 @@ func (s *NotesSynchronizer) Download() error {
 		return fmt.Errorf("download notes - unexpected code: %v", code)
 	}
 	for i := range list {
-		exist := s.s.Find(&list[i])
+		exist := s.S.Find(&list[i])
 		if exist == nil {
-			_, err := s.s.Create(exist)
+			_, err := s.S.Create(&list[i])
 			if err != nil {
 				return fmt.Errorf("create note item: %w", err)
 			}
@@ -48,7 +48,7 @@ func (s *NotesSynchronizer) Download() error {
 		}
 		exist.Text = list[i].Text
 		exist.StoredItem = list[i].StoredItem
-		err := s.s.Update(exist)
+		err := s.S.Update(exist)
 		if err != nil {
 			return fmt.Errorf("update note item: %w", err)
 		}

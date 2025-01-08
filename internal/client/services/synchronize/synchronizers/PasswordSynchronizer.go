@@ -13,7 +13,7 @@ import (
 type PasswordSynchronizer struct {
 	LC convertors.ListConvertor[entities.PasswordItem]
 	L  loader[entities.PasswordItem]
-	s  interfaces.Storage[entities.PasswordItem]
+	S  interfaces.Storage[entities.PasswordItem]
 }
 
 func (s *PasswordSynchronizer) Sync(updates []any) error {
@@ -38,9 +38,9 @@ func (s *PasswordSynchronizer) Download() error {
 		return fmt.Errorf("could not download passwords - unexpected code: %v", code)
 	}
 	for i := range list {
-		exist := s.s.Find(&list[i])
+		exist := s.S.Find(&list[i])
 		if exist == nil {
-			_, err := s.s.Create(exist)
+			_, err := s.S.Create(&list[i])
 			if err != nil {
 				return fmt.Errorf("create password item: %w", err)
 			}
@@ -49,7 +49,7 @@ func (s *PasswordSynchronizer) Download() error {
 		exist.Login = list[i].Login
 		exist.Password = list[i].Password
 		exist.StoredItem = list[i].StoredItem
-		err := s.s.Update(exist)
+		err := s.S.Update(exist)
 		if err != nil {
 			return fmt.Errorf("update password item: %w", err)
 		}

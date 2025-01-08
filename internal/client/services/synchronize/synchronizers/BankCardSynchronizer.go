@@ -13,7 +13,7 @@ import (
 type BankCardSynchronizer struct {
 	LC convertors.ListConvertor[entities.BankCardItem]
 	L  loader[entities.BankCardItem]
-	s  interfaces.Storage[entities.BankCardItem]
+	S  interfaces.Storage[entities.BankCardItem]
 }
 
 func (s *BankCardSynchronizer) Sync(updates []any) error {
@@ -38,9 +38,9 @@ func (s *BankCardSynchronizer) Download() error {
 		return fmt.Errorf("download bank cards - unexpected code: %v", code)
 	}
 	for i := range list {
-		exist := s.s.Find(&list[i])
+		exist := s.S.Find(&list[i])
 		if exist == nil {
-			_, err := s.s.Create(exist)
+			_, err := s.S.Create(&list[i])
 			if err != nil {
 				return fmt.Errorf("create bank card item: %w", err)
 			}
@@ -51,7 +51,7 @@ func (s *BankCardSynchronizer) Download() error {
 		exist.Validity = list[i].Validity
 		exist.Cardholder = list[i].Cardholder
 		exist.StoredItem = list[i].StoredItem
-		err := s.s.Update(exist)
+		err := s.S.Update(exist)
 		if err != nil {
 			return fmt.Errorf("update bank card item: %w", err)
 		}
