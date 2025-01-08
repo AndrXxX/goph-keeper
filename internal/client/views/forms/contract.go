@@ -1,6 +1,6 @@
 package forms
 
-import "github.com/AndrXxX/goph-keeper/pkg/entities"
+import "github.com/AndrXxX/goph-keeper/internal/client/entities"
 
 type Registerer interface {
 	Register(u *entities.User) (string, error)

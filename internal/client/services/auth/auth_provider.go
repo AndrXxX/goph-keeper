@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/AndrXxX/goph-keeper/internal/client/entities"
 	"github.com/AndrXxX/goph-keeper/internal/enums/contenttypes"
-	"github.com/AndrXxX/goph-keeper/pkg/entities"
 )
 
 const (
