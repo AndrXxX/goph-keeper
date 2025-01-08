@@ -7,6 +7,7 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/client/entities"
 	"github.com/AndrXxX/goph-keeper/internal/client/interfaces"
 	"github.com/AndrXxX/goph-keeper/internal/client/services/synchronize/convertors"
+	"github.com/AndrXxX/goph-keeper/internal/client/services/synchronize/e"
 	"github.com/AndrXxX/goph-keeper/internal/enums/datatypes"
 )
 
@@ -22,6 +23,9 @@ func (s *NotesSynchronizer) Sync(updates []any) error {
 		return fmt.Errorf("convert note updates: %w", cErr)
 	}
 	code, uErr := s.L.Upload(datatypes.Notes, list)
+	if code == http.StatusUnauthorized {
+		return e.UnauthorizedError
+	}
 	if uErr != nil {
 		return fmt.Errorf("upload note updates: %w", cErr)
 	}
@@ -37,6 +41,9 @@ func (s *NotesSynchronizer) Sync(updates []any) error {
 
 func (s *NotesSynchronizer) Download() error {
 	code, list := s.L.Download(datatypes.Notes)
+	if code == http.StatusUnauthorized {
+		return e.UnauthorizedError
+	}
 	if code != http.StatusOK {
 		return fmt.Errorf("download notes - unexpected code: %v", code)
 	}
