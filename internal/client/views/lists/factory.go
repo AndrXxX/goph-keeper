@@ -37,7 +37,13 @@ func (f *Factory) NoteList() *noteList {
 }
 
 func (f *Factory) BankCardList() *bankCardList {
-	return newBankCardList()
+	l := newBankCardList()
+	l.sm = f.SM
+	l.lr = &helpers.ListRefresher[entities.BankCardItem]{
+		S:    f.FF.AppState.Storages.BankCard,
+		List: &l.list,
+	}
+	return l
 }
 
 func (f *Factory) FileList() *fileList {
