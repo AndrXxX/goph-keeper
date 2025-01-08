@@ -11,9 +11,11 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/client/entities"
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
+	"github.com/AndrXxX/goph-keeper/internal/client/views/contract"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/form"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
+	"github.com/AndrXxX/goph-keeper/internal/enums/datatypes"
 )
 
 const (
@@ -37,13 +39,15 @@ type bankCardForm struct {
 	creating bool
 	fu       form.FieldsUpdater
 	*baseForm
+	sm contract.SyncManager
 }
 
-func NewBankCardForm(item *entities.BankCardItem) *bankCardForm {
+func NewBankCardForm(item *entities.BankCardItem, sm contract.SyncManager) *bankCardForm {
 	m := bankCardForm{
 		baseForm: NewBaseForm("Create/edit bank card", make([]textinput.Model, 5), form.FieldsUpdater{}),
 		creating: item == nil,
 		item:     item,
+		sm:       sm,
 	}
 	m.baseForm.keys = &bankCardFormKeys
 	if m.creating {
@@ -79,10 +83,15 @@ func (f *bankCardForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, kb.Keys.Back):
 			return f, helpers.GenCmd(messages.ChangeView{Name: names.BankCardList})
 		case key.Matches(msg, kb.Keys.Save):
-			return f, helpers.GenCmd(messages.ChangeView{
-				Name: names.BankCardList,
-				Msg:  messages.AddBankCard{Item: f.getBankCardItem()},
-			})
+			err := f.sm.Sync(datatypes.BankCards, []any{*f.getBankCardItem()})
+			if err != nil {
+				return f, helpers.GenCmd(messages.ShowError{Err: fmt.Sprintf("Ошибка при обновлении: %s", err)})
+			}
+			return f, tea.Batch(
+				helpers.GenCmd(messages.ChangeView{Name: names.BankCardList}),
+				helpers.GenCmd(messages.AddBankCard{Item: f.getBankCardItem()}),
+				helpers.GenCmd(messages.ShowMessage{Message: "Изменения сохранены"}),
+			)
 		case key.Matches(msg, kb.Keys.Copy):
 			c := clipboard.New()
 			err := c.CopyText(f.baseForm.inputs[f.baseForm.focusIndex].Value())
