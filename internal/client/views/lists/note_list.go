@@ -61,8 +61,8 @@ func (l *noteList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch {
 		case key.Matches(msg, kb.Keys.Edit, kb.Keys.Enter):
 			if len(l.list.VisibleItems()) != 0 {
-				e := l.list.SelectedItem().(*entities.NoteItem)
-				f := forms.NewNoteForm(e, l.sm)
+				e := l.list.SelectedItem().(entities.NoteItem)
+				f := forms.NewNoteForm(&e, l.sm)
 				return f, helpers.GenCmd(messages.ChangeView{Name: names.NoteForm, View: f})
 			}
 		case key.Matches(msg, kb.Keys.New):

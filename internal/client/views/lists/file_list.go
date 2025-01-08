@@ -54,8 +54,8 @@ func (pl *fileList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch {
 		case key.Matches(msg, kb.Keys.Edit, kb.Keys.Enter):
 			if len(pl.list.VisibleItems()) != 0 {
-				e := pl.list.SelectedItem().(*entities.FileItem)
-				f := forms.NewFileForm(e)
+				e := pl.list.SelectedItem().(entities.FileItem)
+				f := forms.NewFileForm(&e)
 				return f, helpers.GenCmd(messages.ChangeView{Name: names.FileForm, View: f})
 			}
 		case key.Matches(msg, kb.Keys.New):

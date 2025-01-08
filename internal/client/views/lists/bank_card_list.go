@@ -61,8 +61,8 @@ func (l *bankCardList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch {
 		case key.Matches(msg, kb.Keys.Edit, kb.Keys.Enter):
 			if len(l.list.VisibleItems()) != 0 {
-				e := l.list.SelectedItem().(*entities.BankCardItem)
-				f := forms.NewBankCardForm(e, l.sm)
+				e := l.list.SelectedItem().(entities.BankCardItem)
+				f := forms.NewBankCardForm(&e, l.sm)
 				return f, helpers.GenCmd(messages.ChangeView{Name: names.BankCardForm, View: f})
 			}
 		case key.Matches(msg, kb.Keys.New):
