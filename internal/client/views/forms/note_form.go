@@ -16,6 +16,11 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 )
 
+const (
+	nfText = iota
+	nfDesc
+)
+
 var noteFormKeys = kb.KeyMap{
 	Short: []key.Binding{kb.Back, kb.Save, kb.Copy},
 	Full: [][]key.Binding{
@@ -25,28 +30,26 @@ var noteFormKeys = kb.KeyMap{
 }
 
 type noteForm struct {
-	item     *entities.NoteItem
-	creating bool
-	fu       form.FieldsUpdater
+	item *entities.NoteItem
+	fu   form.FieldsUpdater
 	*baseForm
 }
 
 func NewNoteForm(item *entities.NoteItem) *noteForm {
 	m := noteForm{
 		baseForm: NewBaseForm("Create a new note", make([]textinput.Model, 2), form.FieldsUpdater{}),
-		creating: item == nil,
 		item:     item,
 	}
 	m.baseForm.keys = &noteFormKeys
-	if m.creating {
+	if m.item == nil {
 		m.item = &entities.NoteItem{}
 	}
 
-	m.baseForm.inputs[0].Prompt = "Text: "
-	m.baseForm.inputs[0].SetValue(m.item.Text)
+	m.baseForm.inputs[nfText].Prompt = "Text: "
+	m.baseForm.inputs[nfText].SetValue(m.item.Text)
 
-	m.baseForm.inputs[1].Prompt = "Description: "
-	m.baseForm.inputs[1].SetValue(m.item.Desc)
+	m.baseForm.inputs[nfDesc].Prompt = "Description: "
+	m.baseForm.inputs[nfDesc].SetValue(m.item.Desc)
 
 	return &m
 }
@@ -60,20 +63,12 @@ func (f *noteForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, kb.Keys.Back):
-			return f, func() tea.Msg {
-				return messages.ChangeView{
-					Name: names.NotesList,
-				}
-			}
+			return f, helpers.GenCmd(messages.ChangeView{Name: names.NotesList})
 		case key.Matches(msg, kb.Keys.Save):
-			return f, func() tea.Msg {
-				return messages.ChangeView{
-					Name: names.NotesList,
-					Msg: messages.AddNote{
-						Item: f.getNoteItem(),
-					},
-				}
-			}
+			return f, helpers.GenCmd(messages.ChangeView{
+				Name: names.NotesList,
+				Msg:  messages.AddNote{Item: f.getNoteItem()},
+			})
 		case key.Matches(msg, kb.Keys.Copy):
 			c := clipboard.New()
 			err := c.CopyText(f.baseForm.inputs[f.baseForm.focusIndex].Value())
@@ -88,8 +83,8 @@ func (f *noteForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (f *noteForm) getNoteItem() *entities.NoteItem {
-	f.item.Text = f.baseForm.inputs[0].Value()
-	f.item.Desc = f.baseForm.inputs[1].Value()
+	f.item.Text = f.baseForm.inputs[nfText].Value()
+	f.item.Desc = f.baseForm.inputs[nfDesc].Value()
 	return f.item
 }
 
