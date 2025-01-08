@@ -103,7 +103,8 @@ func (f *passwordForm) getPasswordItem() *entities.PasswordItem {
 	f.item.Login = f.baseForm.inputs[pfLogin].Value()
 	f.item.Password = f.baseForm.inputs[pfPass].Value()
 	f.item.Desc = f.baseForm.inputs[pfDesc].Value()
-	*f.item.UpdatedAt = time.Now()
+	now := time.Now()
+	f.item.UpdatedAt = &now
 	return f.item
 }
 

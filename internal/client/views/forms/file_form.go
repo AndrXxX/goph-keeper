@@ -81,7 +81,8 @@ func (f *fileForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (f *fileForm) getFileItem() *entities.FileItem {
 	f.item.Data = f.baseForm.inputs[0].Value()
 	f.item.Desc = f.baseForm.inputs[1].Value()
-	*f.item.UpdatedAt = time.Now()
+	now := time.Now()
+	f.item.UpdatedAt = &now
 	return f.item
 }
 
