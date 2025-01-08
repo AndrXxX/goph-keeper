@@ -1,11 +1,13 @@
 package lists
 
 import (
+	"github.com/AndrXxX/goph-keeper/internal/client/views/contract"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/forms"
 )
 
 type Factory struct {
 	FF *forms.Factory
+	SM contract.SyncManager
 }
 
 func (f *Factory) AuthMenu() *authMenu {
@@ -23,7 +25,10 @@ func (f *Factory) PasswordList() *passwordList {
 }
 
 func (f *Factory) NoteList() *noteList {
-	return newNoteList()
+	l := newNoteList()
+	l.s = f.FF.AppState
+	l.sm = f.SM
+	return l
 }
 
 func (f *Factory) BankCardList() *bankCardList {

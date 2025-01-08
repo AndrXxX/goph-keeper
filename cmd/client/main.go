@@ -2,10 +2,10 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"net/http"
-	"os"
+	"time"
 
+	tea "github.com/charmbracelet/bubbletea"
 	"go.uber.org/zap"
 
 	"github.com/AndrXxX/goph-keeper/internal/client/app"
@@ -14,9 +14,11 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/client/services/dbprovider"
 	"github.com/AndrXxX/goph-keeper/internal/client/services/ormstorages"
 	"github.com/AndrXxX/goph-keeper/internal/client/services/storageadapters"
+	"github.com/AndrXxX/goph-keeper/internal/client/services/synchronize"
 	"github.com/AndrXxX/goph-keeper/internal/client/state"
 	"github.com/AndrXxX/goph-keeper/internal/client/views"
 	"github.com/AndrXxX/goph-keeper/pkg/logger"
+	"github.com/AndrXxX/goph-keeper/pkg/queue"
 	"github.com/AndrXxX/goph-keeper/pkg/requestsender"
 	"github.com/AndrXxX/goph-keeper/pkg/urlbuilder"
 )
@@ -45,13 +47,20 @@ func main() {
 			BankCard: sa.ORMBankCardAdapter(sp.BankCard(ctx, db)),
 		},
 	}
+	sm := &synchronize.SyncManager{Synchronizers: synchronize.Synchronizers()}
 	viewsFactory := views.Factory{
 		AppState:   appState,
 		Loginer:    ap,
 		Registerer: ap,
+		SM:         sm,
 	}
-	if err := app.New(views.NewMap(viewsFactory), appState).Run(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+	application := app.App{
+		TUI:   tea.NewProgram(views.NewContainer(views.NewMap(viewsFactory)), tea.WithAltScreen()),
+		State: appState,
+		Sync:  sm,
+		QR:    queue.NewRunner(1 * time.Second),
+	}
+	if err := application.Run(); err != nil {
+		logger.Log.Fatal("failed to start application", zap.Error(err))
 	}
 }
