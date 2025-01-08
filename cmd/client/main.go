@@ -25,10 +25,8 @@ import (
 
 func main() {
 	_ = logger.Initialize("debug", []string{"./client.log"})
-	ap := &auth.Provider{
-		Sender: requestsender.New(&http.Client{}),
-		UB:     urlbuilder.New("http://localhost:8081"),
-	}
+	ub := urlbuilder.New("http://localhost:8081")
+	ap := &auth.Provider{Sender: requestsender.New(&http.Client{}), UB: ub}
 	ctx := context.Background()
 	dbProvider := &dbprovider.DBProvider{}
 	db, err := dbProvider.DB()
@@ -37,6 +35,7 @@ func main() {
 	}
 	sp := ormstorages.Factory()
 	sa := storageadapters.Factory{}
+	rs := requestsender.New(&http.Client{})
 	appState := &state.AppState{
 		User:       &entities.User{},
 		DBProvider: dbProvider,
@@ -46,8 +45,12 @@ func main() {
 			Note:     sa.ORMNotesAdapter(sp.Note(ctx, db)),
 			BankCard: sa.ORMBankCardAdapter(sp.BankCard(ctx, db)),
 		},
+		AS: func(u *entities.User) {
+			*rs = *requestsender.New(&http.Client{}, requestsender.WithToken(u.Token))
+		},
 	}
-	sm := &synchronize.SyncManager{Synchronizers: synchronize.Synchronizers()}
+	sFactory := synchronize.Factory{RS: rs, UB: ub, Storages: (*synchronize.Storages)(appState.Storages)}
+	sm := &synchronize.SyncManager{Synchronizers: sFactory.Map()}
 	viewsFactory := views.Factory{
 		AppState:   appState,
 		Loginer:    ap,

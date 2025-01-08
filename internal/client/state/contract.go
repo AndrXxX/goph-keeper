@@ -19,3 +19,5 @@ type Storages struct {
 	Note     interfaces.Storage[entities.NoteItem]
 	BankCard interfaces.Storage[entities.BankCardItem]
 }
+
+type authSetup func(u *entities.User)
