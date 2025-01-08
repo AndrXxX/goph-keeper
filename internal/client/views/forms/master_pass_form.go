@@ -1,7 +1,6 @@
 package forms
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/charmbracelet/bubbles/key"
@@ -59,7 +58,7 @@ func (f *masterPassForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			})
 		case key.Matches(msg, kb.Keys.Enter):
 			if f.s.User.Login == "" && !f.s.DBProvider.IsDBExist() {
-				return f, helpers.GenCmd(messages.ShowError{Err: "local database not exist, need to auth by login/pass"})
+				return f, helpers.GenCmd(messages.ShowError{Err: "local database not exist, need to auth by login/pass or register"})
 			}
 			if len(f.baseForm.inputs[mpFormPassword].Value()) < minPassLength {
 				return f, helpers.GenCmd(messages.ShowError{
@@ -70,12 +69,8 @@ func (f *masterPassForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return f, helpers.GenCmd(messages.ShowError{Err: "passwords must be equal"})
 			}
 			f.s.User.MasterPassword = f.baseForm.inputs[mpFormPassword].Value()
-			db, err := f.s.DBProvider.DB(f.s.User.MasterPassword)
-			if err != nil {
-				return f, helpers.GenCmd(messages.ShowError{Err: fmt.Sprintf("error opening local database connection: %s", err.Error())})
-			}
-			f.s.InitStorages(context.TODO(), db)
-			if f.s.User.Login != "" && f.s.User.ID == 0 {
+			if f.s.User.Login != "" {
+				// TODO: clear DB
 				created, err := f.s.Storages.User.Create(f.s.User)
 				if err != nil {
 					return f, helpers.GenCmd(messages.ShowError{Err: fmt.Sprintf("error saving user: %s", err.Error())})
