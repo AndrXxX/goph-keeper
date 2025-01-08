@@ -9,6 +9,9 @@ type BankCardOrmEntityConvertor struct {
 }
 
 func (c BankCardOrmEntityConvertor) Convert(m *ormmodels.BankCardItem) *entities.BankCardItem {
+	if m == nil {
+		return nil
+	}
 	return &entities.BankCardItem{
 		StoredItem: *ItemOrmEntityConvertor{}.Convert(&m.StoredItem),
 		Number:     m.Number,

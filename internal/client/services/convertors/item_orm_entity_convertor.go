@@ -9,5 +9,8 @@ type ItemOrmEntityConvertor struct {
 }
 
 func (c ItemOrmEntityConvertor) Convert(m *ormmodels.StoredItem) *entities.StoredItem {
+	if m == nil {
+		return nil
+	}
 	return &entities.StoredItem{ID: m.ID, Desc: m.Desc, UpdatedAt: m.UpdatedAt}
 }

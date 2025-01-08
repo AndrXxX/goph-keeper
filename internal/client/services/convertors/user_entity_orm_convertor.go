@@ -9,6 +9,9 @@ type UserEntityOrmConvertor struct {
 }
 
 func (c UserEntityOrmConvertor) Convert(e *entities.User) *ormmodels.User {
+	if e == nil {
+		return nil
+	}
 	return &ormmodels.User{
 		ID:             e.ID,
 		Login:          e.Login,

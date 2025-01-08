@@ -9,6 +9,9 @@ type NoteEntityOrmConvertor struct {
 }
 
 func (c NoteEntityOrmConvertor) Convert(e *entities.NoteItem) *ormmodels.NoteItem {
+	if e == nil {
+		return nil
+	}
 	return &ormmodels.NoteItem{
 		StoredItem: *ItemEntityOrmConvertor{}.Convert(&e.StoredItem),
 		Text:       e.Text,

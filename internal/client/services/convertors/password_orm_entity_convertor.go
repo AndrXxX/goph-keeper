@@ -9,6 +9,9 @@ type PasswordOrmEntityConvertor struct {
 }
 
 func (c PasswordOrmEntityConvertor) Convert(m *ormmodels.PasswordItem) *entities.PasswordItem {
+	if m == nil {
+		return nil
+	}
 	return &entities.PasswordItem{
 		StoredItem: *ItemOrmEntityConvertor{}.Convert(&m.StoredItem),
 		Login:      m.Login,
