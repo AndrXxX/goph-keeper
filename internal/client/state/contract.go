@@ -11,7 +11,7 @@ import (
 
 type dbProvider interface {
 	IsDBExist() bool
-	DB(masterPass string) (*gorm.DB, error)
+	DB() (*gorm.DB, error)
 	RemoveDB() error
 }
 
