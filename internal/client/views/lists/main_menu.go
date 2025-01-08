@@ -32,7 +32,7 @@ func newMainMenu() *mainMenu {
 		menuitems.MainMenuItem{Name: "Passwords", Code: datatypes.Passwords, Desc: "Manage passwords"},
 		menuitems.MainMenuItem{Name: "Notes", Code: datatypes.Notes, Desc: "Manage notes"},
 		menuitems.MainMenuItem{Name: "Bank Cards", Code: datatypes.BankCards, Desc: "Manage bank cards"},
-		menuitems.MainMenuItem{Name: "Files", Code: datatypes.Files, Desc: "Manage files"},
+		//menuitems.MainMenuItem{Name: "Files", Code: datatypes.Files, Desc: "Manage files"},
 	}, list.NewDefaultDelegate(), 0, 0)
 	defaultList.SetShowHelp(false)
 	defaultList.Title = "Menu"
