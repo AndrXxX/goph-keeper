@@ -62,13 +62,13 @@ func (m *Container) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.errors.Store(msg.Err, msg.Err)
 		go func() {
 			time.Sleep(errorsTimeout)
-			m.errors.Clear()
+			m.errors.Delete(msg.Err)
 		}()
 	case messages.ShowMessage:
 		m.messages.Store(msg.Message, msg.Message)
 		go func() {
 			time.Sleep(errorsTimeout)
-			m.messages.Clear()
+			m.messages.Delete(msg.Message)
 		}()
 	case messages.ChangeView:
 		m.current = msg.Name
