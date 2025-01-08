@@ -60,7 +60,7 @@ func (m *authMenu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "login":
 				return m, helpers.GenCmd(messages.ChangeView{Name: names.LoginForm, View: m.f.LoginForm()})
 			case "master_pass":
-				return m, helpers.GenCmd(messages.ChangeView{Name: names.MasterPassForm, View: m.f.MasterPassForm()})
+				return m, helpers.GenCmd(messages.ChangeView{Name: names.MasterPassAuthForm, View: m.f.MasterPassAuthForm()})
 			}
 			return m, nil
 		}

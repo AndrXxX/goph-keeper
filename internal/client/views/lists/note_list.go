@@ -76,7 +76,7 @@ func (l *noteList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		l.list.SetSize(msg.Width/styles.InnerMargin, msg.Height/2)
 	case messages.AddNote:
-		err := l.sm.Sync(datatypes.Notes, []any{msg.Item})
+		err := l.sm.Sync(datatypes.Notes, []any{*msg.Item})
 		if err != nil {
 			return l, helpers.GenCmd(messages.ShowError{Err: "Ошибка при обновлении"})
 		}

@@ -26,8 +26,14 @@ func (f *Factory) RegisterForm() *registerForm {
 	return rf
 }
 
-func (f *Factory) MasterPassForm() *masterPassForm {
-	mpf := newMasterPassForm()
+func (f *Factory) MasterPassRegForm() *masterPassRegForm {
+	mpf := newMasterPassRegForm()
+	mpf.s = f.AppState
+	return mpf
+}
+
+func (f *Factory) MasterPassAuthForm() *masterPassAuthForm {
+	mpf := newMasterPassAuthForm()
 	mpf.s = f.AppState
 	return mpf
 }

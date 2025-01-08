@@ -63,7 +63,7 @@ func (f *registerForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			f.s.User.Password = u.Password
 			f.s.User.Token = token
 			cmdList := []tea.Cmd{
-				helpers.GenCmd(messages.ChangeView{Name: names.MasterPassForm, View: f.f.MasterPassForm()}),
+				helpers.GenCmd(messages.ChangeView{Name: names.MasterPassRegForm, View: f.f.MasterPassRegForm()}),
 				helpers.GenCmd(messages.ShowMessage{Message: "Successfully logged in"}),
 			}
 			return f, tea.Batch(cmdList...)

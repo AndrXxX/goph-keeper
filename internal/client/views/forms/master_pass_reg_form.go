@@ -15,7 +15,7 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 )
 
-var masterPassFormKeys = kb.KeyMap{
+var masterPassRegFormKeys = kb.KeyMap{
 	Short: []key.Binding{kb.Back, kb.Enter},
 	Full: [][]key.Binding{
 		{kb.Back, kb.Enter},
@@ -24,31 +24,31 @@ var masterPassFormKeys = kb.KeyMap{
 }
 
 const (
-	mpFormPassword = iota
-	mpFormRepeat
+	mprFormPassword = iota
+	mprFormRepeat
 )
 const minPassLength = 5
 
-type masterPassForm struct {
+type masterPassRegForm struct {
 	*baseForm
 	s *state.AppState
 }
 
-func newMasterPassForm() *masterPassForm {
-	m := masterPassForm{
+func newMasterPassRegForm() *masterPassRegForm {
+	m := masterPassRegForm{
 		baseForm: NewBaseForm("Enter a master password to access", make([]textinput.Model, 2), form.FieldsUpdater{}),
 	}
-	m.baseForm.keys = &masterPassFormKeys
-	m.baseForm.inputs[mpFormPassword].Prompt = "Password: "
-	m.baseForm.inputs[mpFormRepeat].Prompt = "Repeat password: "
+	m.baseForm.keys = &masterPassRegFormKeys
+	m.baseForm.inputs[mprFormPassword].Prompt = "Password: "
+	m.baseForm.inputs[mprFormRepeat].Prompt = "Repeat password: "
 	return &m
 }
 
-func (f *masterPassForm) Init() tea.Cmd {
+func (f *masterPassRegForm) Init() tea.Cmd {
 	return textinput.Blink
 }
 
-func (f *masterPassForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (f *masterPassRegForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch {
@@ -57,25 +57,18 @@ func (f *masterPassForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				Name: names.AuthMenu,
 			})
 		case key.Matches(msg, kb.Keys.Enter):
-			if f.s.User.Login == "" && !f.s.DBProvider.IsDBExist() {
-				return f, helpers.GenCmd(messages.ShowError{Err: "local database not exist, need to auth by login/pass or register"})
-			}
-			if len(f.baseForm.inputs[mpFormPassword].Value()) < minPassLength {
+			if len(f.baseForm.inputs[mprFormPassword].Value()) < minPassLength {
 				return f, helpers.GenCmd(messages.ShowError{
 					Err: fmt.Sprintf("password must be at least %d characters long", minPassLength),
 				})
 			}
-			if f.baseForm.inputs[mpFormPassword].Value() != f.baseForm.inputs[mpFormRepeat].Value() {
+			if f.baseForm.inputs[mprFormPassword].Value() != f.baseForm.inputs[mprFormRepeat].Value() {
 				return f, helpers.GenCmd(messages.ShowError{Err: "passwords must be equal"})
 			}
-			f.s.User.MasterPassword = f.baseForm.inputs[mpFormPassword].Value()
-			if f.s.User.Login != "" {
-				// TODO: clear DB
-				created, err := f.s.Storages.User.Create(f.s.User)
-				if err != nil {
-					return f, helpers.GenCmd(messages.ShowError{Err: fmt.Sprintf("error saving user: %s", err.Error())})
-				}
-				f.s.User = created
+			f.s.User.MasterPassword = f.baseForm.inputs[mprFormPassword].Value()
+			err := f.s.Auth()
+			if err != nil {
+				return f, tea.Batch(helpers.GenCmd(messages.ShowError{Err: fmt.Sprintf("ошибка при входе %s", err)}))
 			}
 			return f, tea.Batch(helpers.GenCmd(messages.ChangeView{Name: names.MainMenu}))
 		}
@@ -84,6 +77,6 @@ func (f *masterPassForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return f, cmd
 }
 
-func (f *masterPassForm) View() string {
+func (f *masterPassRegForm) View() string {
 	return f.baseForm.View()
 }
