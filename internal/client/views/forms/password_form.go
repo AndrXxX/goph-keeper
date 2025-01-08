@@ -78,7 +78,6 @@ func (f *passwordForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if err != nil {
 				return f, helpers.GenCmd(messages.ShowError{Err: fmt.Sprintf("Ошибка при обновлении: %s", err)})
 			}
-			//return l, helpers.GenCmd(messages.ShowMessage{Message: "Изменения сохранены"})
 			return f, tea.Batch(
 				helpers.GenCmd(messages.ChangeView{Name: names.PasswordList}),
 				helpers.GenCmd(messages.AddPassword{Item: f.getPasswordItem()}),

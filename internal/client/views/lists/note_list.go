@@ -15,7 +15,6 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/styles"
-	"github.com/AndrXxX/goph-keeper/internal/enums/datatypes"
 )
 
 var noteListKeys = kb.KeyMap{
@@ -56,21 +55,18 @@ func (l *noteList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		l.list.SetSize(msg.Width/styles.InnerMargin, msg.Height/2)
 	case messages.AddNote:
-		err := l.sm.Sync(datatypes.Notes, []any{*msg.Item})
-		if err != nil {
-			return l, helpers.GenCmd(messages.ShowError{Err: "Ошибка при обновлении"})
-		}
-		return l, helpers.GenCmd(messages.ShowMessage{Message: "Изменения сохранены"})
+		l.lr.Refresh()
+		return l, nil
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, kb.Keys.Edit, kb.Keys.Enter):
 			if len(l.list.VisibleItems()) != 0 {
 				e := l.list.SelectedItem().(*entities.NoteItem)
-				f := forms.NewNoteForm(e)
+				f := forms.NewNoteForm(e, l.sm)
 				return f, helpers.GenCmd(messages.ChangeView{Name: names.NoteForm, View: f})
 			}
 		case key.Matches(msg, kb.Keys.New):
-			f := forms.NewNoteForm(nil)
+			f := forms.NewNoteForm(nil, l.sm)
 			return f, helpers.GenCmd(messages.ChangeView{Name: names.NoteForm, View: f})
 		case key.Matches(msg, kb.Keys.Back):
 			return l, helpers.GenCmd(messages.ChangeView{Name: names.MainMenu})
