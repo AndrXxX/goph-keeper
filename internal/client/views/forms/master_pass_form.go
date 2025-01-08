@@ -58,7 +58,7 @@ func (f *masterPassForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				Name: names.AuthMenu,
 			})
 		case key.Matches(msg, kb.Keys.Enter):
-			if f.s.User.Login == "" && f.s.DBProvider.IsDBExist() {
+			if f.s.User.Login == "" && !f.s.DBProvider.IsDBExist() {
 				return f, helpers.GenCmd(messages.ShowError{Err: "local database not exist, need to auth by login/pass"})
 			}
 			if len(f.baseForm.inputs[mpFormPassword].Value()) < minPassLength {
