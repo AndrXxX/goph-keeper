@@ -33,3 +33,11 @@ func (f Factory) ORMBankCardAdapter(s interfaces.Storage[orm.BankCardItem]) ORMA
 		Storage:         s,
 	}
 }
+
+func (f Factory) ORMUserAdapter(s interfaces.Storage[orm.User]) ORMAdapter[e.User, orm.User] {
+	return ORMAdapter[e.User, orm.User]{
+		ORMConvertor:    convertors.UserOrmEntityConvertor{},
+		EntityConvertor: convertors.UserEntityOrmConvertor{},
+		Storage:         s,
+	}
+}
