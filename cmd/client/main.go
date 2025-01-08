@@ -35,21 +35,22 @@ func main() {
 	}
 	sp := ormstorages.Factory()
 	sa := storageadapters.Factory{}
-	viewsFactory := views.Factory{
-		AppState: &state.AppState{
-			User:       &entities.User{},
-			DBProvider: dbProvider,
-			Storages: &state.Storages{
-				User:     sa.ORMUserAdapter(sp.User(ctx, db)),
-				Password: sa.ORMPasswordsAdapter(sp.Password(ctx, db)),
-				Note:     sa.ORMNotesAdapter(sp.Note(ctx, db)),
-				BankCard: sa.ORMBankCardAdapter(sp.BankCard(ctx, db)),
-			},
+	appState := &state.AppState{
+		User:       &entities.User{},
+		DBProvider: dbProvider,
+		Storages: &state.Storages{
+			User:     sa.ORMUserAdapter(sp.User(ctx, db)),
+			Password: sa.ORMPasswordsAdapter(sp.Password(ctx, db)),
+			Note:     sa.ORMNotesAdapter(sp.Note(ctx, db)),
+			BankCard: sa.ORMBankCardAdapter(sp.BankCard(ctx, db)),
 		},
+	}
+	viewsFactory := views.Factory{
+		AppState:   appState,
 		Loginer:    ap,
 		Registerer: ap,
 	}
-	if err := app.New(views.NewMap(viewsFactory)).Run(); err != nil {
+	if err := app.New(views.NewMap(viewsFactory), appState).Run(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}

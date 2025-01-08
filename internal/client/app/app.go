@@ -12,13 +12,13 @@ type App struct {
 	State *state.AppState
 	//sync   *SyncManager
 	//crypto *CryptoManager
-	Views map[string]views.View
 }
 
-func New(l views.Map) *App {
+func New(l views.Map, s *state.AppState) *App {
 	p := tea.NewProgram(views.NewContainer(l), tea.WithAltScreen())
 	return &App{
-		TUI: p,
+		TUI:   p,
+		State: s,
 	}
 }
 
