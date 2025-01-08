@@ -1,12 +1,11 @@
 package forms
 
 import (
-	"fmt"
-
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 
+	"github.com/AndrXxX/goph-keeper/internal/client/entities"
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
 	"github.com/AndrXxX/goph-keeper/internal/client/state"
@@ -54,10 +53,11 @@ func (f *masterPassAuthForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				Name: names.AuthMenu,
 			})
 		case key.Matches(msg, kb.Keys.Enter):
+			f.s.User = &entities.User{}
 			f.s.User.MasterPassword = f.baseForm.inputs[mprFormPassword].Value()
 			err := f.s.Auth()
 			if err != nil {
-				return f, tea.Batch(helpers.GenCmd(messages.ShowError{Err: fmt.Sprintf("ошибка при входе %s", err)}))
+				return f, tea.Batch(helpers.GenCmd(messages.ShowError{Err: err.Error()}))
 			}
 			return f, tea.Batch(helpers.GenCmd(messages.ChangeView{Name: names.MainMenu}))
 		}
