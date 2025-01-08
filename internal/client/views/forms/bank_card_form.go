@@ -113,7 +113,7 @@ func (f *bankCardForm) getBankCardItem() *entities.BankCardItem {
 	f.item.Cardholder = f.baseForm.inputs[bcHolder].Value()
 	f.item.Desc = f.baseForm.inputs[bcDesc].Value()
 	now := time.Now()
-	f.item.UpdatedAt = &now
+	f.item.UpdatedAt = now
 	return f.item
 }
 

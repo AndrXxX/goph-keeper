@@ -1,5 +1,11 @@
 package entities
 
+import (
+	"fmt"
+
+	"github.com/AndrXxX/goph-keeper/internal/client/formats"
+)
+
 type NoteItem struct {
 	StoredItem
 	Text string `json:"text"`
@@ -14,5 +20,5 @@ func (i NoteItem) Title() string {
 }
 
 func (i NoteItem) Description() string {
-	return i.Desc
+	return fmt.Sprintf("%s [%s]", i.Desc, i.UpdatedAt.Format(formats.FullDate))
 }

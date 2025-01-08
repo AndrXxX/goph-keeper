@@ -95,8 +95,7 @@ func (f *noteForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (f *noteForm) getNoteItem() *entities.NoteItem {
 	f.item.Text = f.baseForm.inputs[nfText].Value()
 	f.item.Desc = f.baseForm.inputs[nfDesc].Value()
-	now := time.Now()
-	f.item.UpdatedAt = &now
+	f.item.UpdatedAt = time.Now()
 	return f.item
 }
 

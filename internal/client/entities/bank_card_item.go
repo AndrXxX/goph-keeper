@@ -1,5 +1,11 @@
 package entities
 
+import (
+	"fmt"
+
+	"github.com/AndrXxX/goph-keeper/internal/client/formats"
+)
+
 type BankCardItem struct {
 	StoredItem
 	Number     string `json:"number"`
@@ -17,5 +23,5 @@ func (i BankCardItem) Title() string {
 }
 
 func (i BankCardItem) Description() string {
-	return i.Desc
+	return fmt.Sprintf("%s [%s]", i.Desc, i.UpdatedAt.Format(formats.FullDate))
 }

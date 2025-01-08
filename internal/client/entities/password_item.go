@@ -1,19 +1,25 @@
 package entities
 
+import (
+	"fmt"
+
+	"github.com/AndrXxX/goph-keeper/internal/client/formats"
+)
+
 type PasswordItem struct {
 	StoredItem
 	Login    string `json:"login"`
 	Password string `json:"password"`
 }
 
-func (si PasswordItem) FilterValue() string {
-	return si.Login + si.Desc
+func (i PasswordItem) FilterValue() string {
+	return i.Login + i.Desc
 }
 
-func (si PasswordItem) Title() string {
-	return si.Login
+func (i PasswordItem) Title() string {
+	return i.Login
 }
 
-func (si PasswordItem) Description() string {
-	return si.Desc
+func (i PasswordItem) Description() string {
+	return fmt.Sprintf("%s [%s]", i.Desc, i.UpdatedAt.Format(formats.FullDate))
 }
