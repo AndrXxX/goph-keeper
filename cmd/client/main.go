@@ -1,15 +1,19 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"os"
 
+	"go.uber.org/zap"
+
 	"github.com/AndrXxX/goph-keeper/internal/client/app"
-	"github.com/AndrXxX/goph-keeper/internal/client/ormmodels"
+	"github.com/AndrXxX/goph-keeper/internal/client/entities"
 	"github.com/AndrXxX/goph-keeper/internal/client/services/auth"
 	"github.com/AndrXxX/goph-keeper/internal/client/services/dbprovider"
 	"github.com/AndrXxX/goph-keeper/internal/client/services/ormstorages"
+	"github.com/AndrXxX/goph-keeper/internal/client/services/storageadapters"
 	"github.com/AndrXxX/goph-keeper/internal/client/state"
 	"github.com/AndrXxX/goph-keeper/internal/client/views"
 	"github.com/AndrXxX/goph-keeper/pkg/logger"
@@ -23,11 +27,24 @@ func main() {
 		Sender: requestsender.New(&http.Client{}),
 		UB:     urlbuilder.New("http://localhost:8081"),
 	}
+	ctx := context.Background()
+	dbProvider := &dbprovider.DBProvider{}
+	db, err := dbProvider.DB()
+	if err != nil {
+		logger.Log.Fatal("failed to connect to database", zap.Error(err))
+	}
+	sp := ormstorages.Factory()
+	sa := storageadapters.Factory{}
 	viewsFactory := views.Factory{
 		AppState: &state.AppState{
-			User:            &ormmodels.User{},
-			DBProvider:      &dbprovider.DBProvider{},
-			StorageProvider: ormstorages.Factory(),
+			User:       &entities.User{},
+			DBProvider: dbProvider,
+			Storages: &state.Storages{
+				User:     sa.ORMUserAdapter(sp.User(ctx, db)),
+				Password: sa.ORMPasswordsAdapter(sp.Password(ctx, db)),
+				Note:     sa.ORMNotesAdapter(sp.Note(ctx, db)),
+				BankCard: sa.ORMBankCardAdapter(sp.BankCard(ctx, db)),
+			},
 		},
 		Loginer:    ap,
 		Registerer: ap,
