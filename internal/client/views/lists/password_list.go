@@ -15,7 +15,6 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/styles"
-	"github.com/AndrXxX/goph-keeper/internal/enums/datatypes"
 )
 
 var passwordListKeys = kb.KeyMap{
@@ -56,21 +55,18 @@ func (l *passwordList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		l.list.SetSize(msg.Width/styles.InnerMargin, msg.Height/2)
 	case messages.AddPassword:
-		err := l.sm.Sync(datatypes.Passwords, []any{*msg.Item})
-		if err != nil {
-			return l, helpers.GenCmd(messages.ShowError{Err: "Ошибка при обновлении"})
-		}
-		return l, helpers.GenCmd(messages.ShowMessage{Message: "Изменения сохранены"})
+		l.lr.Refresh()
+		return l, nil
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, kb.Keys.Edit, kb.Keys.Enter):
 			if len(l.list.VisibleItems()) != 0 {
 				e := l.list.SelectedItem().(*entities.PasswordItem)
-				f := forms.NewPasswordForm(e)
+				f := forms.NewPasswordForm(e, l.sm)
 				return f, helpers.GenCmd(messages.ChangeView{Name: names.PasswordForm, View: f})
 			}
 		case key.Matches(msg, kb.Keys.New):
-			f := forms.NewPasswordForm(nil)
+			f := forms.NewPasswordForm(nil, l.sm)
 			return f, helpers.GenCmd(messages.ChangeView{Name: names.PasswordForm, View: f})
 		case key.Matches(msg, kb.Keys.Back):
 			return l, helpers.GenCmd(messages.ChangeView{Name: names.MainMenu})

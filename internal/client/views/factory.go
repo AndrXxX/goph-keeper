@@ -19,6 +19,7 @@ func (f *Factory) FormsFactory() *forms.Factory {
 		AppState:   f.AppState,
 		Loginer:    f.Loginer,
 		Registerer: f.Registerer,
+		SM:         f.SM,
 	}
 }
 
