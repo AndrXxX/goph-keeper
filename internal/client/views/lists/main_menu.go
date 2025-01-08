@@ -67,10 +67,11 @@ func (m *mainMenu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return messages.ChangeView{
 						Name: names.BankCardList,
 					}
-				case datatypes.Files:
-					return messages.ChangeView{
-						Name: names.FileList,
-					}
+					// TODO
+					//case datatypes.Files:
+					//	return messages.ChangeView{
+					//		Name: names.FileList,
+					//	}
 				}
 				return nil
 			}
