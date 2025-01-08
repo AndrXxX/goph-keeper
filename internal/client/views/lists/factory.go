@@ -1,11 +1,15 @@
 package lists
 
 import (
+	"time"
+
 	"github.com/AndrXxX/goph-keeper/internal/client/entities"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/contract"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/forms"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
 )
+
+const refreshListInterval = 2 * time.Second
 
 type Factory struct {
 	FF *forms.Factory

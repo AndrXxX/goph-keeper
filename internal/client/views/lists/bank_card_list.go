@@ -1,8 +1,6 @@
 package lists
 
 import (
-	"time"
-
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
@@ -52,7 +50,7 @@ func (l *bankCardList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if len(l.list.Items()) == 0 {
 		l.lr.Refresh()
 	}
-	l.lr.RefreshIn(2 * time.Second)
+	l.lr.RefreshIn(refreshListInterval)
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:

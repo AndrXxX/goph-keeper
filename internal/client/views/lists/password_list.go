@@ -10,10 +10,12 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/client/entities"
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
+	"github.com/AndrXxX/goph-keeper/internal/client/views/contract"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/forms"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/styles"
+	"github.com/AndrXxX/goph-keeper/internal/enums/datatypes"
 )
 
 var passwordListKeys = kb.KeyMap{
@@ -27,6 +29,8 @@ var passwordListKeys = kb.KeyMap{
 type passwordList struct {
 	list list.Model
 	help help.Model
+	sm   contract.SyncManager
+	lr   refresher
 }
 
 func newPasswordList() *passwordList {
@@ -37,25 +41,31 @@ func newPasswordList() *passwordList {
 	return &passwordList{list: defaultList, help: help.New()}
 }
 
-func (pl *passwordList) Init() tea.Cmd {
+func (l *passwordList) Init() tea.Cmd {
+	l.lr.Refresh()
 	return nil
 }
 
-func (pl *passwordList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (l *passwordList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	if len(l.list.Items()) == 0 {
+		l.lr.Refresh()
+	}
+	l.lr.RefreshIn(refreshListInterval)
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		pl.list.SetSize(msg.Width/styles.InnerMargin, msg.Height/2)
+		l.list.SetSize(msg.Width/styles.InnerMargin, msg.Height/2)
 	case messages.AddPassword:
-		// TODO: action
-		pl.list.InsertItem(-1, msg.Item)
-		pl.View()
-		return pl, nil
+		err := l.sm.Sync(datatypes.Passwords, []any{*msg.Item})
+		if err != nil {
+			return l, helpers.GenCmd(messages.ShowError{Err: "Ошибка при обновлении"})
+		}
+		return l, helpers.GenCmd(messages.ShowMessage{Message: "Изменения сохранены"})
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, kb.Keys.Edit, kb.Keys.Enter):
-			if len(pl.list.VisibleItems()) != 0 {
-				e := pl.list.SelectedItem().(*entities.PasswordItem)
+			if len(l.list.VisibleItems()) != 0 {
+				e := l.list.SelectedItem().(*entities.PasswordItem)
 				f := forms.NewPasswordForm(e)
 				return f, helpers.GenCmd(messages.ChangeView{Name: names.PasswordForm, View: f})
 			}
@@ -63,26 +73,26 @@ func (pl *passwordList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			f := forms.NewPasswordForm(nil)
 			return f, helpers.GenCmd(messages.ChangeView{Name: names.PasswordForm, View: f})
 		case key.Matches(msg, kb.Keys.Back):
-			return pl, helpers.GenCmd(messages.ChangeView{Name: names.MainMenu})
+			return l, helpers.GenCmd(messages.ChangeView{Name: names.MainMenu})
 		case key.Matches(msg, kb.Keys.Delete):
 			// TODO: approve + action
-			return pl, pl.DeleteCurrent()
+			return l, l.DeleteCurrent()
 		}
 	}
-	pl.list, cmd = pl.list.Update(msg)
-	return pl, cmd
+	l.list, cmd = l.list.Update(msg)
+	return l, cmd
 }
 
-func (pl *passwordList) View() string {
-	return lipgloss.JoinVertical(lipgloss.Left, pl.list.View(), pl.help.View(passwordListKeys))
+func (l *passwordList) View() string {
+	return lipgloss.JoinVertical(lipgloss.Left, l.list.View(), l.help.View(passwordListKeys))
 }
 
-func (pl *passwordList) DeleteCurrent() tea.Cmd {
-	if len(pl.list.VisibleItems()) > 0 {
-		pl.list.RemoveItem(pl.list.Index())
+func (l *passwordList) DeleteCurrent() tea.Cmd {
+	if len(l.list.VisibleItems()) > 0 {
+		l.list.RemoveItem(l.list.Index())
 	}
 
 	var cmd tea.Cmd
-	pl.list, cmd = pl.list.Update(nil)
+	l.list, cmd = l.list.Update(nil)
 	return cmd
 }
