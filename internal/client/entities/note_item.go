@@ -20,5 +20,8 @@ func (i NoteItem) Title() string {
 }
 
 func (i NoteItem) Description() string {
-	return fmt.Sprintf("%s [%s]", i.Desc, i.UpdatedAt.Format(formats.FullDate))
+	if len(i.Desc) > 0 {
+		return fmt.Sprintf("%s [%s]", i.Desc, i.UpdatedAt.Format(formats.FullDate))
+	}
+	return i.UpdatedAt.Format(formats.FullDate)
 }

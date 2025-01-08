@@ -21,5 +21,8 @@ func (i PasswordItem) Title() string {
 }
 
 func (i PasswordItem) Description() string {
-	return fmt.Sprintf("%s [%s]", i.Desc, i.UpdatedAt.Format(formats.FullDate))
+	if len(i.Desc) > 0 {
+		return fmt.Sprintf("%s [%s]", i.Desc, i.UpdatedAt.Format(formats.FullDate))
+	}
+	return i.UpdatedAt.Format(formats.FullDate)
 }
