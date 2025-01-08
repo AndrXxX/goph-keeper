@@ -40,12 +40,12 @@ func (s *ormStorage[T]) Update(m *T) error {
 	return nil
 }
 
-func (s *ormStorage[T]) FindAll(m *T) []*T {
-	var list []*T
+func (s *ormStorage[T]) FindAll(m *T) []T {
+	var list []T
 	result := s.db.Where(m).Order("created_at desc").Find(&list)
 	if result.Error != nil {
 		logger.Log.Info("failed to find all models", zap.Error(result.Error), zap.Any("model", m))
-		return make([]*T, 0)
+		return make([]T, 0)
 	}
 	return list
 }
