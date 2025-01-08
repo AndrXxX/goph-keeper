@@ -12,7 +12,6 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/client/entities"
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
-	"github.com/AndrXxX/goph-keeper/internal/client/state"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/contract"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/forms"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
@@ -30,11 +29,10 @@ var noteListKeys = kb.KeyMap{
 }
 
 type noteList struct {
-	list       list.Model
-	help       help.Model
-	s          *state.AppState
-	sm         contract.SyncManager
-	refreshing bool
+	list list.Model
+	help help.Model
+	sm   contract.SyncManager
+	lr   refresher
 }
 
 func newNoteList() *noteList {
@@ -46,31 +44,15 @@ func newNoteList() *noteList {
 }
 
 func (l *noteList) Init() tea.Cmd {
-	l.Refresh()
+	l.lr.Refresh()
 	return nil
-}
-
-func (l *noteList) Refresh() {
-	if l.refreshing || l.s.Storages == nil {
-		return
-	}
-	l.refreshing = true
-	items := l.s.Storages.Note.FindAll(nil)
-	l.list.SetItems([]list.Item{})
-	for i := range items {
-		l.list.InsertItem(-1, &items[i])
-	}
-	l.refreshing = false
 }
 
 func (l *noteList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if len(l.list.Items()) == 0 {
-		l.Refresh()
+		l.lr.Refresh()
 	}
-	go func() {
-		time.Sleep(2 * time.Second)
-		l.Refresh()
-	}()
+	l.lr.RefreshIn(2 * time.Second)
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:

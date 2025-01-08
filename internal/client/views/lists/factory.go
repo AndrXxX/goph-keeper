@@ -1,8 +1,10 @@
 package lists
 
 import (
+	"github.com/AndrXxX/goph-keeper/internal/client/entities"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/contract"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/forms"
+	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
 )
 
 type Factory struct {
@@ -26,8 +28,11 @@ func (f *Factory) PasswordList() *passwordList {
 
 func (f *Factory) NoteList() *noteList {
 	l := newNoteList()
-	l.s = f.FF.AppState
 	l.sm = f.SM
+	l.lr = &helpers.ListRefresher[entities.NoteItem]{
+		S:    f.FF.AppState.Storages.Note,
+		List: &l.list,
+	}
 	return l
 }
 
