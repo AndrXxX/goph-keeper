@@ -1,6 +1,8 @@
 package forms
 
 import (
+	"fmt"
+
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -10,6 +12,7 @@ import (
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/form"
+	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 )
 
@@ -63,27 +66,21 @@ func (f *noteForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			}
 		case key.Matches(msg, kb.Keys.Save):
-			// TODO: сделать уведомление
-			var nMsg tea.Msg
-			if f.creating {
-				nMsg = messages.AddNote{
-					Item: f.getNoteItem(),
-				}
-			}
 			return f, func() tea.Msg {
 				return messages.ChangeView{
 					Name: names.NotesList,
-					Msg:  nMsg,
+					Msg: messages.AddNote{
+						Item: f.getNoteItem(),
+					},
 				}
 			}
 		case key.Matches(msg, kb.Keys.Copy):
 			c := clipboard.New()
 			err := c.CopyText(f.baseForm.inputs[f.baseForm.focusIndex].Value())
 			if err != nil {
-				println(err.Error())
+				return f, helpers.GenCmd(messages.ShowError{Err: fmt.Sprintf("failed to copy: %s", err.Error())})
 			}
-			// TODO: process error
-			return f, nil
+			return f, helpers.GenCmd(messages.ShowMessage{Message: "value copied to clipboard"})
 		}
 	}
 	_, cmd := f.baseForm.Update(msg)
