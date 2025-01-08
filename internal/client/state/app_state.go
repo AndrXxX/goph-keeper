@@ -13,7 +13,7 @@ type AppState struct {
 	AS         authSetup
 }
 
-func (as AppState) Auth() error {
+func (as *AppState) Auth() error {
 	if as.User.Login != "" {
 		// TODO: вызывает ошибку attempt to write to readonly database
 		//err := as.DBProvider.RemoveDB()

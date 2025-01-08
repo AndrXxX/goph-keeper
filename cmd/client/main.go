@@ -50,7 +50,16 @@ func main() {
 		},
 	}
 	sFactory := synchronize.Factory{RS: rs, UB: ub, Storages: (*synchronize.Storages)(appState.Storages)}
-	sm := &synchronize.SyncManager{Synchronizers: sFactory.Map()}
+	sm := &synchronize.SyncManager{Synchronizers: sFactory.Map(), TR: func() {
+		token, err := ap.Login(appState.User)
+		if err != nil {
+			logger.Log.Error("failed to refresh token", zap.Error(err))
+			return
+		}
+		appState.User.Token = token
+		_ = appState.Storages.User.Update(appState.User)
+		*rs = *requestsender.New(&http.Client{}, requestsender.WithToken(token))
+	}}
 	viewsFactory := views.Factory{
 		AppState:   appState,
 		Loginer:    ap,
