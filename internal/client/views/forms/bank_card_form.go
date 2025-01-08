@@ -1,6 +1,8 @@
 package forms
 
 import (
+	"fmt"
+
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -12,6 +14,14 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/client/views/form"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
+)
+
+const (
+	bcNumber = iota
+	bcCVC
+	bcValidity
+	bcHolder
+	bcDesc
 )
 
 var bankCardFormKeys = kb.KeyMap{
@@ -40,20 +50,20 @@ func NewBankCardForm(item *entities.BankCardItem) *bankCardForm {
 		m.item = &entities.BankCardItem{}
 	}
 
-	m.baseForm.inputs[0].Prompt = "Number: "
-	m.baseForm.inputs[0].SetValue(m.item.Number)
+	m.baseForm.inputs[bcNumber].Prompt = "Number: "
+	m.baseForm.inputs[bcNumber].SetValue(m.item.Number)
 
-	m.baseForm.inputs[1].Prompt = "CVCCode: "
-	m.baseForm.inputs[1].SetValue(m.item.CVCCode)
+	m.baseForm.inputs[bcCVC].Prompt = "CVCCode: "
+	m.baseForm.inputs[bcCVC].SetValue(m.item.CVCCode)
 
-	m.baseForm.inputs[2].Prompt = "Validity: "
-	m.baseForm.inputs[2].SetValue(m.item.Validity)
+	m.baseForm.inputs[bcValidity].Prompt = "Validity: "
+	m.baseForm.inputs[bcValidity].SetValue(m.item.Validity)
 
-	m.baseForm.inputs[3].Prompt = "Cardholder: "
-	m.baseForm.inputs[3].SetValue(m.item.Cardholder)
+	m.baseForm.inputs[bcHolder].Prompt = "Cardholder: "
+	m.baseForm.inputs[bcHolder].SetValue(m.item.Cardholder)
 
-	m.baseForm.inputs[4].Prompt = "Description: "
-	m.baseForm.inputs[4].SetValue(m.item.Desc)
+	m.baseForm.inputs[bcDesc].Prompt = "Description: "
+	m.baseForm.inputs[bcDesc].SetValue(m.item.Desc)
 
 	return &m
 }
@@ -67,29 +77,19 @@ func (f *bankCardForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, kb.Keys.Back):
-			return f, func() tea.Msg {
-				return messages.ChangeView{
-					Name: names.BankCardList,
-				}
-			}
+			return f, helpers.GenCmd(messages.ChangeView{Name: names.BankCardList})
 		case key.Matches(msg, kb.Keys.Save):
-			var nMsg tea.Msg
-			if f.creating {
-				nMsg = messages.AddBankCard{Item: f.getBankCardItem()}
-			}
-			cmdList := []tea.Cmd{
-				helpers.GenCmd(messages.ChangeView{Name: names.BankCardList, Msg: nMsg}),
-				helpers.GenCmd(messages.ShowMessage{Message: "bank card saved"}),
-			}
-			return f, tea.Batch(cmdList...)
+			return f, helpers.GenCmd(messages.ChangeView{
+				Name: names.BankCardList,
+				Msg:  messages.AddBankCard{Item: f.getBankCardItem()},
+			})
 		case key.Matches(msg, kb.Keys.Copy):
 			c := clipboard.New()
 			err := c.CopyText(f.baseForm.inputs[f.baseForm.focusIndex].Value())
 			if err != nil {
-				println(err.Error())
+				return f, helpers.GenCmd(messages.ShowError{Err: fmt.Sprintf("failed to copy: %s", err.Error())})
 			}
-			// TODO: process error
-			return f, nil
+			return f, helpers.GenCmd(messages.ShowMessage{Message: "value copied to clipboard"})
 		}
 	}
 	_, cmd := f.baseForm.Update(msg)
@@ -97,11 +97,11 @@ func (f *bankCardForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (f *bankCardForm) getBankCardItem() *entities.BankCardItem {
-	f.item.Number = f.baseForm.inputs[0].Value()
-	f.item.CVCCode = f.baseForm.inputs[1].Value()
-	f.item.Validity = f.baseForm.inputs[2].Value()
-	f.item.Cardholder = f.baseForm.inputs[3].Value()
-	f.item.Desc = f.baseForm.inputs[4].Value()
+	f.item.Number = f.baseForm.inputs[bcNumber].Value()
+	f.item.CVCCode = f.baseForm.inputs[bcCVC].Value()
+	f.item.Validity = f.baseForm.inputs[bcValidity].Value()
+	f.item.Cardholder = f.baseForm.inputs[bcHolder].Value()
+	f.item.Desc = f.baseForm.inputs[bcDesc].Value()
 	return f.item
 }
 
