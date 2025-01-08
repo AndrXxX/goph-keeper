@@ -21,9 +21,12 @@ func (s *NotesSynchronizer) Sync(updates []any) error {
 	if cErr != nil {
 		return fmt.Errorf("convert note updates: %w", cErr)
 	}
-	uErr := s.L.Upload(datatypes.Notes, list)
+	code, uErr := s.L.Upload(datatypes.Notes, list)
 	if uErr != nil {
 		return fmt.Errorf("upload note updates: %w", cErr)
+	}
+	if code != http.StatusOK {
+		return fmt.Errorf("upload note updates - unexpected code: %v", code)
 	}
 	dErr := s.Download()
 	if dErr != nil {

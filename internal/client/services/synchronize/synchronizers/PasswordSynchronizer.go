@@ -21,9 +21,12 @@ func (s *PasswordSynchronizer) Sync(updates []any) error {
 	if cErr != nil {
 		return fmt.Errorf("convert password updates: %w", cErr)
 	}
-	uErr := s.L.Upload(datatypes.Passwords, list)
+	code, uErr := s.L.Upload(datatypes.Passwords, list)
 	if uErr != nil {
 		return fmt.Errorf("upload password updates: %w", cErr)
+	}
+	if code != http.StatusOK {
+		return fmt.Errorf("upload password updates - unexpected code: %v", code)
 	}
 	dErr := s.Download()
 	if dErr != nil {

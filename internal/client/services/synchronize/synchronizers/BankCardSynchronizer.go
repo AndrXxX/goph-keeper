@@ -21,9 +21,12 @@ func (s *BankCardSynchronizer) Sync(updates []any) error {
 	if cErr != nil {
 		return fmt.Errorf("convert bank card updates: %w", cErr)
 	}
-	uErr := s.L.Upload(datatypes.BankCards, list)
+	code, uErr := s.L.Upload(datatypes.BankCards, list)
 	if uErr != nil {
 		return fmt.Errorf("upload bank card updates: %w", cErr)
+	}
+	if code != http.StatusOK {
+		return fmt.Errorf("upload bank card updates - unexpected code: %v", code)
 	}
 	dErr := s.Download()
 	if dErr != nil {

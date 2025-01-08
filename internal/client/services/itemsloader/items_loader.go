@@ -35,20 +35,23 @@ func (c *ItemsLoader[T]) Download(itemType string) (statusCode int, l []T) {
 	return resp.StatusCode, l
 }
 
-func (c *ItemsLoader[T]) Upload(itemType string, list []T) error {
+func (c *ItemsLoader[T]) Upload(itemType string, list []T) (statusCode int, err error) {
 	url := c.URLBuilder.Build(fetchRoute, map[string]string{"type": itemType})
 
 	data, mErr := json.Marshal(list)
 	if mErr != nil {
-		return fmt.Errorf("marshal data with itemType (%s) %w", itemType, mErr)
+		return 0, fmt.Errorf("marshal data with itemType (%s) %w", itemType, mErr)
 	}
 
 	resp, sErr := c.Sender.Post(url, contenttypes.ApplicationJSON, data)
 	if sErr != nil {
-		return fmt.Errorf("post request with itemType (%s) %w", itemType, sErr)
+		return 0, fmt.Errorf("post request with itemType (%s) %w", itemType, sErr)
 	}
-	if resp != nil && resp.Body != nil {
-		return resp.Body.Close()
+	if resp != nil {
+		if resp.Body != nil {
+			return resp.StatusCode, resp.Body.Close()
+		}
+		return resp.StatusCode, nil
 	}
-	return nil
+	return 0, nil
 }
