@@ -27,7 +27,13 @@ func (f *Factory) MainMenu() *mainMenu {
 }
 
 func (f *Factory) PasswordList() *passwordList {
-	return newPasswordList()
+	l := newPasswordList()
+	l.sm = f.SM
+	l.lr = &helpers.ListRefresher[entities.PasswordItem]{
+		S:    f.FF.AppState.Storages.Password,
+		List: &l.list,
+	}
+	return l
 }
 
 func (f *Factory) NoteList() *noteList {

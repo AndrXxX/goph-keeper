@@ -31,20 +31,18 @@ var passwordFormKeys = kb.KeyMap{
 }
 
 type passwordForm struct {
-	item     *entities.PasswordItem
-	creating bool
-	fu       form.FieldsUpdater
+	item *entities.PasswordItem
+	fu   form.FieldsUpdater
 	*baseForm
 }
 
 func NewPasswordForm(item *entities.PasswordItem) *passwordForm {
 	m := passwordForm{
 		baseForm: NewBaseForm("Create a new password", make([]textinput.Model, 3), form.FieldsUpdater{}),
-		creating: item == nil,
 		item:     item,
 	}
 	m.baseForm.keys = &passwordFormKeys
-	if m.creating {
+	if m.item == nil {
 		m.item = &entities.PasswordItem{}
 	}
 
@@ -72,15 +70,10 @@ func (f *passwordForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, kb.Keys.Back):
 			return f, helpers.GenCmd(messages.ChangeView{Name: names.PasswordList})
 		case key.Matches(msg, kb.Keys.Save):
-			var nMsg tea.Msg
-			if f.creating {
-				nMsg = messages.AddPassword{Item: f.getPasswordItem()}
-			}
-			cmdList := []tea.Cmd{
-				helpers.GenCmd(messages.ChangeView{Name: names.PasswordList, Msg: nMsg}),
-				helpers.GenCmd(messages.ShowMessage{Message: "Password successfully saved"}),
-			}
-			return f, tea.Batch(cmdList...)
+			return f, tea.Batch(helpers.GenCmd(messages.ChangeView{
+				Name: names.PasswordList,
+				Msg:  messages.AddPassword{Item: f.getPasswordItem()},
+			}))
 		case key.Matches(msg, kb.Keys.Copy):
 			c := clipboard.New()
 			err := c.CopyText(f.baseForm.inputs[f.baseForm.focusIndex].Value())
