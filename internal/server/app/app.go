@@ -18,9 +18,9 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/server/api/middlewares"
 	"github.com/AndrXxX/goph-keeper/internal/server/config"
 	"github.com/AndrXxX/goph-keeper/internal/server/controllers"
+	entities2 "github.com/AndrXxX/goph-keeper/internal/server/entities"
 	"github.com/AndrXxX/goph-keeper/internal/server/services/entityconvertors"
 	"github.com/AndrXxX/goph-keeper/internal/server/services/valueconvertors"
-	"github.com/AndrXxX/goph-keeper/pkg/entities"
 	"github.com/AndrXxX/goph-keeper/pkg/hashgenerator"
 	"github.com/AndrXxX/goph-keeper/pkg/logger"
 	"github.com/AndrXxX/goph-keeper/pkg/requestjsonentity"
@@ -105,7 +105,7 @@ func (a *app) registerAPI(r *chi.Mux) {
 
 	r.Group(func(r chi.Router) {
 		r.Use(middlewares.CompressGzip().Handler)
-		ac := controllers.AuthController{US: a.storage.US, HG: hg, TS: ts, UF: &requestjsonentity.Fetcher[entities.User]{}}
+		ac := controllers.AuthController{US: a.storage.US, HG: hg, TS: ts, UF: &requestjsonentity.Fetcher[entities2.User]{}}
 		r.Post("/api/user/register", ac.Register)
 		r.Post("/api/user/login", ac.Login)
 	})
@@ -116,36 +116,36 @@ func (a *app) registerAPI(r *chi.Mux) {
 
 		r.Use(middlewares.IsAuthorized(ts).Handler)
 		r.Use(middlewares.CompressGzip().Handler)
-		lpc := controllers.ItemsController[entities.PasswordItem]{
+		lpc := controllers.ItemsController[entities2.PasswordItem]{
 			Type:      datatypes.Passwords,
-			Fetcher:   &requestjsonentity.Fetcher[entities.PasswordItem]{},
+			Fetcher:   &requestjsonentity.Fetcher[entities2.PasswordItem]{},
 			Storage:   a.storage.IS,
 			Convertor: ecf.Password(vcf.Password()),
 		}
 		r.Post(fmt.Sprintf("/api/updates/%s", datatypes.Passwords), lpc.StoreUpdates)
 		r.Get(fmt.Sprintf("/api/updates/%s", datatypes.Passwords), lpc.FetchUpdates)
 
-		tc := controllers.ItemsController[entities.NoteItem]{
+		tc := controllers.ItemsController[entities2.NoteItem]{
 			Type:      datatypes.Notes,
-			Fetcher:   &requestjsonentity.Fetcher[entities.NoteItem]{},
+			Fetcher:   &requestjsonentity.Fetcher[entities2.NoteItem]{},
 			Storage:   a.storage.IS,
 			Convertor: ecf.Note(vcf.Note()),
 		}
 		r.Post(fmt.Sprintf("/api/updates/%s", datatypes.Notes), tc.StoreUpdates)
 		r.Get(fmt.Sprintf("/api/updates/%s", datatypes.Notes), tc.FetchUpdates)
 
-		bcc := controllers.ItemsController[entities.BankCardItem]{
+		bcc := controllers.ItemsController[entities2.BankCardItem]{
 			Type:      datatypes.BankCards,
-			Fetcher:   &requestjsonentity.Fetcher[entities.BankCardItem]{},
+			Fetcher:   &requestjsonentity.Fetcher[entities2.BankCardItem]{},
 			Storage:   a.storage.IS,
 			Convertor: ecf.BankCard(vcf.BankCard()),
 		}
 		r.Post(fmt.Sprintf("/api/updates/%s", datatypes.BankCards), bcc.StoreUpdates)
 		r.Get(fmt.Sprintf("/api/updates/%s", datatypes.BankCards), bcc.FetchUpdates)
 
-		bc := controllers.ItemsController[entities.FileItem]{
+		bc := controllers.ItemsController[entities2.FileItem]{
 			Type:      datatypes.Files,
-			Fetcher:   &requestjsonentity.Fetcher[entities.FileItem]{},
+			Fetcher:   &requestjsonentity.Fetcher[entities2.FileItem]{},
 			Storage:   a.storage.IS,
 			Convertor: ecf.File(vcf.File()),
 		}

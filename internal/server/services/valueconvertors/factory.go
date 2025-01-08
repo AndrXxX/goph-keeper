@@ -1,25 +1,25 @@
 package valueconvertors
 
 import (
-	entities "github.com/AndrXxX/goph-keeper/pkg/entities"
-	values2 "github.com/AndrXxX/goph-keeper/pkg/entities/values"
+	entities2 "github.com/AndrXxX/goph-keeper/internal/server/entities"
+	"github.com/AndrXxX/goph-keeper/internal/server/entities/values"
 )
 
 type Factory struct {
 }
 
-func (f Factory) Password() ValueConvertor[entities.PasswordItem, values2.PasswordValue] {
+func (f Factory) Password() ValueConvertor[entities2.PasswordItem, values.PasswordValue] {
 	return &loginPassValueConvertor{}
 }
 
-func (f Factory) Note() ValueConvertor[entities.NoteItem, values2.NoteValue] {
+func (f Factory) Note() ValueConvertor[entities2.NoteItem, values.NoteValue] {
 	return &textValueConvertor{}
 }
 
-func (f Factory) BankCard() ValueConvertor[entities.BankCardItem, values2.BankCardValue] {
+func (f Factory) BankCard() ValueConvertor[entities2.BankCardItem, values.BankCardValue] {
 	return &bankCardValueConvertor{}
 }
 
-func (f Factory) File() ValueConvertor[entities.FileItem, values2.FileValue] {
+func (f Factory) File() ValueConvertor[entities2.FileItem, values.FileValue] {
 	return &binaryValueConvertor{}
 }

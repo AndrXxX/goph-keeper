@@ -1,7 +1,7 @@
 package entities
 
 import (
-	"github.com/AndrXxX/goph-keeper/pkg/entities/values"
+	"github.com/AndrXxX/goph-keeper/internal/server/entities/values"
 )
 
 type NoteItem struct {
