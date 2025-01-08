@@ -2,6 +2,7 @@ package forms
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
@@ -99,9 +100,10 @@ func (f *passwordForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (f *passwordForm) getPasswordItem() *entities.PasswordItem {
-	f.item.Login = f.baseForm.inputs[0].Value()
-	f.item.Password = f.baseForm.inputs[1].Value()
-	f.item.Desc = f.baseForm.inputs[2].Value()
+	f.item.Login = f.baseForm.inputs[pfLogin].Value()
+	f.item.Password = f.baseForm.inputs[pfPass].Value()
+	f.item.Desc = f.baseForm.inputs[pfDesc].Value()
+	*f.item.UpdatedAt = time.Now()
 	return f.item
 }
 

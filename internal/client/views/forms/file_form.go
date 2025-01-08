@@ -1,6 +1,8 @@
 package forms
 
 import (
+	"time"
+
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -79,6 +81,7 @@ func (f *fileForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (f *fileForm) getFileItem() *entities.FileItem {
 	f.item.Data = f.baseForm.inputs[0].Value()
 	f.item.Desc = f.baseForm.inputs[1].Value()
+	*f.item.UpdatedAt = time.Now()
 	return f.item
 }
 

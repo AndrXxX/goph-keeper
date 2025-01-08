@@ -2,6 +2,7 @@ package forms
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
@@ -94,6 +95,7 @@ func (f *noteForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (f *noteForm) getNoteItem() *entities.NoteItem {
 	f.item.Text = f.baseForm.inputs[nfText].Value()
 	f.item.Desc = f.baseForm.inputs[nfDesc].Value()
+	*f.item.UpdatedAt = time.Now()
 	return f.item
 }
 

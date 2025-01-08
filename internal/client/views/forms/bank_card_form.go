@@ -2,6 +2,7 @@ package forms
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
@@ -111,6 +112,7 @@ func (f *bankCardForm) getBankCardItem() *entities.BankCardItem {
 	f.item.Validity = f.baseForm.inputs[bcValidity].Value()
 	f.item.Cardholder = f.baseForm.inputs[bcHolder].Value()
 	f.item.Desc = f.baseForm.inputs[bcDesc].Value()
+	*f.item.UpdatedAt = time.Now()
 	return f.item
 }
 
