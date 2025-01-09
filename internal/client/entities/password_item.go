@@ -8,8 +8,8 @@ import (
 
 type PasswordItem struct {
 	StoredItem
-	Login    string `json:"login"`
-	Password string `json:"password"`
+	Login    string `json:"login" valid:"required"`
+	Password string `json:"password" valid:"required"`
 }
 
 func (i PasswordItem) FilterValue() string {

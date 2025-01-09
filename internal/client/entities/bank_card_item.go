@@ -8,10 +8,10 @@ import (
 
 type BankCardItem struct {
 	StoredItem
-	Number     string `json:"number"`
-	CVCCode    string `json:"cvc_code"`
-	Validity   string `json:"validity"`
-	Cardholder string `json:"cardholder"`
+	Number     string `json:"number" valid:"required,luhn~Card number is not valid"`
+	CVCCode    string `json:"cvc_code" valid:"required,numeric,stringlength(3|3)~CVCCode must contain 3 digits"`
+	Validity   string `json:"validity" valid:"required,cardvalidity~Validity must contain date in format 10/2024"`
+	Cardholder string `json:"cardholder" valid:"required,minstringlength(10)~Cardholder must contain 10 characters"`
 }
 
 func (i BankCardItem) FilterValue() string {

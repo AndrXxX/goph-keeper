@@ -8,7 +8,7 @@ import (
 
 type NoteItem struct {
 	StoredItem
-	Text string `json:"text"`
+	Text string `json:"text" valid:"required"`
 }
 
 func (i NoteItem) FilterValue() string {
