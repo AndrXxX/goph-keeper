@@ -16,7 +16,6 @@ type ormStorage[T any] struct {
 func (s *ormStorage[T]) Find(m *T) *T {
 	result := s.db.Where(m).First(m)
 	if result.Error != nil {
-		logger.Log.Info("failed to find Order", zap.Error(result.Error), zap.Any("order", m))
 		return nil
 	}
 	return m
