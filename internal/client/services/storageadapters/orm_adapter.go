@@ -1,11 +1,7 @@
 package storageadapters
 
-import (
-	"github.com/AndrXxX/goph-keeper/internal/client/interfaces"
-)
-
 type ORMAdapter[E any, M any] struct {
-	Storage         interfaces.Storage[M]
+	Storage         Storage[M]
 	ORMConvertor    convertor[M, E]
 	EntityConvertor convertor[E, M]
 }
