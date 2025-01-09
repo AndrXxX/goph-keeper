@@ -11,6 +11,7 @@ import (
 
 	"github.com/AndrXxX/goph-keeper/internal/client/entities"
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
+	"github.com/AndrXxX/goph-keeper/internal/client/locales"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/contract"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/form"
@@ -50,10 +51,10 @@ func NewNoteForm(item *entities.NoteItem, sm contract.SyncManager) *noteForm {
 		m.item = &entities.NoteItem{}
 	}
 
-	m.baseForm.inputs[nfText].Prompt = "Text: "
+	m.baseForm.inputs[nfText].Prompt = locales.FIText
 	m.baseForm.inputs[nfText].SetValue(m.item.Text)
 
-	m.baseForm.inputs[nfDesc].Prompt = "Description: "
+	m.baseForm.inputs[nfDesc].Prompt = locales.FIDescription
 	m.baseForm.inputs[nfDesc].SetValue(m.item.Desc)
 
 	return &m

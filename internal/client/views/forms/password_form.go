@@ -11,6 +11,7 @@ import (
 
 	"github.com/AndrXxX/goph-keeper/internal/client/entities"
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
+	"github.com/AndrXxX/goph-keeper/internal/client/locales"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/contract"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/form"
@@ -51,15 +52,15 @@ func NewPasswordForm(item *entities.PasswordItem, sm contract.SyncManager) *pass
 		m.item = &entities.PasswordItem{}
 	}
 
-	m.baseForm.inputs[pfLogin].Prompt = "Login: "
+	m.baseForm.inputs[pfLogin].Prompt = locales.FILogin
 	m.baseForm.inputs[pfLogin].SetValue(m.item.Login)
 
-	m.baseForm.inputs[pfPass].Prompt = "Password: "
+	m.baseForm.inputs[pfPass].Prompt = locales.FIPassword
 	m.baseForm.inputs[pfPass].SetValue(m.item.Password)
 	//m.baseForm.inputs[pfPass].EchoMode = textinput.EchoPassword
 	//m.baseForm.inputs[pfPass].EchoCharacter = '•'
 
-	m.baseForm.inputs[pfDesc].Prompt = "Description: "
+	m.baseForm.inputs[pfDesc].Prompt = locales.FIDescription
 	m.baseForm.inputs[pfDesc].SetValue(m.item.Desc)
 	return &m
 }

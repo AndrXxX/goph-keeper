@@ -7,6 +7,7 @@ import (
 
 	"github.com/AndrXxX/goph-keeper/internal/client/entities"
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
+	"github.com/AndrXxX/goph-keeper/internal/client/locales"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
 	"github.com/AndrXxX/goph-keeper/internal/client/state"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/form"
@@ -34,8 +35,8 @@ func newRegisterForm() *registerForm {
 		baseForm: NewBaseForm("Create a new account", make([]textinput.Model, 2), form.FieldsUpdater{}),
 	}
 	m.baseForm.keys = &registerFormKeys
-	m.baseForm.inputs[0].Prompt = "Login: "
-	m.baseForm.inputs[1].Prompt = "Password: "
+	m.baseForm.inputs[0].Prompt = locales.FILogin
+	m.baseForm.inputs[1].Prompt = locales.FIPassword
 	return &m
 }
 

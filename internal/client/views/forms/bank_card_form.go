@@ -11,6 +11,7 @@ import (
 
 	"github.com/AndrXxX/goph-keeper/internal/client/entities"
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
+	"github.com/AndrXxX/goph-keeper/internal/client/locales"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/contract"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/form"
@@ -55,19 +56,19 @@ func NewBankCardForm(item *entities.BankCardItem, sm contract.SyncManager) *bank
 		m.item = &entities.BankCardItem{}
 	}
 
-	m.baseForm.inputs[bcNumber].Prompt = "Number: "
+	m.baseForm.inputs[bcNumber].Prompt = locales.FINumber
 	m.baseForm.inputs[bcNumber].SetValue(m.item.Number)
 
-	m.baseForm.inputs[bcCVC].Prompt = "CVCCode: "
+	m.baseForm.inputs[bcCVC].Prompt = locales.FICVCCode
 	m.baseForm.inputs[bcCVC].SetValue(m.item.CVCCode)
 
-	m.baseForm.inputs[bcValidity].Prompt = "Validity: "
+	m.baseForm.inputs[bcValidity].Prompt = locales.FIValidity
 	m.baseForm.inputs[bcValidity].SetValue(m.item.Validity)
 
-	m.baseForm.inputs[bcHolder].Prompt = "Cardholder: "
+	m.baseForm.inputs[bcHolder].Prompt = locales.FICardholder
 	m.baseForm.inputs[bcHolder].SetValue(m.item.Cardholder)
 
-	m.baseForm.inputs[bcDesc].Prompt = "Description: "
+	m.baseForm.inputs[bcDesc].Prompt = locales.FIDescription
 	m.baseForm.inputs[bcDesc].SetValue(m.item.Desc)
 
 	return &m

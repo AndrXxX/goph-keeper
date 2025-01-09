@@ -8,6 +8,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
+	"github.com/AndrXxX/goph-keeper/internal/client/locales"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
 	"github.com/AndrXxX/goph-keeper/internal/client/state"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/form"
@@ -39,8 +40,8 @@ func newMasterPassRegForm() *masterPassRegForm {
 		baseForm: NewBaseForm("Enter a master password to access", make([]textinput.Model, 2), form.FieldsUpdater{}),
 	}
 	m.baseForm.keys = &masterPassRegFormKeys
-	m.baseForm.inputs[mprFormPassword].Prompt = "Password: "
-	m.baseForm.inputs[mprFormRepeat].Prompt = "Repeat password: "
+	m.baseForm.inputs[mprFormPassword].Prompt = locales.FIPassword
+	m.baseForm.inputs[mprFormRepeat].Prompt = locales.FIRepeatPassword
 	return &m
 }
 

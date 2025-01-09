@@ -6,6 +6,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
+	"github.com/AndrXxX/goph-keeper/internal/client/locales"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
 	"github.com/AndrXxX/goph-keeper/internal/client/state"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/form"
@@ -38,8 +39,8 @@ func newLoginForm() *loginForm {
 		baseForm: NewBaseForm("Enter an exist account", make([]textinput.Model, 2), form.FieldsUpdater{}),
 	}
 	m.baseForm.keys = &loginFormKeys
-	m.baseForm.inputs[lfLogin].Prompt = "Login: "
-	m.baseForm.inputs[lfPassword].Prompt = "Password: "
+	m.baseForm.inputs[lfLogin].Prompt = locales.FILogin
+	m.baseForm.inputs[lfPassword].Prompt = locales.FIPassword
 	return &m
 }
 

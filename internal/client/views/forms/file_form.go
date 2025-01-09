@@ -9,6 +9,7 @@ import (
 
 	"github.com/AndrXxX/goph-keeper/internal/client/entities"
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
+	"github.com/AndrXxX/goph-keeper/internal/client/locales"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/form"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
@@ -41,10 +42,10 @@ func NewFileForm(item *entities.FileItem) *fileForm {
 		m.item = &entities.FileItem{}
 	}
 
-	m.baseForm.inputs[0].Prompt = "File: "
+	m.baseForm.inputs[0].Prompt = locales.FIFile
 	m.baseForm.inputs[0].SetValue(m.item.Data)
 
-	m.baseForm.inputs[1].Prompt = "Description: "
+	m.baseForm.inputs[1].Prompt = locales.FIDescription
 	m.baseForm.inputs[1].SetValue(m.item.Desc)
 
 	return &m

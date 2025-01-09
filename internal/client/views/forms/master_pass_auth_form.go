@@ -7,6 +7,7 @@ import (
 
 	"github.com/AndrXxX/goph-keeper/internal/client/entities"
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
+	"github.com/AndrXxX/goph-keeper/internal/client/locales"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
 	"github.com/AndrXxX/goph-keeper/internal/client/state"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/form"
@@ -36,7 +37,7 @@ func newMasterPassAuthForm() *masterPassAuthForm {
 		baseForm: NewBaseForm("Enter master password to access", make([]textinput.Model, 1), form.FieldsUpdater{}),
 	}
 	m.baseForm.keys = &masterPassAuthFormKeys
-	m.baseForm.inputs[mpaFormPassword].Prompt = "Password: "
+	m.baseForm.inputs[mpaFormPassword].Prompt = locales.FIPassword
 	return &m
 }
 
