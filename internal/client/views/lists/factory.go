@@ -7,6 +7,7 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/client/views/contract"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/forms"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
+	"github.com/AndrXxX/goph-keeper/internal/client/views/menuitems"
 )
 
 const refreshListInterval = 2 * time.Second
@@ -17,7 +18,11 @@ type Factory struct {
 }
 
 func (f *Factory) AuthMenu() *authMenu {
-	m := newAuthMenu()
+	m := newAuthMenu(
+		withAuthItem(menuitems.AuthItem{Name: "Register", Code: "register", Desc: "Create a new account"}),
+		withAuthItem(menuitems.AuthItem{Name: "Login", Code: "login", Desc: "Enter an exist account"}),
+		withAuthItem(menuitems.AuthItem{Name: "Enter", Code: "master_pass", Desc: "Enter a master password to access"}),
+	)
 	m.f = f.FF
 	return m
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"golang.org/x/tools/container/intsets"
 
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
@@ -29,16 +30,24 @@ type authMenu struct {
 	f    *forms.Factory
 }
 
-func newAuthMenu() *authMenu {
-	defaultList := list.New([]list.Item{
-		menuitems.AuthItem{Name: "Register", Code: "register", Desc: "Create a new account"},
-		menuitems.AuthItem{Name: "Login", Code: "login", Desc: "Enter an exist account"},
-		menuitems.AuthItem{Name: "Enter", Code: "master_pass", Desc: "Enter a master password to access"},
-	}, list.NewDefaultDelegate(), 0, 0)
-	defaultList.SetShowHelp(false)
-	defaultList.Title = "Goph Keeper"
-	defaultList.Styles.Title = styles.Title
-	return &authMenu{list: defaultList, help: help.New()}
+type amOption func(a *authMenu)
+
+func withAuthItem(i menuitems.AuthItem) amOption {
+	return func(a *authMenu) {
+		a.list.InsertItem(intsets.MaxInt, i)
+	}
+}
+
+func newAuthMenu(opts ...amOption) *authMenu {
+	l := list.New([]list.Item{}, list.NewDefaultDelegate(), 0, 0)
+	l.SetShowHelp(false)
+	l.Title = "Goph Keeper"
+	l.Styles.Title = styles.Title
+	am := &authMenu{list: l, help: help.New()}
+	for _, opt := range opts {
+		opt(am)
+	}
+	return am
 }
 
 func (m *authMenu) Init() tea.Cmd {
