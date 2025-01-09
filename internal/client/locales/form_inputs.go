@@ -10,5 +10,5 @@ const (
 	FILogin          = "Login: "
 	FIPassword       = "Password: "
 	FIRepeatPassword = "Repeat password: "
-	FIText           = "Repeat password: "
+	FIText           = "Text: "
 )
