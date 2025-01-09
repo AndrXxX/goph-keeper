@@ -66,6 +66,7 @@ func main() {
 		_ = appState.Storages.User.Update(appState.User)
 		*rs = *requestsender.New(&http.Client{}, requestsender.WithToken(token))
 	}}
+	qr := queue.NewRunner(1 * time.Second).SetWorkersCount(5)
 	viewsFactory := views.Factory{
 		AppState:   appState,
 		Loginer:    ap,
@@ -77,12 +78,13 @@ func main() {
 			Note:     sa.ORMNotesAdapter(sp.Note(ctx, db)),
 			BankCard: sa.ORMBankCardAdapter(sp.BankCard(ctx, db)),
 		},
+		QR: qr,
 	}
 	application := app.App{
-		TUI:   tea.NewProgram(views.NewContainer(views.NewMap(viewsFactory)), tea.WithAltScreen()),
+		TUI:   tea.NewProgram(viewsFactory.Container(), tea.WithAltScreen()),
 		State: appState,
 		Sync:  sm,
-		QR:    queue.NewRunner(1 * time.Second).SetWorkersCount(5),
+		QR:    qr,
 	}
 	if err := application.Run(ctx); err != nil {
 		logger.Log.Fatal(err.Error())

@@ -1,6 +1,8 @@
 package views
 
 import (
+	"github.com/charmbracelet/bubbles/help"
+
 	"github.com/AndrXxX/goph-keeper/internal/client/state"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/contract"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/forms"
@@ -13,6 +15,11 @@ type Factory struct {
 	Registerer forms.Registerer
 	SM         contract.SyncManager
 	S          *contract.Storages
+	QR         contract.QueueRunner
+}
+
+func (f *Factory) Container() *container {
+	return &container{help: help.New(), views: NewMap(f), qr: f.QR, sm: f.SM}
 }
 
 func (f *Factory) FormsFactory() *forms.Factory {

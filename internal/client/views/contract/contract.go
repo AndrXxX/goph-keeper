@@ -1,6 +1,9 @@
 package contract
 
-import "github.com/AndrXxX/goph-keeper/internal/client/entities"
+import (
+	"github.com/AndrXxX/goph-keeper/internal/client/entities"
+	"github.com/AndrXxX/goph-keeper/pkg/queue"
+)
 
 type SyncManager interface {
 	Sync(dataType string, updates []any) error
@@ -18,4 +21,8 @@ type Storages struct {
 	Password Storage[entities.PasswordItem]
 	Note     Storage[entities.NoteItem]
 	BankCard Storage[entities.BankCardItem]
+}
+
+type QueueRunner interface {
+	AddJob(queue.Job) error
 }

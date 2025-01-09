@@ -13,13 +13,14 @@ import (
 
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
+	"github.com/AndrXxX/goph-keeper/internal/client/views/contract"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/styles"
 )
 
 const errorsTimeout = 2 * time.Second
 
-type Container struct {
+type container struct {
 	help     help.Model
 	loaded   bool
 	current  names.ViewName
@@ -27,18 +28,16 @@ type Container struct {
 	quitting bool
 	errors   sync.Map
 	messages sync.Map
+	sm       contract.SyncManager
+	qr       contract.QueueRunner
 }
 
-func NewContainer(cols Map) *Container {
-	return &Container{help: help.New(), views: cols, errors: sync.Map{}}
-}
-
-func (m *Container) Init() tea.Cmd {
+func (m *container) Init() tea.Cmd {
 	m.current = names.AuthMenu
 	return nil
 }
 
-func (m *Container) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *container) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
@@ -83,7 +82,7 @@ func (m *Container) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func (m *Container) View() string {
+func (m *container) View() string {
 	if m.quitting {
 		return styles.Border.Render("")
 	}
@@ -116,7 +115,7 @@ func (m *Container) View() string {
 	return styles.Border.Render(lipgloss.JoinVertical(lipgloss.Left, board, err, mes))
 }
 
-func (m *Container) collectMessages(l *sync.Map) string {
+func (m *container) collectMessages(l *sync.Map) string {
 	b := strings.Builder{}
 	l.Range(func(_, v any) bool {
 		b.WriteString(fmt.Sprintf("%s\n", v.(string)))
