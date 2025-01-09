@@ -40,6 +40,14 @@ services:
     depends_on:
       - goph-keeper-db
 
+  goph-keeper-tests:
+    image: golang:1.23
+    container_name: goph-keeper-tests
+    volumes:
+      - ./:/go/src/github.com/AndrXxX/goph-keeper/
+    working_dir: /go/src/github.com/AndrXxX/goph-keeper/
+    entrypoint: go test ./... -coverprofile cover.out > /dev/null && go tool cover -func cover.out && rm cover.out
+
 networks:
   default:
     driver: bridge
