@@ -4,6 +4,8 @@ import (
 	"context"
 	"io"
 
+	"github.com/google/uuid"
+
 	"github.com/AndrXxX/goph-keeper/pkg/storages/postgressql/models"
 )
 
@@ -15,7 +17,7 @@ type usersStorage interface {
 type itemsStorage interface {
 	Insert(ctx context.Context, m *models.StoredItem) (*models.StoredItem, error)
 	Update(ctx context.Context, m *models.StoredItem) (*models.StoredItem, error)
-	QueryOneById(ctx context.Context, id uint) (*models.StoredItem, error)
+	QueryOneById(ctx context.Context, id uuid.UUID) (*models.StoredItem, error)
 	Query(ctx context.Context, m *models.StoredItem) ([]models.StoredItem, error)
 }
 
@@ -42,5 +44,5 @@ type itemConvertor[E any] interface {
 }
 
 type idItem interface {
-	GetID() uint
+	GetID() uuid.UUID
 }
