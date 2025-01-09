@@ -75,7 +75,7 @@ func main() {
 		TUI:   tea.NewProgram(views.NewContainer(views.NewMap(viewsFactory)), tea.WithAltScreen()),
 		State: appState,
 		Sync:  sm,
-		QR:    queue.NewRunner(1 * time.Second),
+		QR:    queue.NewRunner(1 * time.Second).SetWorkersCount(5),
 	}
 	if err := application.Run(); err != nil {
 		logger.Log.Fatal("failed to start application", zap.Error(err))
