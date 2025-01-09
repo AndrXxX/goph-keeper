@@ -40,7 +40,6 @@ func (f *Factory) MainMenu() *mainMenu {
 
 func (f *Factory) PasswordList() *passwordList {
 	l := newPasswordList()
-	l.sm = f.SM
 	l.lr = &helpers.ListRefresher[entities.PasswordItem]{
 		S:    f.S.Password,
 		List: &l.list,
@@ -50,7 +49,6 @@ func (f *Factory) PasswordList() *passwordList {
 
 func (f *Factory) NoteList() *noteList {
 	l := newNoteList()
-	l.sm = f.SM
 	l.lr = &helpers.ListRefresher[entities.NoteItem]{
 		S:    f.S.Note,
 		List: &l.list,
@@ -60,7 +58,6 @@ func (f *Factory) NoteList() *noteList {
 
 func (f *Factory) BankCardList() *bankCardList {
 	l := newBankCardList()
-	l.sm = f.SM
 	l.lr = &helpers.ListRefresher[entities.BankCardItem]{
 		S:    f.S.BankCard,
 		List: &l.list,

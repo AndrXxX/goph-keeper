@@ -14,7 +14,6 @@ import (
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/locales"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
-	"github.com/AndrXxX/goph-keeper/internal/client/views/contract"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/form"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
@@ -42,15 +41,13 @@ type bankCardForm struct {
 	creating bool
 	fu       form.FieldsUpdater
 	*baseForm
-	sm contract.SyncManager
 }
 
-func NewBankCardForm(item *entities.BankCardItem, sm contract.SyncManager) *bankCardForm {
+func NewBankCardForm(item *entities.BankCardItem) *bankCardForm {
 	m := bankCardForm{
 		baseForm: NewBaseForm("Create/edit bank card", make([]textinput.Model, 5), form.FieldsUpdater{}),
 		creating: item == nil,
 		item:     item,
-		sm:       sm,
 	}
 	m.baseForm.keys = &bankCardFormKeys
 	if m.creating {

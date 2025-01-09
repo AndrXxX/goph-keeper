@@ -10,7 +10,6 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/client/entities"
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
-	"github.com/AndrXxX/goph-keeper/internal/client/views/contract"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/forms"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
@@ -28,7 +27,6 @@ var passwordListKeys = kb.KeyMap{
 type passwordList struct {
 	list list.Model
 	help help.Model
-	sm   contract.SyncManager
 	lr   refresher
 }
 
@@ -62,11 +60,11 @@ func (l *passwordList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, kb.Keys.Edit, kb.Keys.Enter):
 			if len(l.list.VisibleItems()) != 0 {
 				e := l.list.SelectedItem().(entities.PasswordItem)
-				f := forms.NewPasswordForm(&e, l.sm)
+				f := forms.NewPasswordForm(&e)
 				return f, helpers.GenCmd(messages.ChangeView{Name: names.PasswordForm, View: f})
 			}
 		case key.Matches(msg, kb.Keys.New):
-			f := forms.NewPasswordForm(nil, l.sm)
+			f := forms.NewPasswordForm(nil)
 			return f, helpers.GenCmd(messages.ChangeView{Name: names.PasswordForm, View: f})
 		case key.Matches(msg, kb.Keys.Back):
 			return l, helpers.GenCmd(messages.ChangeView{Name: names.MainMenu})

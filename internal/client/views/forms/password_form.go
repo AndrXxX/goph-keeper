@@ -14,7 +14,6 @@ import (
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/locales"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
-	"github.com/AndrXxX/goph-keeper/internal/client/views/contract"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/form"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
@@ -39,14 +38,12 @@ type passwordForm struct {
 	item *entities.PasswordItem
 	fu   form.FieldsUpdater
 	*baseForm
-	sm contract.SyncManager
 }
 
-func NewPasswordForm(item *entities.PasswordItem, sm contract.SyncManager) *passwordForm {
+func NewPasswordForm(item *entities.PasswordItem) *passwordForm {
 	m := passwordForm{
 		baseForm: NewBaseForm("Create a new password", make([]textinput.Model, 3), form.FieldsUpdater{}),
 		item:     item,
-		sm:       sm,
 	}
 	m.baseForm.keys = &passwordFormKeys
 	if m.item == nil {

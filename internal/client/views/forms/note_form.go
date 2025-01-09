@@ -14,7 +14,6 @@ import (
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/locales"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
-	"github.com/AndrXxX/goph-keeper/internal/client/views/contract"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/form"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
@@ -38,14 +37,12 @@ type noteForm struct {
 	item *entities.NoteItem
 	fu   form.FieldsUpdater
 	*baseForm
-	sm contract.SyncManager
 }
 
-func NewNoteForm(item *entities.NoteItem, sm contract.SyncManager) *noteForm {
+func NewNoteForm(item *entities.NoteItem) *noteForm {
 	m := noteForm{
 		baseForm: NewBaseForm("Create a new note", make([]textinput.Model, 2), form.FieldsUpdater{}),
 		item:     item,
-		sm:       sm,
 	}
 	m.baseForm.keys = &noteFormKeys
 	if m.item == nil {
