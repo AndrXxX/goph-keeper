@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/AndrXxX/goph-keeper/internal/client/entities"
-	"github.com/AndrXxX/goph-keeper/internal/client/interfaces"
 	"github.com/AndrXxX/goph-keeper/internal/client/services/synchronize/convertors"
 	"github.com/AndrXxX/goph-keeper/internal/client/services/synchronize/e"
 	"github.com/AndrXxX/goph-keeper/internal/enums/datatypes"
@@ -14,7 +13,7 @@ import (
 type PasswordSynchronizer struct {
 	LC convertors.ListConvertor[entities.PasswordItem]
 	L  loader[entities.PasswordItem]
-	S  interfaces.Storage[entities.PasswordItem]
+	S  Storage[entities.PasswordItem]
 }
 
 func (s *PasswordSynchronizer) Sync(updates []any) error {

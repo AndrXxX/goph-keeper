@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/AndrXxX/goph-keeper/internal/client/entities"
-	"github.com/AndrXxX/goph-keeper/internal/client/interfaces"
 	"github.com/AndrXxX/goph-keeper/internal/client/services/synchronize/convertors"
 	"github.com/AndrXxX/goph-keeper/internal/client/services/synchronize/e"
 	"github.com/AndrXxX/goph-keeper/internal/enums/datatypes"
@@ -14,7 +13,7 @@ import (
 type NotesSynchronizer struct {
 	LC convertors.ListConvertor[entities.NoteItem]
 	L  loader[entities.NoteItem]
-	S  interfaces.Storage[entities.NoteItem]
+	S  Storage[entities.NoteItem]
 }
 
 func (s *NotesSynchronizer) Sync(updates []any) error {

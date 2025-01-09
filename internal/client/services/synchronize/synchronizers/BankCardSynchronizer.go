@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/AndrXxX/goph-keeper/internal/client/entities"
-	"github.com/AndrXxX/goph-keeper/internal/client/interfaces"
 	"github.com/AndrXxX/goph-keeper/internal/client/services/synchronize/convertors"
 	"github.com/AndrXxX/goph-keeper/internal/client/services/synchronize/e"
 	"github.com/AndrXxX/goph-keeper/internal/enums/datatypes"
@@ -14,7 +13,7 @@ import (
 type BankCardSynchronizer struct {
 	LC convertors.ListConvertor[entities.BankCardItem]
 	L  loader[entities.BankCardItem]
-	S  interfaces.Storage[entities.BankCardItem]
+	S  Storage[entities.BankCardItem]
 }
 
 func (s *BankCardSynchronizer) Sync(updates []any) error {

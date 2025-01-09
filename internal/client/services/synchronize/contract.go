@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/AndrXxX/goph-keeper/internal/client/entities"
+	"github.com/AndrXxX/goph-keeper/internal/client/services/synchronize/synchronizers"
 )
 
 type Synchronizer interface {
@@ -19,17 +20,10 @@ type urlBuilder interface {
 	Build(endpoint string, params map[string]string) string
 }
 
-type Storage[T any] interface {
-	Find(*T) *T
-	Create(*T) (*T, error)
-	Update(*T) error
-	FindAll(*T) []T
-}
-
 type Storages struct {
-	Password Storage[entities.PasswordItem]
-	Note     Storage[entities.NoteItem]
-	BankCard Storage[entities.BankCardItem]
+	Password synchronizers.Storage[entities.PasswordItem]
+	Note     synchronizers.Storage[entities.NoteItem]
+	BankCard synchronizers.Storage[entities.BankCardItem]
 }
 
 type tokenRefresher func()
