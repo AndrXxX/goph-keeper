@@ -4,12 +4,10 @@ import (
 	"time"
 
 	"github.com/charmbracelet/bubbles/list"
-
-	"github.com/AndrXxX/goph-keeper/internal/client/interfaces"
 )
 
 type ListRefresher[T list.Item] struct {
-	S          interfaces.Storage[T]
+	S          Storage[T]
 	List       *list.Model
 	refreshing bool
 }
