@@ -6,6 +6,7 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"golang.org/x/tools/container/intsets"
 
 	"github.com/AndrXxX/goph-keeper/internal/client/entities"
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
@@ -47,7 +48,7 @@ func (pl *fileList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		pl.list.SetSize(msg.Width/styles.InnerMargin, msg.Height/2)
 	case messages.AddFile:
-		pl.list.InsertItem(-1, msg.Item)
+		pl.list.InsertItem(intsets.MaxInt, msg.Item)
 		pl.View()
 		return pl, nil
 	case tea.KeyMsg:
