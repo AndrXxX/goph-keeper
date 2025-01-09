@@ -17,6 +17,7 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/client/services/synchronize"
 	"github.com/AndrXxX/goph-keeper/internal/client/state"
 	"github.com/AndrXxX/goph-keeper/internal/client/views"
+	vContract "github.com/AndrXxX/goph-keeper/internal/client/views/contract"
 	"github.com/AndrXxX/goph-keeper/pkg/logger"
 	"github.com/AndrXxX/goph-keeper/pkg/queue"
 	"github.com/AndrXxX/goph-keeper/pkg/requestsender"
@@ -40,20 +41,15 @@ func main() {
 	appState := &state.AppState{
 		User:       &entities.User{},
 		DBProvider: dbProvider,
-		Storages: &state.Storages{
-			User:     sa.ORMUserAdapter(sp.User(ctx, db)),
-			Password: sa.ORMPasswordsAdapter(sp.Password(ctx, db)),
-			Note:     sa.ORMNotesAdapter(sp.Note(ctx, db)),
-			BankCard: sa.ORMBankCardAdapter(sp.BankCard(ctx, db)),
-		},
+		Storages:   &state.Storages{User: sa.ORMUserAdapter(sp.User(ctx, db))},
 		AS: func(u *entities.User) {
 			*rs = *requestsender.New(&http.Client{}, requestsender.WithToken(u.Token))
 		},
 	}
 	sFactory := synchronize.Factory{RS: rs, UB: ub, Storages: &synchronize.Storages{
-		Password: appState.Storages.Password,
-		Note:     appState.Storages.Note,
-		BankCard: appState.Storages.BankCard,
+		Password: sa.ORMPasswordsAdapter(sp.Password(ctx, db)),
+		Note:     sa.ORMNotesAdapter(sp.Note(ctx, db)),
+		BankCard: sa.ORMBankCardAdapter(sp.BankCard(ctx, db)),
 	}}
 	sm := &synchronize.SyncManager{Synchronizers: sFactory.Map(), TR: func() {
 		token, err := ap.Login(appState.User)
@@ -70,6 +66,12 @@ func main() {
 		Loginer:    ap,
 		Registerer: ap,
 		SM:         sm,
+		S: &vContract.Storages{
+			User:     sa.ORMUserAdapter(sp.User(ctx, db)),
+			Password: sa.ORMPasswordsAdapter(sp.Password(ctx, db)),
+			Note:     sa.ORMNotesAdapter(sp.Note(ctx, db)),
+			BankCard: sa.ORMBankCardAdapter(sp.BankCard(ctx, db)),
+		},
 	}
 	application := app.App{
 		TUI:   tea.NewProgram(views.NewContainer(views.NewMap(viewsFactory)), tea.WithAltScreen()),

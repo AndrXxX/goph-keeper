@@ -20,10 +20,7 @@ type Storage[T any] interface {
 }
 
 type Storages struct {
-	User     Storage[entities.User]
-	Password Storage[entities.PasswordItem]
-	Note     Storage[entities.NoteItem]
-	BankCard Storage[entities.BankCardItem]
+	User Storage[entities.User]
 }
 
 type authSetup func(u *entities.User)

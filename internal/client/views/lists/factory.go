@@ -16,6 +16,7 @@ const refreshListInterval = 2 * time.Second
 type Factory struct {
 	FF *forms.Factory
 	SM contract.SyncManager
+	S  *contract.Storages
 }
 
 func (f *Factory) AuthMenu() *authMenu {
@@ -41,7 +42,7 @@ func (f *Factory) PasswordList() *passwordList {
 	l := newPasswordList()
 	l.sm = f.SM
 	l.lr = &helpers.ListRefresher[entities.PasswordItem]{
-		S:    f.FF.AppState.Storages.Password,
+		S:    f.S.Password,
 		List: &l.list,
 	}
 	return l
@@ -51,7 +52,7 @@ func (f *Factory) NoteList() *noteList {
 	l := newNoteList()
 	l.sm = f.SM
 	l.lr = &helpers.ListRefresher[entities.NoteItem]{
-		S:    f.FF.AppState.Storages.Note,
+		S:    f.S.Note,
 		List: &l.list,
 	}
 	return l
@@ -61,7 +62,7 @@ func (f *Factory) BankCardList() *bankCardList {
 	l := newBankCardList()
 	l.sm = f.SM
 	l.lr = &helpers.ListRefresher[entities.BankCardItem]{
-		S:    f.FF.AppState.Storages.BankCard,
+		S:    f.S.BankCard,
 		List: &l.list,
 	}
 	return l
