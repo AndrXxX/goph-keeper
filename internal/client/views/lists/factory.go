@@ -8,6 +8,7 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/client/views/forms"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/menuitems"
+	"github.com/AndrXxX/goph-keeper/internal/enums/datatypes"
 )
 
 const refreshListInterval = 2 * time.Second
@@ -28,7 +29,12 @@ func (f *Factory) AuthMenu() *authMenu {
 }
 
 func (f *Factory) MainMenu() *mainMenu {
-	return newMainMenu()
+	return newMainMenu(
+		withMenuItem(menuitems.MainMenuItem{Name: "Passwords", Code: datatypes.Passwords, Desc: "Manage passwords"}),
+		withMenuItem(menuitems.MainMenuItem{Name: "Notes", Code: datatypes.Notes, Desc: "Manage notes"}),
+		withMenuItem(menuitems.MainMenuItem{Name: "Bank Cards", Code: datatypes.BankCards, Desc: "Manage bank cards"}),
+		//withMenuItem(menuitems.MainMenuItem{Name: "Files", Code: datatypes.Files, Desc: "Manage files"}),
+	)
 }
 
 func (f *Factory) PasswordList() *passwordList {

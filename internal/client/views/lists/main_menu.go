@@ -6,6 +6,7 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"golang.org/x/tools/container/intsets"
 
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
@@ -27,17 +28,26 @@ type mainMenu struct {
 	help help.Model
 }
 
-func newMainMenu() *mainMenu {
-	defaultList := list.New([]list.Item{
-		menuitems.MainMenuItem{Name: "Passwords", Code: datatypes.Passwords, Desc: "Manage passwords"},
-		menuitems.MainMenuItem{Name: "Notes", Code: datatypes.Notes, Desc: "Manage notes"},
-		menuitems.MainMenuItem{Name: "Bank Cards", Code: datatypes.BankCards, Desc: "Manage bank cards"},
-		//menuitems.MainMenuItem{Name: "Files", Code: datatypes.Files, Desc: "Manage files"},
-	}, list.NewDefaultDelegate(), 0, 0)
-	defaultList.SetShowHelp(false)
-	defaultList.Title = "Menu"
-	defaultList.Styles.Title = styles.Title
-	return &mainMenu{list: defaultList, help: help.New()}
+type mmOption func(a *mainMenu)
+
+func withMenuItem(i menuitems.MainMenuItem) mmOption {
+	return func(a *mainMenu) {
+		a.list.InsertItem(intsets.MaxInt, i)
+	}
+}
+
+func newMainMenu(opts ...mmOption) *mainMenu {
+	m := &mainMenu{
+		list: list.New([]list.Item{}, list.NewDefaultDelegate(), 0, 0),
+		help: help.New(),
+	}
+	m.list.SetShowHelp(false)
+	m.list.Title = "Menu"
+	m.list.Styles.Title = styles.Title
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
 }
 
 func (m *mainMenu) Init() tea.Cmd {
