@@ -39,15 +39,17 @@ func withAuthItem(i menuitems.AuthItem) amOption {
 }
 
 func newAuthMenu(opts ...amOption) *authMenu {
-	l := list.New([]list.Item{}, list.NewDefaultDelegate(), 0, 0)
-	l.SetShowHelp(false)
-	l.Title = "Goph Keeper"
-	l.Styles.Title = styles.Title
-	am := &authMenu{list: l, help: help.New()}
-	for _, opt := range opts {
-		opt(am)
+	m := &authMenu{
+		list: list.New([]list.Item{}, list.NewDefaultDelegate(), 0, 0),
+		help: help.New(),
 	}
-	return am
+	m.list.SetShowHelp(false)
+	m.list.Title = "Goph Keeper"
+	m.list.Styles.Title = styles.Title
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
 }
 
 func (m *authMenu) Init() tea.Cmd {
