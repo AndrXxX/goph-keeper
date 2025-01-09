@@ -85,10 +85,10 @@ func (m *Container) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m *Container) View() string {
 	if m.quitting {
-		return m.getStyle().Render("")
+		return styles.Border.Render("")
 	}
 	if !m.loaded {
-		return m.getStyle().Render("loading...")
+		return styles.Border.Render("loading...")
 	}
 	board := lipgloss.JoinHorizontal(
 		lipgloss.Left,
@@ -113,7 +113,7 @@ func (m *Container) View() string {
 	if mes != "" {
 		mes = styles.Info.Render(mes)
 	}
-	return m.getStyle().Render(lipgloss.JoinVertical(lipgloss.Left, board, err, mes))
+	return styles.Border.Render(lipgloss.JoinVertical(lipgloss.Left, board, err, mes))
 }
 
 func (m *Container) collectMessages(l *sync.Map) string {
@@ -123,11 +123,4 @@ func (m *Container) collectMessages(l *sync.Map) string {
 		return true
 	})
 	return b.String()
-}
-
-func (m *Container) getStyle() lipgloss.Style {
-	return lipgloss.NewStyle().
-		Padding(1, 2).
-		Border(lipgloss.RoundedBorder()).
-		BorderForeground(lipgloss.Color("62"))
 }
