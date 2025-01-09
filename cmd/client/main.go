@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"net/http"
+	"os/signal"
+	"syscall"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -27,9 +29,12 @@ import (
 
 func main() {
 	_ = logger.Initialize("debug", []string{"./client.log"})
+
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
+	defer stop()
+
 	ub := urlbuilder.New("http://localhost:8081")
 	ap := &auth.Provider{Sender: requestsender.New(&http.Client{}), UB: ub}
-	ctx := context.Background()
 	dbProvider := &dbprovider.DBProvider{}
 	db, err := dbProvider.DB()
 	if err != nil {
@@ -79,7 +84,7 @@ func main() {
 		Sync:  sm,
 		QR:    queue.NewRunner(1 * time.Second).SetWorkersCount(5),
 	}
-	if err := application.Run(); err != nil {
-		logger.Log.Fatal("failed to start application", zap.Error(err))
+	if err := application.Run(ctx); err != nil {
+		logger.Log.Fatal(err.Error())
 	}
 }

@@ -7,7 +7,7 @@ import (
 )
 
 type queueRunner interface {
-	Run() error
+	Run(context.Context) error
 	Stop(context.Context) error
 	AddJob(queue.Job) error
 }
