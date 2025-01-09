@@ -6,7 +6,7 @@ import (
 
 	"github.com/AndrXxX/goph-keeper/internal/client/entities"
 	"github.com/AndrXxX/goph-keeper/internal/client/services/synchronize/convertors"
-	"github.com/AndrXxX/goph-keeper/internal/client/services/synchronize/e"
+	"github.com/AndrXxX/goph-keeper/internal/client/services/synchronize/syncerr"
 	"github.com/AndrXxX/goph-keeper/internal/enums/datatypes"
 )
 
@@ -23,7 +23,7 @@ func (s *PasswordSynchronizer) Sync(updates []any) error {
 	}
 	code, uErr := s.L.Upload(datatypes.Passwords, list)
 	if code == http.StatusUnauthorized {
-		return e.UnauthorizedError
+		return syncerr.UnauthorizedError
 	}
 	if uErr != nil {
 		return fmt.Errorf("upload password updates: %w", cErr)
@@ -41,7 +41,7 @@ func (s *PasswordSynchronizer) Sync(updates []any) error {
 func (s *PasswordSynchronizer) Download() error {
 	code, list := s.L.Download(datatypes.Passwords)
 	if code == http.StatusUnauthorized {
-		return e.UnauthorizedError
+		return syncerr.UnauthorizedError
 	}
 	if code != http.StatusOK {
 		return fmt.Errorf("could not download passwords - unexpected code: %v", code)

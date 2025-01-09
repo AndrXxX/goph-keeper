@@ -6,7 +6,7 @@ import (
 
 	"github.com/asaskevich/govalidator"
 
-	"github.com/AndrXxX/goph-keeper/internal/client/services/synchronize/e"
+	"github.com/AndrXxX/goph-keeper/internal/client/services/synchronize/syncerr"
 )
 
 type SyncManager struct {
@@ -25,7 +25,7 @@ func (m SyncManager) Sync(dataType string, updates []any) error {
 		}
 	}
 	err := s.Sync(updates)
-	if errors.Is(err, e.UnauthorizedError) {
+	if errors.Is(err, syncerr.UnauthorizedError) {
 		m.TR()
 		err = s.Sync(updates)
 	}

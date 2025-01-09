@@ -6,7 +6,7 @@ import (
 
 	"github.com/AndrXxX/goph-keeper/internal/client/entities"
 	"github.com/AndrXxX/goph-keeper/internal/client/services/synchronize/convertors"
-	"github.com/AndrXxX/goph-keeper/internal/client/services/synchronize/e"
+	"github.com/AndrXxX/goph-keeper/internal/client/services/synchronize/syncerr"
 	"github.com/AndrXxX/goph-keeper/internal/enums/datatypes"
 )
 
@@ -23,7 +23,7 @@ func (s *BankCardSynchronizer) Sync(updates []any) error {
 	}
 	code, uErr := s.L.Upload(datatypes.BankCards, list)
 	if code == http.StatusUnauthorized {
-		return e.UnauthorizedError
+		return syncerr.UnauthorizedError
 	}
 	if uErr != nil {
 		return fmt.Errorf("upload bank card updates: %w", cErr)
@@ -41,7 +41,7 @@ func (s *BankCardSynchronizer) Sync(updates []any) error {
 func (s *BankCardSynchronizer) Download() error {
 	code, list := s.L.Download(datatypes.BankCards)
 	if code == http.StatusUnauthorized {
-		return e.UnauthorizedError
+		return syncerr.UnauthorizedError
 	}
 	if code != http.StatusOK {
 		return fmt.Errorf("download bank cards - unexpected code: %v", code)
