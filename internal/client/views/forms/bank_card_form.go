@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -85,14 +86,15 @@ func (f *bankCardForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, kb.Keys.Back):
 			return f, helpers.GenCmd(messages.ChangeView{Name: names.BankCardList})
 		case key.Matches(msg, kb.Keys.Save):
-			err := f.sm.Sync(datatypes.BankCards, []any{*f.getBankCardItem()})
-			if err != nil {
+			item := f.getBankCardItem()
+			if _, err := govalidator.ValidateStruct(item); err != nil {
 				return f, helpers.GenCmd(messages.ShowError{Err: fmt.Sprintf("Ошибка при обновлении: %s", err)})
 			}
 			return f, tea.Batch(
+				helpers.GenCmd(messages.UploadItemUpdates{Type: datatypes.BankCards, Items: []any{*item}}),
 				helpers.GenCmd(messages.ChangeView{Name: names.BankCardList}),
-				helpers.GenCmd(messages.AddBankCard{Item: f.getBankCardItem()}),
-				helpers.GenCmd(messages.ShowMessage{Message: "Изменения сохранены"}),
+				helpers.GenCmd(messages.AddBankCard{Item: item}),
+				helpers.GenCmd(messages.ShowMessage{Message: "Выполняется синхронизация изменений"}),
 			)
 		case key.Matches(msg, kb.Keys.Copy):
 			c := clipboard.New()

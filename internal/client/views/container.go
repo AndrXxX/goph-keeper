@@ -11,9 +11,11 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
+	"github.com/AndrXxX/goph-keeper/internal/client/jobs"
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/contract"
+	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/styles"
 )
@@ -38,7 +40,7 @@ func (m *container) Init() tea.Cmd {
 }
 
 func (m *container) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	var cmd tea.Cmd
+	cmdList := make([]tea.Cmd, 0)
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		var cmd tea.Cmd
@@ -69,17 +71,28 @@ func (m *container) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			time.Sleep(errorsTimeout)
 			m.messages.Delete(msg.Message)
 		}()
+	case messages.UploadItemUpdates:
+		err := m.qr.AddJob(&jobs.UploadItemsUpdatesJob{
+			Type:        msg.Type,
+			Items:       msg.Items,
+			SyncManager: m.sm,
+		})
+		if err != nil {
+			return m, helpers.GenCmd(messages.ShowError{Err: fmt.Sprintf("Ошибка при обновлении: %s", err)})
+		}
 	case messages.ChangeView:
 		m.current = msg.Name
 		if msg.View != nil {
 			m.views[m.current] = msg.View
 		}
 		if msg.Msg != nil {
-			_, cmd = m.views[m.current].Update(msg.Msg)
+			_, cmd := m.views[m.current].Update(msg.Msg)
+			cmdList = append(cmdList, cmd)
 		}
 	}
-	_, cmd = m.views[m.current].Update(msg)
-	return m, cmd
+	_, cmd := m.views[m.current].Update(msg)
+	cmdList = append(cmdList, cmd)
+	return m, tea.Batch(cmdList...)
 }
 
 func (m *container) View() string {
