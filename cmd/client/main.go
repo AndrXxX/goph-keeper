@@ -21,6 +21,7 @@ import (
 	"github.com/AndrXxX/goph-keeper/pkg/queue"
 	"github.com/AndrXxX/goph-keeper/pkg/requestsender"
 	"github.com/AndrXxX/goph-keeper/pkg/urlbuilder"
+	_ "github.com/AndrXxX/goph-keeper/pkg/validators"
 )
 
 func main() {
