@@ -15,6 +15,14 @@ services:
     networks:
       - default
 
+  migrations:
+    image: ghcr.io/kukymbr/goose-docker:3.24.0
+    environment:
+      - GOOSE_DRIVER=postgres
+      - GOOSE_DBSTRING=host=goph-keeper-db user=${DB_USERNAME:-goph_keeper_user} password=${DB_PASSWORD:-goph_keeper_pass} dbname=${DB_NAME:-goph_keeper_db} sslmode=disable
+    volumes:
+      - ./migrations/postgresql:/migrations
+
   goph-keeper-server:
     image: golang:1.23
     container_name: goph-keeper-server
