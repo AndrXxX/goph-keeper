@@ -50,7 +50,11 @@ func main() {
 			*rs = *requestsender.New(&http.Client{}, requestsender.WithToken(u.Token))
 		},
 	}
-	sFactory := synchronize.Factory{RS: rs, UB: ub, Storages: (*synchronize.Storages)(appState.Storages)}
+	sFactory := synchronize.Factory{RS: rs, UB: ub, Storages: &synchronize.Storages{
+		Password: appState.Storages.Password,
+		Note:     appState.Storages.Note,
+		BankCard: appState.Storages.BankCard,
+	}}
 	sm := &synchronize.SyncManager{Synchronizers: sFactory.Map(), TR: func() {
 		token, err := ap.Login(appState.User)
 		if err != nil {
