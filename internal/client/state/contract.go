@@ -4,7 +4,6 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/AndrXxX/goph-keeper/internal/client/entities"
-	"github.com/AndrXxX/goph-keeper/internal/client/interfaces"
 )
 
 type dbProvider interface {
@@ -13,11 +12,18 @@ type dbProvider interface {
 	RemoveDB() error
 }
 
+type Storage[T any] interface {
+	Find(*T) *T
+	Create(*T) (*T, error)
+	Update(*T) error
+	FindAll(*T) []T
+}
+
 type Storages struct {
-	User     interfaces.Storage[entities.User]
-	Password interfaces.Storage[entities.PasswordItem]
-	Note     interfaces.Storage[entities.NoteItem]
-	BankCard interfaces.Storage[entities.BankCardItem]
+	User     Storage[entities.User]
+	Password Storage[entities.PasswordItem]
+	Note     Storage[entities.NoteItem]
+	BankCard Storage[entities.BankCardItem]
 }
 
 type authSetup func(u *entities.User)
