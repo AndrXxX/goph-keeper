@@ -47,7 +47,7 @@ func (s *BankCardSynchronizer) Download() error {
 		return fmt.Errorf("download bank cards - unexpected code: %v", code)
 	}
 	for i := range list {
-		exist := s.S.Find(&list[i])
+		exist := s.S.Find(&entities.BankCardItem{StoredItem: entities.StoredItem{ID: list[i].ID}})
 		if exist == nil {
 			_, err := s.S.Create(&list[i])
 			if err != nil {
