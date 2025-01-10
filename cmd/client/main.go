@@ -17,6 +17,7 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/client/services/ormstorages"
 	"github.com/AndrXxX/goph-keeper/internal/client/services/storageadapters"
 	"github.com/AndrXxX/goph-keeper/internal/client/services/synchronize"
+	"github.com/AndrXxX/goph-keeper/internal/client/services/useraccessor"
 	"github.com/AndrXxX/goph-keeper/internal/client/state"
 	"github.com/AndrXxX/goph-keeper/internal/client/views"
 	vContract "github.com/AndrXxX/goph-keeper/internal/client/views/contract"
@@ -45,27 +46,27 @@ func main() {
 	sp := ormstorages.Factory()
 	sa := storageadapters.Factory{}
 	rs := requestsender.New(&http.Client{})
-	appState := &state.AppState{
-		User:       &entities.User{},
-		DBProvider: dbProvider,
-		Storages:   &state.Storages{User: sa.ORMUserAdapter(sp.User(ctx, db))},
+	ua := &useraccessor.Accessor{
+		User: &entities.User{},
+		US:   sa.ORMUserAdapter(sp.User(ctx, db)),
 		AS: func(u *entities.User) {
 			*rs = *requestsender.New(&http.Client{}, requestsender.WithToken(u.Token))
 		},
 	}
+	appState := &state.AppState{}
 	sFactory := synchronize.Factory{RS: rs, UB: ub, Storages: &synchronize.Storages{
 		Password: sa.ORMPasswordsAdapter(sp.Password(ctx, db)),
 		Note:     sa.ORMNotesAdapter(sp.Note(ctx, db)),
 		BankCard: sa.ORMBankCardAdapter(sp.BankCard(ctx, db)),
 	}}
 	sm := &synchronize.SyncManager{Synchronizers: sFactory.Map(), TR: func() {
-		token, err := ap.Login(appState.User)
+		token, err := ap.Login(ua.GetUser())
 		if err != nil {
 			logger.Log.Error("failed to refresh token", zap.Error(err))
 			return
 		}
-		appState.User.Token = token
-		_ = appState.Storages.User.Update(appState.User)
+		ua.SetToken(token)
+		_ = ua.US.Update(ua.GetUser())
 		*rs = *requestsender.New(&http.Client{}, requestsender.WithToken(token))
 	}}
 	qr := queue.NewRunner(1 * time.Second).SetWorkersCount(5)
@@ -73,7 +74,6 @@ func main() {
 		Loginer:    ap,
 		Registerer: ap,
 		S: &vContract.Storages{
-			User:     sa.ORMUserAdapter(sp.User(ctx, db)),
 			Password: sa.ORMPasswordsAdapter(sp.Password(ctx, db)),
 			Note:     sa.ORMNotesAdapter(sp.Note(ctx, db)),
 			BankCard: sa.ORMBankCardAdapter(sp.BankCard(ctx, db)),
@@ -83,8 +83,8 @@ func main() {
 		TUI: tea.NewProgram(viewsFactory.Container(
 			views.WithShowMessage(msgTimeout),
 			views.WithShowError(msgTimeout),
-			views.WithUpdateUser(appState),
-			views.WithAuth(appState),
+			views.WithUpdateUser(ua),
+			views.WithAuth(ua),
 			views.WithUploadItemUpdates(sm, qr),
 		), tea.WithAltScreen()),
 		State: appState,

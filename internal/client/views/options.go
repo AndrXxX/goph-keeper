@@ -8,7 +8,6 @@ import (
 
 	"github.com/AndrXxX/goph-keeper/internal/client/jobs"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
-	"github.com/AndrXxX/goph-keeper/internal/client/state"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/contract"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
@@ -44,22 +43,22 @@ func WithShowError(timeout time.Duration) Option {
 	}
 }
 
-func WithUpdateUser(as *state.AppState) Option {
+func WithUpdateUser(a contract.UserAccessor) Option {
 	return func(c *container) {
 		c.uo[getKeyType(messages.UpdateUser{})] = func(v tea.Msg) (tea.Model, tea.Cmd) {
 			msg := v.(messages.UpdateUser)
-			as.User = msg.User
+			a.SetUser(msg.User)
 			return c, nil
 		}
 	}
 }
 
-func WithAuth(as *state.AppState) Option {
+func WithAuth(a contract.UserAccessor) Option {
 	return func(c *container) {
 		c.uo[getKeyType(messages.Auth{})] = func(v tea.Msg) (tea.Model, tea.Cmd) {
 			msg := v.(messages.Auth)
-			as.User.MasterPassword = msg.MasterPass
-			err := as.Auth()
+			a.SetMasterPass(msg.MasterPass)
+			err := a.Auth()
 			if err != nil {
 				return c, helpers.GenCmd(messages.ShowError{Err: fmt.Sprintf(err.Error())})
 			}

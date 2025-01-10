@@ -17,7 +17,6 @@ type Storage[T any] interface {
 }
 
 type Storages struct {
-	User     Storage[entities.User]
 	Password Storage[entities.PasswordItem]
 	Note     Storage[entities.NoteItem]
 	BankCard Storage[entities.BankCardItem]
@@ -25,4 +24,10 @@ type Storages struct {
 
 type QueueRunner interface {
 	AddJob(queue.Job) error
+}
+
+type UserAccessor interface {
+	Auth() error
+	SetMasterPass(mp string)
+	SetUser(user *entities.User)
 }
