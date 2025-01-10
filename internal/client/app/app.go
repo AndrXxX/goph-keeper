@@ -45,34 +45,35 @@ func NewApp(c *config.Config) *App {
 	ub := urlbuilder.New(c.Host)
 	ap := &auth.Provider{Sender: requestsender.New(&http.Client{}), UB: ub}
 	dbProvider := &dbprovider.DBProvider{}
-	var db *gorm.DB
+	appState := &state.AppState{}
 	sp := ormstorages.Factory()
 	sa := storageadapters.Factory{}
 	rs := requestsender.New(&http.Client{})
 	ua := &useraccessor.Accessor{
 		User: &entities.User{},
-		US:   sa.ORMUserAdapter(sp.User(ctx, db)),
+		SP: func(db *gorm.DB) useraccessor.Storage[entities.User] {
+			return sa.ORMUserAdapter(sp.User(ctx, db))
+		},
 		ST: func(token string) {
 			*rs = *requestsender.New(&http.Client{}, requestsender.WithToken(token))
 		},
-		SDB: func(masterPass string) error {
+		SDB: func(masterPass string) (*gorm.DB, error) {
 			actDB, err := dbProvider.DB(masterPass)
 			if err != nil {
-				return err
+				return nil, err
 			}
 			// TODO: отрефакторить
-			*db = *actDB
-			return nil
+			*appState.DB = *actDB
+			return actDB, nil
 		},
 		HG: func(key string) useraccessor.HashGenerator {
 			return hashgenerator.Factory().SHA256(key)
 		},
 	}
-	appState := &state.AppState{}
 	sFactory := synchronize.Factory{RS: rs, UB: ub, Storages: &synchronize.Storages{
-		Password: sa.ORMPasswordsAdapter(sp.Password(ctx, db)),
-		Note:     sa.ORMNotesAdapter(sp.Note(ctx, db)),
-		BankCard: sa.ORMBankCardAdapter(sp.BankCard(ctx, db)),
+		Password: sa.ORMPasswordsAdapter(sp.Password(ctx, appState.DB)),
+		Note:     sa.ORMNotesAdapter(sp.Note(ctx, appState.DB)),
+		BankCard: sa.ORMBankCardAdapter(sp.BankCard(ctx, appState.DB)),
 	}}
 	sm := &synchronize.SyncManager{Synchronizers: sFactory.Map(), TR: func() {
 		token, err := ap.Login(ua.GetUser())
@@ -89,9 +90,9 @@ func NewApp(c *config.Config) *App {
 		Loginer:    ap,
 		Registerer: ap,
 		S: &vContract.Storages{
-			Password: sa.ORMPasswordsAdapter(sp.Password(ctx, db)),
-			Note:     sa.ORMNotesAdapter(sp.Note(ctx, db)),
-			BankCard: sa.ORMBankCardAdapter(sp.BankCard(ctx, db)),
+			Password: sa.ORMPasswordsAdapter(sp.Password(ctx, appState.DB)),
+			Note:     sa.ORMNotesAdapter(sp.Note(ctx, appState.DB)),
+			BankCard: sa.ORMBankCardAdapter(sp.BankCard(ctx, appState.DB)),
 		},
 	}
 	application := App{

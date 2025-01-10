@@ -1,5 +1,9 @@
 package useraccessor
 
+import "gorm.io/gorm"
+
+type storageProvider[T any] func(db *gorm.DB) Storage[T]
+
 type Storage[T any] interface {
 	Find(*T) *T
 	Create(*T) (*T, error)
@@ -8,7 +12,7 @@ type Storage[T any] interface {
 }
 
 type setupToken func(token string)
-type setupDb func(masterPass string) error
+type setupDb func(masterPass string) (*gorm.DB, error)
 
 type HashGenerator interface {
 	Generate(data []byte) string
