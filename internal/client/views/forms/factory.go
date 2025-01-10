@@ -36,6 +36,5 @@ func (f *Factory) MasterPassRegForm() *masterPassRegForm {
 
 func (f *Factory) MasterPassAuthForm() *masterPassAuthForm {
 	mpf := newMasterPassAuthForm()
-	mpf.s = f.AppState
 	return mpf
 }

@@ -19,7 +19,7 @@ type Factory struct {
 }
 
 func (f *Factory) Container() *container {
-	return &container{help: help.New(), views: NewMap(f), qr: f.QR, sm: f.SM}
+	return &container{help: help.New(), views: NewMap(f), qr: f.QR, sm: f.SM, as: f.AppState}
 }
 
 func (f *Factory) FormsFactory() *forms.Factory {

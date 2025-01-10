@@ -9,7 +9,6 @@ import (
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/locales"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
-	"github.com/AndrXxX/goph-keeper/internal/client/state"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/form"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
@@ -29,7 +28,6 @@ const (
 
 type masterPassAuthForm struct {
 	*baseForm
-	s *state.AppState
 }
 
 func newMasterPassAuthForm() *masterPassAuthForm {
@@ -54,13 +52,10 @@ func (f *masterPassAuthForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				Name: names.AuthMenu,
 			})
 		case key.Matches(msg, kb.Keys.Enter):
-			f.s.User = &entities.User{}
-			f.s.User.MasterPassword = f.baseForm.inputs[mprFormPassword].Value()
-			err := f.s.Auth()
-			if err != nil {
-				return f, tea.Batch(helpers.GenCmd(messages.ShowError{Err: err.Error()}))
-			}
-			return f, tea.Batch(helpers.GenCmd(messages.ChangeView{Name: names.MainMenu}))
+			return f, tea.Batch(
+				helpers.GenCmd(messages.UpdateUser{User: &entities.User{}}),
+				helpers.GenCmd(messages.Auth{MasterPass: f.baseForm.inputs[mpaFormPassword].Value()}),
+			)
 		}
 	}
 	_, cmd := f.baseForm.Update(msg)
