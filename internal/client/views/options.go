@@ -15,6 +15,12 @@ import (
 
 type Option func(c *container)
 
+func WithStartView(view names.ViewName) Option {
+	return func(c *container) {
+		c.current = view
+	}
+}
+
 func WithShowMessage(timeout time.Duration) Option {
 	return func(c *container) {
 		c.uo[getKeyType(messages.ShowMessage{})] = func(v tea.Msg) (tea.Model, tea.Cmd) {
