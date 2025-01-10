@@ -21,6 +21,7 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/client/state"
 	"github.com/AndrXxX/goph-keeper/internal/client/views"
 	vContract "github.com/AndrXxX/goph-keeper/internal/client/views/contract"
+	"github.com/AndrXxX/goph-keeper/pkg/hashgenerator"
 	"github.com/AndrXxX/goph-keeper/pkg/logger"
 	"github.com/AndrXxX/goph-keeper/pkg/queue"
 	"github.com/AndrXxX/goph-keeper/pkg/requestsender"
@@ -51,6 +52,9 @@ func main() {
 		US:   sa.ORMUserAdapter(sp.User(ctx, db)),
 		AS: func(u *entities.User) {
 			*rs = *requestsender.New(&http.Client{}, requestsender.WithToken(u.Token))
+		},
+		HG: func(key string) useraccessor.HashGenerator {
+			return hashgenerator.Factory().SHA256(key)
 		},
 	}
 	appState := &state.AppState{}

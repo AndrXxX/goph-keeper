@@ -10,44 +10,40 @@ type Accessor struct {
 	User *entities.User
 	US   Storage[entities.User]
 	AS   authSetup
+	HG   hashGeneratorFetcher
 }
 
-func (u *Accessor) GetUser() *entities.User {
-	return u.User
+func (a *Accessor) GetUser() *entities.User {
+	return a.User
 }
 
-func (u *Accessor) SetUser(user *entities.User) {
-	u.User = user
+func (a *Accessor) SetUser(user *entities.User) {
+	a.User = user
 }
 
-func (u *Accessor) SetToken(t string) {
-	u.User.Token = t
+func (a *Accessor) SetToken(t string) {
+	a.User.Token = t
 }
 
-func (u *Accessor) SetMasterPass(mp string) {
-	u.User.MasterPassword = mp
+func (a *Accessor) SetMasterPass(mp string) {
+	a.User.MasterPassword = a.HG(mp).Generate([]byte(mp))
 }
 
-func (u *Accessor) Auth() error {
-	if u.User.Login != "" {
-		// TODO: вызывает ошибку attempt to write to readonly database
-		//err := u.DBProvider.RemoveDB()
-		//if err != nil {
-		//	return err
-		//}
-		created, err := u.US.Create(u.User)
+func (a *Accessor) Auth() error {
+	if a.User.Login != "" {
+		created, err := a.US.Create(a.User)
 		if err != nil {
 			return fmt.Errorf("error saving user: %w", err)
 		}
-		u.User = created
-		u.AS(u.User)
+		a.User = created
+		a.AS(a.User)
 		return nil
 	}
-	list := u.US.FindAll(nil)
+	list := a.US.FindAll(nil)
 	for i := range list {
-		if list[i].MasterPassword == u.User.MasterPassword {
-			u.User = &list[i]
-			u.AS(u.User)
+		if list[i].MasterPassword == a.User.MasterPassword {
+			a.User = &list[i]
+			a.AS(a.User)
 			return nil
 		}
 	}

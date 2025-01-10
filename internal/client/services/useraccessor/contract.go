@@ -10,3 +10,9 @@ type Storage[T any] interface {
 }
 
 type authSetup func(u *entities.User)
+
+type HashGenerator interface {
+	Generate(data []byte) string
+}
+
+type hashGeneratorFetcher func(key string) HashGenerator
