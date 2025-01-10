@@ -86,6 +86,7 @@ func main() {
 		TUI: tea.NewProgram(viewsFactory.Container(
 			views.WithShowMessage(msgTimeout),
 			views.WithShowError(msgTimeout),
+			views.WithUpdateUser(appState),
 		), tea.WithAltScreen()),
 		State: appState,
 		Sync:  sm,

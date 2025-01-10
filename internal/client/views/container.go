@@ -68,9 +68,6 @@ func (m *container) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if err != nil {
 			return m, helpers.GenCmd(messages.ShowError{Err: fmt.Sprintf("Ошибка при обновлении: %s", err)})
 		}
-	case messages.UpdateUser:
-		m.as.User = msg.User
-		return m, nil
 	case messages.Auth:
 		m.as.User.MasterPassword = msg.MasterPass
 		err := m.as.Auth()

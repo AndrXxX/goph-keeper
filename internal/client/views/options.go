@@ -7,6 +7,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
+	"github.com/AndrXxX/goph-keeper/internal/client/state"
 )
 
 type Option func(c *container)
@@ -34,6 +35,16 @@ func WithShowError(timeout time.Duration) Option {
 				time.Sleep(timeout)
 				c.errors.Delete(msg.Err)
 			}()
+			return c, nil
+		}
+	}
+}
+
+func WithUpdateUser(as *state.AppState) Option {
+	return func(c *container) {
+		c.uo[getKeyType(messages.UpdateUser{})] = func(v tea.Msg) (tea.Model, tea.Cmd) {
+			msg := v.(messages.UpdateUser)
+			as.User = msg.User
 			return c, nil
 		}
 	}
