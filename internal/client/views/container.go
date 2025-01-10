@@ -10,11 +10,8 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
-	"github.com/AndrXxX/goph-keeper/internal/client/jobs"
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
-	"github.com/AndrXxX/goph-keeper/internal/client/views/contract"
-	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/styles"
 )
@@ -28,8 +25,6 @@ type container struct {
 	errors   sync.Map
 	messages sync.Map
 	uo       map[tea.Msg]UpdateOption
-	sm       contract.SyncManager
-	qr       contract.QueueRunner
 }
 
 func (m *container) Init() tea.Cmd {
@@ -56,15 +51,6 @@ func (m *container) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, kb.Keys.Quit):
 			m.quitting = true
 			return m, tea.Quit
-		}
-	case messages.UploadItemUpdates:
-		err := m.qr.AddJob(&jobs.UploadItemsUpdatesJob{
-			Type:        msg.Type,
-			Items:       msg.Items,
-			SyncManager: m.sm,
-		})
-		if err != nil {
-			return m, helpers.GenCmd(messages.ShowError{Err: fmt.Sprintf("Ошибка при обновлении: %s", err)})
 		}
 	case messages.ChangeView:
 		m.current = msg.Name

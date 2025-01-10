@@ -12,17 +12,13 @@ import (
 type Factory struct {
 	Loginer    forms.Loginer
 	Registerer forms.Registerer
-	SM         contract.SyncManager
 	S          *contract.Storages
-	QR         contract.QueueRunner
 }
 
 func (f *Factory) Container(opts ...Option) *container {
 	c := &container{
 		help:  help.New(),
 		views: NewMap(f),
-		qr:    f.QR,
-		sm:    f.SM,
 		uo:    make(map[tea.Msg]UpdateOption),
 	}
 	for _, opt := range opts {
@@ -35,14 +31,12 @@ func (f *Factory) FormsFactory() *forms.Factory {
 	return &forms.Factory{
 		Loginer:    f.Loginer,
 		Registerer: f.Registerer,
-		SM:         f.SM,
 	}
 }
 
 func (f *Factory) MenusFactory() *lists.Factory {
 	return &lists.Factory{
 		FF: f.FormsFactory(),
-		SM: f.SM,
 		S:  f.S,
 	}
 }

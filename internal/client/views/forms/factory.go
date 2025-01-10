@@ -1,13 +1,8 @@
 package forms
 
-import (
-	"github.com/AndrXxX/goph-keeper/internal/client/views/contract"
-)
-
 type Factory struct {
 	Loginer    Loginer
 	Registerer Registerer
-	SM         contract.SyncManager
 }
 
 func (f *Factory) LoginForm() *loginForm {

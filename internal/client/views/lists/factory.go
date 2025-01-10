@@ -15,7 +15,6 @@ const refreshListInterval = 2 * time.Second
 
 type Factory struct {
 	FF *forms.Factory
-	SM contract.SyncManager
 	S  *contract.Storages
 }
 

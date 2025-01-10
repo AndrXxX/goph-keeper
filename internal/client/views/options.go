@@ -6,8 +6,10 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 
+	"github.com/AndrXxX/goph-keeper/internal/client/jobs"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
 	"github.com/AndrXxX/goph-keeper/internal/client/state"
+	"github.com/AndrXxX/goph-keeper/internal/client/views/contract"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 )
@@ -62,6 +64,23 @@ func WithAuth(as *state.AppState) Option {
 				return c, helpers.GenCmd(messages.ShowError{Err: fmt.Sprintf(err.Error())})
 			}
 			return c, tea.Batch(helpers.GenCmd(messages.ChangeView{Name: names.MainMenu}))
+		}
+	}
+}
+
+func WithUploadItemUpdates(sm contract.SyncManager, qr contract.QueueRunner) Option {
+	return func(c *container) {
+		c.uo[getKeyType(messages.UploadItemUpdates{})] = func(v tea.Msg) (tea.Model, tea.Cmd) {
+			msg := v.(messages.UploadItemUpdates)
+			err := qr.AddJob(&jobs.UploadItemsUpdatesJob{
+				Type:        msg.Type,
+				Items:       msg.Items,
+				SyncManager: sm,
+			})
+			if err != nil {
+				return c, helpers.GenCmd(messages.ShowError{Err: fmt.Sprintf("Ошибка при синхронизации: %s", err)})
+			}
+			return c, nil
 		}
 	}
 }

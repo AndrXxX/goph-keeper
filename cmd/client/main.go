@@ -72,14 +72,12 @@ func main() {
 	viewsFactory := views.Factory{
 		Loginer:    ap,
 		Registerer: ap,
-		SM:         sm,
 		S: &vContract.Storages{
 			User:     sa.ORMUserAdapter(sp.User(ctx, db)),
 			Password: sa.ORMPasswordsAdapter(sp.Password(ctx, db)),
 			Note:     sa.ORMNotesAdapter(sp.Note(ctx, db)),
 			BankCard: sa.ORMBankCardAdapter(sp.BankCard(ctx, db)),
 		},
-		QR: qr,
 	}
 	application := app.App{
 		TUI: tea.NewProgram(viewsFactory.Container(
@@ -87,6 +85,7 @@ func main() {
 			views.WithShowError(msgTimeout),
 			views.WithUpdateUser(appState),
 			views.WithAuth(appState),
+			views.WithUploadItemUpdates(sm, qr),
 		), tea.WithAltScreen()),
 		State: appState,
 		Sync:  sm,
