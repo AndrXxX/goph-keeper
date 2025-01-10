@@ -22,7 +22,6 @@ func (f *Factory) LoginForm() *loginForm {
 func (f *Factory) RegisterForm() *registerForm {
 	rf := newRegisterForm()
 	rf.r = f.Registerer
-	rf.s = f.AppState
 	rf.f = f
 	return rf
 }
