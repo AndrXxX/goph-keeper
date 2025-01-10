@@ -15,7 +15,6 @@ type Factory struct {
 func (f *Factory) LoginForm() *loginForm {
 	lf := newLoginForm()
 	lf.f = f
-	lf.s = f.AppState
 	lf.l = f.Loginer
 	return lf
 }

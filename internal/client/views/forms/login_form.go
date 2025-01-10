@@ -5,10 +5,10 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 
+	"github.com/AndrXxX/goph-keeper/internal/client/entities"
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/locales"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
-	"github.com/AndrXxX/goph-keeper/internal/client/state"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/form"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
@@ -30,7 +30,6 @@ var loginFormKeys = kb.KeyMap{
 type loginForm struct {
 	*baseForm
 	l Loginer
-	s *state.AppState
 	f *Factory
 }
 
@@ -55,14 +54,14 @@ func (f *loginForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, kb.Keys.Back):
 			return f, helpers.GenCmd(messages.ChangeView{Name: names.AuthMenu})
 		case key.Matches(msg, kb.Keys.Enter):
-			f.s.User.Login = f.inputs[lfLogin].Value()
-			f.s.User.Password = f.inputs[lfPassword].Value()
-			token, err := f.l.Login(f.s.User)
+			u := &entities.User{Login: f.inputs[lfLogin].Value(), Password: f.inputs[lfPassword].Value()}
+			token, err := f.l.Login(u)
 			if err != nil {
 				return f, helpers.GenCmd(messages.ShowError{Err: err.Error()})
 			}
-			f.s.User.Token = token
+			u.Token = token
 			cmdList := []tea.Cmd{
+				helpers.GenCmd(messages.UpdateUser{User: u}),
 				helpers.GenCmd(messages.ChangeView{Name: names.MasterPassRegForm, View: f.f.MasterPassRegForm()}),
 				helpers.GenCmd(messages.ShowMessage{Message: "Successfully logged in"}),
 			}
