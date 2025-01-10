@@ -3,14 +3,19 @@ package useraccessor
 import (
 	"fmt"
 
+	"go.uber.org/zap"
+
 	"github.com/AndrXxX/goph-keeper/internal/client/entities"
+	"github.com/AndrXxX/goph-keeper/pkg/logger"
 )
 
 type Accessor struct {
-	User *entities.User
-	US   Storage[entities.User]
-	AS   authSetup
-	HG   hashGeneratorFetcher
+	User       *entities.User
+	US         Storage[entities.User]
+	ST         setupToken
+	SDB        setupDb
+	HG         hashGeneratorFetcher
+	masterPass string
 }
 
 func (a *Accessor) GetUser() *entities.User {
@@ -26,24 +31,30 @@ func (a *Accessor) SetToken(t string) {
 }
 
 func (a *Accessor) SetMasterPass(mp string) {
+	a.masterPass = mp
 	a.User.MasterPassword = a.HG(mp).Generate([]byte(mp))
 }
 
 func (a *Accessor) Auth() error {
+	err := a.SDB(a.masterPass)
+	if err != nil {
+		logger.Log.Info("неверный мастер пароль", zap.Error(err))
+		return fmt.Errorf("неверный мастер пароль")
+	}
 	if a.User.Login != "" {
 		created, err := a.US.Create(a.User)
 		if err != nil {
 			return fmt.Errorf("error saving user: %w", err)
 		}
 		a.User = created
-		a.AS(a.User)
+		a.ST(a.User.Token)
 		return nil
 	}
 	list := a.US.FindAll(nil)
 	for i := range list {
 		if list[i].MasterPassword == a.User.MasterPassword {
 			a.User = &list[i]
-			a.AS(a.User)
+			a.ST(a.User.Token)
 			return nil
 		}
 	}

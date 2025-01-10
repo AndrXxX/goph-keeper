@@ -1,7 +1,5 @@
 package useraccessor
 
-import "github.com/AndrXxX/goph-keeper/internal/client/entities"
-
 type Storage[T any] interface {
 	Find(*T) *T
 	Create(*T) (*T, error)
@@ -9,7 +7,8 @@ type Storage[T any] interface {
 	FindAll(*T) []T
 }
 
-type authSetup func(u *entities.User)
+type setupToken func(token string)
+type setupDb func(masterPass string) error
 
 type HashGenerator interface {
 	Generate(data []byte) string

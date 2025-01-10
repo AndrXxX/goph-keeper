@@ -9,6 +9,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 
 	"github.com/AndrXxX/goph-keeper/internal/client/app"
 	"github.com/AndrXxX/goph-keeper/internal/client/entities"
@@ -40,18 +41,24 @@ func main() {
 	ub := urlbuilder.New("http://localhost:8081")
 	ap := &auth.Provider{Sender: requestsender.New(&http.Client{}), UB: ub}
 	dbProvider := &dbprovider.DBProvider{}
-	db, err := dbProvider.DB("testKey")
-	if err != nil {
-		logger.Log.Fatal("failed to connect to database", zap.Error(err))
-	}
+	var db *gorm.DB
 	sp := ormstorages.Factory()
 	sa := storageadapters.Factory{}
 	rs := requestsender.New(&http.Client{})
 	ua := &useraccessor.Accessor{
 		User: &entities.User{},
 		US:   sa.ORMUserAdapter(sp.User(ctx, db)),
-		AS: func(u *entities.User) {
-			*rs = *requestsender.New(&http.Client{}, requestsender.WithToken(u.Token))
+		ST: func(token string) {
+			*rs = *requestsender.New(&http.Client{}, requestsender.WithToken(token))
+		},
+		SDB: func(masterPass string) error {
+			actDB, err := dbProvider.DB(masterPass)
+			if err != nil {
+				return err
+			}
+			// TODO: отрефакторить
+			*db = *actDB
+			return nil
 		},
 		HG: func(key string) useraccessor.HashGenerator {
 			return hashgenerator.Factory().SHA256(key)
