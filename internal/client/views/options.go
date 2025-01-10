@@ -84,6 +84,16 @@ func WithUploadItemUpdates(sm contract.SyncManager, qr contract.QueueRunner) Opt
 	}
 }
 
+func WithQuit(handler func()) Option {
+	return func(c *container) {
+		c.uo[getKeyType(messages.Quit{})] = func(v tea.Msg) (tea.Model, tea.Cmd) {
+			c.quitting = true
+			handler()
+			return c, tea.Quit
+		}
+	}
+}
+
 func getKeyType(v tea.Msg) string {
 	return fmt.Sprintf("%T", v)
 }

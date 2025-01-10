@@ -12,6 +12,7 @@ import (
 
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
+	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/styles"
 )
@@ -49,8 +50,7 @@ func (m *container) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, kb.Keys.Quit):
-			m.quitting = true
-			return m, tea.Quit
+			return m, helpers.GenCmd(messages.Quit{})
 		}
 	case messages.ChangeView:
 		m.current = msg.Name

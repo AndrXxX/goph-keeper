@@ -90,6 +90,9 @@ func main() {
 			views.WithUpdateUser(ua),
 			views.WithAuth(ua),
 			views.WithUploadItemUpdates(sm, qr),
+			views.WithQuit(func() {
+				stop()
+			}),
 		), tea.WithAltScreen()),
 		State: appState,
 		Sync:  sm,
