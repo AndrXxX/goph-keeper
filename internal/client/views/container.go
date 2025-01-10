@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
@@ -20,8 +19,6 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/styles"
 )
-
-const errorsTimeout = 2 * time.Second
 
 type container struct {
 	help     help.Model
@@ -62,12 +59,6 @@ func (m *container) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.quitting = true
 			return m, tea.Quit
 		}
-	case messages.ShowError:
-		m.errors.Store(msg.Err, msg.Err)
-		go func() {
-			time.Sleep(errorsTimeout)
-			m.errors.Delete(msg.Err)
-		}()
 	case messages.UploadItemUpdates:
 		err := m.qr.AddJob(&jobs.UploadItemsUpdatesJob{
 			Type:        msg.Type,

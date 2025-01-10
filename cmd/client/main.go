@@ -27,6 +27,8 @@ import (
 	_ "github.com/AndrXxX/goph-keeper/pkg/validators"
 )
 
+const msgTimeout = 2 * time.Second
+
 func main() {
 	_ = logger.Initialize("debug", []string{"./client.log"})
 
@@ -81,7 +83,10 @@ func main() {
 		QR: qr,
 	}
 	application := app.App{
-		TUI:   tea.NewProgram(viewsFactory.Container(views.WithShowMessage()), tea.WithAltScreen()),
+		TUI: tea.NewProgram(viewsFactory.Container(
+			views.WithShowMessage(msgTimeout),
+			views.WithShowError(msgTimeout),
+		), tea.WithAltScreen()),
 		State: appState,
 		Sync:  sm,
 		QR:    qr,
