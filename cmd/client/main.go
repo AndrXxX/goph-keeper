@@ -81,7 +81,7 @@ func main() {
 		QR: qr,
 	}
 	application := app.App{
-		TUI:   tea.NewProgram(viewsFactory.Container(), tea.WithAltScreen()),
+		TUI:   tea.NewProgram(viewsFactory.Container(views.WithShowMessage()), tea.WithAltScreen()),
 		State: appState,
 		Sync:  sm,
 		QR:    qr,

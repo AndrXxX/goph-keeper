@@ -2,6 +2,7 @@ package views
 
 import (
 	"github.com/charmbracelet/bubbles/help"
+	tea "github.com/charmbracelet/bubbletea"
 
 	"github.com/AndrXxX/goph-keeper/internal/client/state"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/contract"
@@ -18,8 +19,19 @@ type Factory struct {
 	QR         contract.QueueRunner
 }
 
-func (f *Factory) Container() *container {
-	return &container{help: help.New(), views: NewMap(f), qr: f.QR, sm: f.SM, as: f.AppState}
+func (f *Factory) Container(opts ...Option) *container {
+	c := &container{
+		help:  help.New(),
+		views: NewMap(f),
+		qr:    f.QR,
+		sm:    f.SM,
+		as:    f.AppState,
+		uo:    make(map[tea.Msg]UpdateOption),
+	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 func (f *Factory) FormsFactory() *forms.Factory {

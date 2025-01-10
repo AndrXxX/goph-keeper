@@ -31,6 +31,7 @@ type container struct {
 	quitting bool
 	errors   sync.Map
 	messages sync.Map
+	uo       map[tea.Msg]UpdateOption
 	sm       contract.SyncManager
 	qr       contract.QueueRunner
 	as       *state.AppState
@@ -67,12 +68,6 @@ func (m *container) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			time.Sleep(errorsTimeout)
 			m.errors.Delete(msg.Err)
 		}()
-	case messages.ShowMessage:
-		m.messages.Store(msg.Message, msg.Message)
-		go func() {
-			time.Sleep(errorsTimeout)
-			m.messages.Delete(msg.Message)
-		}()
 	case messages.UploadItemUpdates:
 		err := m.qr.AddJob(&jobs.UploadItemsUpdatesJob{
 			Type:        msg.Type,
@@ -99,6 +94,12 @@ func (m *container) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		if msg.Msg != nil {
 			_, cmd := m.views[m.current].Update(msg.Msg)
+			cmdList = append(cmdList, cmd)
+		}
+	default:
+		mgsK := fmt.Sprintf("%T", msg)
+		if f, ok := m.uo[mgsK]; ok {
+			_, cmd := f(msg)
 			cmdList = append(cmdList, cmd)
 		}
 	}
