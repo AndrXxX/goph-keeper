@@ -8,7 +8,7 @@ import (
 
 type dbProvider interface {
 	IsDBExist() bool
-	DB() (*gorm.DB, error)
+	DB(string) (*gorm.DB, error)
 	RemoveDB() error
 }
 

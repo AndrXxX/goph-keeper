@@ -36,7 +36,7 @@ func main() {
 	ub := urlbuilder.New("http://localhost:8081")
 	ap := &auth.Provider{Sender: requestsender.New(&http.Client{}), UB: ub}
 	dbProvider := &dbprovider.DBProvider{}
-	db, err := dbProvider.DB()
+	db, err := dbProvider.DB("testKey")
 	if err != nil {
 		logger.Log.Fatal("failed to connect to database", zap.Error(err))
 	}
