@@ -8,6 +8,8 @@ import (
 
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
 	"github.com/AndrXxX/goph-keeper/internal/client/state"
+	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
+	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 )
 
 type Option func(c *container)
@@ -46,6 +48,20 @@ func WithUpdateUser(as *state.AppState) Option {
 			msg := v.(messages.UpdateUser)
 			as.User = msg.User
 			return c, nil
+		}
+	}
+}
+
+func WithAuth(as *state.AppState) Option {
+	return func(c *container) {
+		c.uo[getKeyType(messages.Auth{})] = func(v tea.Msg) (tea.Model, tea.Cmd) {
+			msg := v.(messages.Auth)
+			as.User.MasterPassword = msg.MasterPass
+			err := as.Auth()
+			if err != nil {
+				return c, helpers.GenCmd(messages.ShowError{Err: fmt.Sprintf(err.Error())})
+			}
+			return c, tea.Batch(helpers.GenCmd(messages.ChangeView{Name: names.MainMenu}))
 		}
 	}
 }

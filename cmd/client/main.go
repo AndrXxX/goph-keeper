@@ -70,7 +70,6 @@ func main() {
 	}}
 	qr := queue.NewRunner(1 * time.Second).SetWorkersCount(5)
 	viewsFactory := views.Factory{
-		AppState:   appState,
 		Loginer:    ap,
 		Registerer: ap,
 		SM:         sm,
@@ -87,6 +86,7 @@ func main() {
 			views.WithShowMessage(msgTimeout),
 			views.WithShowError(msgTimeout),
 			views.WithUpdateUser(appState),
+			views.WithAuth(appState),
 		), tea.WithAltScreen()),
 		State: appState,
 		Sync:  sm,

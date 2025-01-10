@@ -13,7 +13,6 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/client/jobs"
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
-	"github.com/AndrXxX/goph-keeper/internal/client/state"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/contract"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
@@ -31,7 +30,6 @@ type container struct {
 	uo       map[tea.Msg]UpdateOption
 	sm       contract.SyncManager
 	qr       contract.QueueRunner
-	as       *state.AppState
 }
 
 func (m *container) Init() tea.Cmd {
@@ -68,13 +66,6 @@ func (m *container) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if err != nil {
 			return m, helpers.GenCmd(messages.ShowError{Err: fmt.Sprintf("Ошибка при обновлении: %s", err)})
 		}
-	case messages.Auth:
-		m.as.User.MasterPassword = msg.MasterPass
-		err := m.as.Auth()
-		if err != nil {
-			return m, helpers.GenCmd(messages.ShowError{Err: fmt.Sprintf(err.Error())})
-		}
-		return m, tea.Batch(helpers.GenCmd(messages.ChangeView{Name: names.MainMenu}))
 	case messages.ChangeView:
 		m.current = msg.Name
 		if msg.View != nil {

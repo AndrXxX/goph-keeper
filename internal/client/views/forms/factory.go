@@ -1,12 +1,10 @@
 package forms
 
 import (
-	"github.com/AndrXxX/goph-keeper/internal/client/state"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/contract"
 )
 
 type Factory struct {
-	AppState   *state.AppState
 	Loginer    Loginer
 	Registerer Registerer
 	SM         contract.SyncManager
