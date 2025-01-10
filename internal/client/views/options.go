@@ -15,6 +15,12 @@ import (
 
 type Option func(c *container)
 
+func WithMap(m Map) Option {
+	return func(c *container) {
+		c.views = m
+	}
+}
+
 func WithStartView(view names.ViewName) Option {
 	return func(c *container) {
 		c.current = view
@@ -68,7 +74,7 @@ func WithAuth(a contract.UserAccessor) Option {
 			if err != nil {
 				return c, helpers.GenCmd(messages.ShowError{Err: fmt.Sprintf(err.Error())})
 			}
-			return c, tea.Batch(helpers.GenCmd(messages.ChangeView{Name: names.MainMenu}))
+			return c, helpers.GenCmd(messages.Quit{})
 		}
 	}
 }

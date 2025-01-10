@@ -17,9 +17,8 @@ type Factory struct {
 
 func (f *Factory) Container(opts ...Option) *container {
 	c := &container{
-		help:  help.New(),
-		views: NewMap(f),
-		uo:    make(map[tea.Msg]UpdateOption),
+		help: help.New(),
+		uo:   make(map[tea.Msg]UpdateOption),
 	}
 	for _, opt := range opts {
 		opt(c)

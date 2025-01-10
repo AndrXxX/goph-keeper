@@ -29,7 +29,6 @@ type container struct {
 }
 
 func (m *container) Init() tea.Cmd {
-	m.current = names.AuthMenu
 	return nil
 }
 

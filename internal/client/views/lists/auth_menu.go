@@ -63,6 +63,8 @@ func (m *authMenu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.list.SetSize(msg.Width/styles.InnerMargin, msg.Height/2)
 	case tea.KeyMsg:
 		switch {
+		case key.Matches(msg, kb.Keys.Back):
+			return m, helpers.GenCmd(messages.Quit{})
 		case key.Matches(msg, kb.Keys.Enter):
 			selected := m.list.SelectedItem().(menuitems.AuthItem)
 			switch selected.Code {

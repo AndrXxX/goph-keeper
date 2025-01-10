@@ -11,11 +11,11 @@ import (
 
 type Accessor struct {
 	User       *entities.User
-	US         Storage[entities.User]
 	SP         storageProvider[entities.User]
 	ST         setupToken
 	SDB        setupDb
 	HG         hashGeneratorFetcher
+	AfterAuth  func()
 	masterPass string
 }
 
@@ -37,7 +37,7 @@ func (a *Accessor) SetMasterPass(mp string) {
 }
 
 func (a *Accessor) Auth() error {
-	db, err := a.SDB(a.masterPass)
+	db, err := a.SDB(a.masterPass, a.User.Login != "")
 	if err != nil {
 		logger.Log.Info("неверный мастер пароль", zap.Error(err))
 		return fmt.Errorf("неверный мастер пароль")
@@ -49,14 +49,14 @@ func (a *Accessor) Auth() error {
 			return fmt.Errorf("error saving user: %w", err)
 		}
 		a.User = created
-		a.ST(a.User.Token)
+		a.AfterAuth()
 		return nil
 	}
 	list := storage.FindAll(nil)
 	for i := range list {
 		if list[i].MasterPassword == a.User.MasterPassword {
 			a.User = &list[i]
-			a.ST(a.User.Token)
+			a.AfterAuth()
 			return nil
 		}
 	}

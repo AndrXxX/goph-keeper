@@ -21,6 +21,7 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/client/state"
 	"github.com/AndrXxX/goph-keeper/internal/client/views"
 	vContract "github.com/AndrXxX/goph-keeper/internal/client/views/contract"
+	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 	"github.com/AndrXxX/goph-keeper/pkg/hashgenerator"
 	"github.com/AndrXxX/goph-keeper/pkg/logger"
 	"github.com/AndrXxX/goph-keeper/pkg/queue"
@@ -28,6 +29,7 @@ import (
 	"github.com/AndrXxX/goph-keeper/pkg/urlbuilder"
 )
 
+const queueTimeout = 1 * time.Second
 const msgTimeout = 2 * time.Second
 const shutdownTimeout = 5 * time.Second
 
@@ -37,89 +39,117 @@ type App struct {
 	Sync  syncManager
 	QR    queueRunner
 	//crypto *CryptoManager
-	c *config.Config
+	c  *config.Config
+	vf *views.Factory
+	ua *useraccessor.Accessor
 }
 
 func NewApp(c *config.Config) *App {
-	ctx, stop := context.WithCancel(context.Background())
+	app := App{
+		State: &state.AppState{},
+		c:     c,
+		QR:    queue.NewRunner(queueTimeout).SetWorkersCount(5),
+	}
 	ub := urlbuilder.New(c.Host)
 	ap := &auth.Provider{Sender: requestsender.New(&http.Client{}), UB: ub}
 	dbProvider := &dbprovider.DBProvider{}
-	appState := &state.AppState{}
 	sp := ormstorages.Factory()
 	sa := storageadapters.Factory{}
-	rs := requestsender.New(&http.Client{})
-	ua := &useraccessor.Accessor{
+	app.ua = &useraccessor.Accessor{
 		User: &entities.User{},
 		SP: func(db *gorm.DB) useraccessor.Storage[entities.User] {
-			return sa.ORMUserAdapter(sp.User(ctx, db))
+			return sa.ORMUserAdapter(sp.User(context.Background(), db))
 		},
-		ST: func(token string) {
-			*rs = *requestsender.New(&http.Client{}, requestsender.WithToken(token))
-		},
-		SDB: func(masterPass string) (*gorm.DB, error) {
+		SDB: func(masterPass string, recreate bool) (*gorm.DB, error) {
+			if recreate {
+				err := dbProvider.RemoveDB()
+				if err != nil {
+					return nil, err
+				}
+			}
 			actDB, err := dbProvider.DB(masterPass)
 			if err != nil {
 				return nil, err
 			}
-			// TODO: отрефакторить
-			*appState.DB = *actDB
+			app.State.DB = actDB
 			return actDB, nil
 		},
 		HG: func(key string) useraccessor.HashGenerator {
 			return hashgenerator.Factory().SHA256(key)
 		},
 	}
-	sFactory := synchronize.Factory{RS: rs, UB: ub, Storages: &synchronize.Storages{
-		Password: sa.ORMPasswordsAdapter(sp.Password(ctx, appState.DB)),
-		Note:     sa.ORMNotesAdapter(sp.Note(ctx, appState.DB)),
-		BankCard: sa.ORMBankCardAdapter(sp.BankCard(ctx, appState.DB)),
-	}}
+	app.vf = &views.Factory{Loginer: ap, Registerer: ap}
+	return &app
+}
+
+func (a *App) Run(ctx context.Context) error {
+	ctx, stop := context.WithCancel(ctx)
+	a.TUI = tea.NewProgram(a.vf.Container(
+		views.WithStartView(names.AuthMenu),
+		views.WithMap(views.AuthMap(a.vf)),
+		views.WithShowMessage(msgTimeout),
+		views.WithShowError(msgTimeout),
+		views.WithUpdateUser(a.ua),
+		views.WithAuth(a.ua),
+		views.WithQuit(func() {
+			stop()
+		}),
+	), tea.WithAltScreen())
+	a.ua.AfterAuth = func() {
+		a.TUI.Kill()
+		if err := a.runFull(ctx); err != nil {
+			logger.Log.Error(err.Error())
+		}
+	}
+	go a.runTIU()
+	<-ctx.Done()
+	return a.shutdown()
+}
+
+func (a *App) runFull(ctx context.Context) error {
+	ctx, stop := context.WithCancel(ctx)
+
+	rs := requestsender.New(&http.Client{}, requestsender.WithToken(a.ua.GetUser().Token))
+	ub := urlbuilder.New(a.c.Host)
+	sa := storageadapters.Factory{}
+	sp := ormstorages.Factory()
+
+	us := sa.ORMUserAdapter(sp.User(ctx, a.State.DB))
+	ps := sa.ORMPasswordsAdapter(sp.Password(ctx, a.State.DB))
+	ns := sa.ORMNotesAdapter(sp.Note(ctx, a.State.DB))
+	bs := sa.ORMBankCardAdapter(sp.BankCard(ctx, a.State.DB))
+
+	sFactory := synchronize.Factory{
+		RS:       rs,
+		UB:       ub,
+		Storages: &synchronize.Storages{Password: ps, Note: ns, BankCard: bs},
+	}
 	sm := &synchronize.SyncManager{Synchronizers: sFactory.Map(), TR: func() {
-		token, err := ap.Login(ua.GetUser())
+		token, err := a.vf.Loginer.Login(a.ua.GetUser())
 		if err != nil {
 			logger.Log.Error("failed to refresh token", zap.Error(err))
 			return
 		}
-		ua.SetToken(token)
-		_ = ua.US.Update(ua.GetUser())
+		a.ua.SetToken(token)
+		_ = us.Update(a.ua.GetUser())
 		*rs = *requestsender.New(&http.Client{}, requestsender.WithToken(token))
 	}}
-	qr := queue.NewRunner(1 * time.Second).SetWorkersCount(5)
-	viewsFactory := views.Factory{
-		Loginer:    ap,
-		Registerer: ap,
-		S: &vContract.Storages{
-			Password: sa.ORMPasswordsAdapter(sp.Password(ctx, appState.DB)),
-			Note:     sa.ORMNotesAdapter(sp.Note(ctx, appState.DB)),
-			BankCard: sa.ORMBankCardAdapter(sp.BankCard(ctx, appState.DB)),
-		},
-	}
-	application := App{
-		TUI: tea.NewProgram(viewsFactory.Container(
-			views.WithShowMessage(msgTimeout),
-			views.WithShowError(msgTimeout),
-			views.WithUpdateUser(ua),
-			views.WithAuth(ua),
-			views.WithUploadItemUpdates(sm, qr),
-			views.WithQuit(func() {
-				stop()
-			}),
-		), tea.WithAltScreen()),
-		State: appState,
-		Sync:  sm,
-		QR:    qr,
-		c:     c,
-	}
-	return &application
-}
+	a.vf.S = &vContract.Storages{Password: ps, Note: ns, BankCard: bs}
 
-func (a *App) Run(ctx context.Context) error {
+	a.TUI = tea.NewProgram(a.vf.Container(
+		views.WithStartView(names.MainMenu),
+		views.WithMap(views.NewMainMap(a.vf)),
+		views.WithShowMessage(msgTimeout),
+		views.WithShowError(msgTimeout),
+		views.WithUploadItemUpdates(sm, a.QR),
+		views.WithQuit(func() {
+			stop()
+		}),
+	), tea.WithAltScreen())
+
 	go a.runQueue(ctx)
 	go a.runTIU()
-
-	<-ctx.Done()
-	return a.shutdown()
+	return nil
 }
 
 func (a *App) runQueue(ctx context.Context) {

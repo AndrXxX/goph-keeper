@@ -12,7 +12,7 @@ type Storage[T any] interface {
 }
 
 type setupToken func(token string)
-type setupDb func(masterPass string) (*gorm.DB, error)
+type setupDb func(masterPass string, recreate bool) (*gorm.DB, error)
 
 type HashGenerator interface {
 	Generate(data []byte) string
