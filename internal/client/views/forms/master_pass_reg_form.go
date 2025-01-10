@@ -10,7 +10,6 @@ import (
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/locales"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
-	"github.com/AndrXxX/goph-keeper/internal/client/state"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/form"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
@@ -32,7 +31,6 @@ const minPassLength = 5
 
 type masterPassRegForm struct {
 	*baseForm
-	s *state.AppState
 }
 
 func newMasterPassRegForm() *masterPassRegForm {
@@ -66,12 +64,9 @@ func (f *masterPassRegForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if f.baseForm.inputs[mprFormPassword].Value() != f.baseForm.inputs[mprFormRepeat].Value() {
 				return f, helpers.GenCmd(messages.ShowError{Err: "passwords must be equal"})
 			}
-			f.s.User.MasterPassword = f.baseForm.inputs[mprFormPassword].Value()
-			err := f.s.Auth()
-			if err != nil {
-				return f, tea.Batch(helpers.GenCmd(messages.ShowError{Err: fmt.Sprintf("ошибка при входе %s", err)}))
-			}
-			return f, tea.Batch(helpers.GenCmd(messages.ChangeView{Name: names.MainMenu}))
+			return f, tea.Batch(
+				helpers.GenCmd(messages.Auth{MasterPass: f.baseForm.inputs[mprFormPassword].Value()}),
+			)
 		}
 	}
 	_, cmd := f.baseForm.Update(msg)

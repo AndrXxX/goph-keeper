@@ -30,7 +30,6 @@ func (f *Factory) RegisterForm() *registerForm {
 
 func (f *Factory) MasterPassRegForm() *masterPassRegForm {
 	mpf := newMasterPassRegForm()
-	mpf.s = f.AppState
 	return mpf
 }
 
