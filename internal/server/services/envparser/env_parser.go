@@ -9,13 +9,13 @@ import (
 )
 
 type conf struct {
-	Host             string `env:"HOST"`
-	DatabaseURI      string `env:"DATABASE_URI"`
-	AuthKey          string `env:"AUTH_SECRET_KEY"`
-	AuthKeyExpired   int    `env:"AUTH_SECRET_KEY_EXPIRED"`
-	PasswordKey      string `env:"PASSWORD_SECRET_KEY"`
-	PrivateCryptoKey string `env:"PRIVATE_CRYPTO_KEY"`
-	PublicCryptoKey  string `env:"PUBLIC_CRYPTO_KEY"`
+	Host           string `env:"HOST"`
+	DatabaseURI    string `env:"DATABASE_URI"`
+	AuthKey        string `env:"AUTH_SECRET_KEY"`
+	AuthKeyExpired int    `env:"AUTH_SECRET_KEY_EXPIRED"`
+	PasswordKey    string `env:"PASSWORD_SECRET_KEY"`
+	PrivateKeyPath string `env:"PRIVATE_CRYPTO_KEY_PATH"`
+	PublicKeyPath  string `env:"PUBLIC_CRYPTO_KEY_PATH"`
 }
 
 // Parser сервис для парсинга переменных окружения
@@ -25,13 +25,13 @@ type Parser struct {
 // Parse парсит переменные окружения и наполняет конфигурацию
 func (p Parser) Parse(c *config.Config) error {
 	cfg := conf{
-		Host:             c.Host,
-		DatabaseURI:      c.DatabaseURI,
-		AuthKey:          c.AuthKey,
-		AuthKeyExpired:   c.AuthKeyExpired,
-		PasswordKey:      c.PasswordKey,
-		PrivateCryptoKey: c.PrivateCryptoKey,
-		PublicCryptoKey:  c.PublicCryptoKey,
+		Host:           c.Host,
+		DatabaseURI:    c.DatabaseURI,
+		AuthKey:        c.AuthKey,
+		AuthKeyExpired: c.AuthKeyExpired,
+		PasswordKey:    c.PasswordKey,
+		PrivateKeyPath: c.PrivateKeyPath,
+		PublicKeyPath:  c.PublicKeyPath,
 	}
 	err := env.Parse(&cfg)
 	if err != nil {
@@ -42,7 +42,7 @@ func (p Parser) Parse(c *config.Config) error {
 	c.AuthKey = cfg.AuthKey
 	c.AuthKeyExpired = cfg.AuthKeyExpired
 	c.PasswordKey = cfg.PasswordKey
-	c.PrivateCryptoKey = cfg.PrivateCryptoKey
-	c.PublicCryptoKey = cfg.PublicCryptoKey
+	c.PrivateKeyPath = cfg.PrivateKeyPath
+	c.PublicKeyPath = cfg.PublicKeyPath
 	return nil
 }

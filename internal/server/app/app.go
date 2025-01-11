@@ -49,7 +49,7 @@ func (a *app) Run(commonCtx context.Context) error {
 }
 
 func (a *app) runServer(r *chi.Mux) (*http.Server, error) {
-	tlsConfig, err := tlsconfig.NewProvider(a.config.c.PrivateCryptoKey).ForPrivateKey()
+	tlsConfig, err := tlsconfig.NewProvider(a.config.c.PrivateKeyPath).ForPrivateKey()
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch tls config: %w", err)
 	}
