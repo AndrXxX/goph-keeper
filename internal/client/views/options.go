@@ -12,6 +12,8 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/client/views/contract"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
+	"github.com/AndrXxX/goph-keeper/pkg/logger"
+	"github.com/AndrXxX/goph-keeper/pkg/queue"
 )
 
 type Option func(c *container)
@@ -19,6 +21,23 @@ type Option func(c *container)
 func WithMap(m Map) Option {
 	return func(c *container) {
 		c.views = m
+	}
+}
+
+func WithRepeatableJob(qr contract.QueueRunner, ri time.Duration, job queue.Job) Option {
+	return func(c *container) {
+		go func() {
+			for {
+				if c.quitting {
+					return
+				}
+				time.Sleep(ri)
+				if err := qr.AddJob(job); err != nil {
+					logger.Log.Error(err.Error())
+					return
+				}
+			}
+		}()
 	}
 }
 

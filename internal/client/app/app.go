@@ -12,6 +12,7 @@ import (
 
 	"github.com/AndrXxX/goph-keeper/internal/client/config"
 	"github.com/AndrXxX/goph-keeper/internal/client/entities"
+	"github.com/AndrXxX/goph-keeper/internal/client/jobs"
 	"github.com/AndrXxX/goph-keeper/internal/client/services/auth"
 	"github.com/AndrXxX/goph-keeper/internal/client/services/dbprovider"
 	"github.com/AndrXxX/goph-keeper/internal/client/services/ormstorages"
@@ -22,6 +23,7 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/client/views"
 	vContract "github.com/AndrXxX/goph-keeper/internal/client/views/contract"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
+	"github.com/AndrXxX/goph-keeper/internal/enums/datatypes"
 	"github.com/AndrXxX/goph-keeper/pkg/hashgenerator"
 	"github.com/AndrXxX/goph-keeper/pkg/logger"
 	"github.com/AndrXxX/goph-keeper/pkg/queue"
@@ -32,6 +34,7 @@ import (
 const queueTimeout = 1 * time.Second
 const msgTimeout = 2 * time.Second
 const shutdownTimeout = 5 * time.Second
+const syncInterval = 10 * time.Second
 
 type App struct {
 	TUI   *tea.Program
@@ -127,7 +130,7 @@ func (a *App) runFull(ctx context.Context) error {
 		UB:       ub,
 		Storages: &synchronize.Storages{Password: ps, Note: ns, BankCard: bs},
 	}
-	sm := &synchronize.SyncManager{Synchronizers: sFactory.Map(), TR: func() {
+	a.Sync = &synchronize.SyncManager{Synchronizers: sFactory.Map(), TR: func() {
 		token, err := a.vf.Loginer.Login(a.ua.GetUser())
 		if err != nil {
 			logger.Log.Error("failed to refresh token", zap.Error(err))
@@ -145,7 +148,10 @@ func (a *App) runFull(ctx context.Context) error {
 		views.WithMap(views.NewMainMap(a.vf)),
 		views.WithShowMessage(msgTimeout),
 		views.WithShowError(msgTimeout),
-		views.WithUploadItemUpdates(sm, a.QR),
+		views.WithUploadItemUpdates(a.Sync, a.QR),
+		views.WithRepeatableJob(a.QR, syncInterval, &jobs.SyncJob{Type: datatypes.Passwords, SyncManager: a.Sync}),
+		views.WithRepeatableJob(a.QR, syncInterval, &jobs.SyncJob{Type: datatypes.Notes, SyncManager: a.Sync}),
+		views.WithRepeatableJob(a.QR, syncInterval, &jobs.SyncJob{Type: datatypes.BankCards, SyncManager: a.Sync}),
 		views.WithQuit(func() {
 			stop()
 			a.TUI.Kill()
