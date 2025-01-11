@@ -11,9 +11,15 @@ import (
 	_ "github.com/AndrXxX/goph-keeper/pkg/validators"
 )
 
+var buildVersion string
+var buildDate string
+var serverHost string
+
 func main() {
 	cfg := config.NewConfig()
-	cfg.Host = "http://localhost:8081"
+	cfg.Host = serverHost
+	cfg.BuildVersion = buildVersion
+	cfg.BuildDate = buildDate
 	_ = logger.Initialize("debug", []string{cfg.LogPath})
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
