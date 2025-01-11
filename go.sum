@@ -50,7 +50,6 @@ github.com/docker/go-units v0.4.0 h1:3uh0PgVws3nIA0Q+MwDC8yjEPf9zjRfZZWXZYDct3Tw
 github.com/docker/go-units v0.4.0/go.mod h1:fgPhTUdO+D/Jk86RDLlptpiXQzgHJF7gydDDbaIK4Dk=
 github.com/dromara/dongle v1.0.1 h1:si/7UP/EXxnFVZok1cNos70GiMGxInAYMilHQFP5dJs=
 github.com/dromara/dongle v1.0.1/go.mod h1:ebFhTaDgxaDIKppycENTWlBsxz8mWCPWOLnsEgDpMv4=
-github.com/emmansun/gmsm v0.15.5 h1:iLvUezUwA9WZHQFhK/UUhKhqviDczb28Qx+gynbvTKY=
 github.com/emmansun/gmsm v0.15.5/go.mod h1:2m4jygryohSWkaSduFErgCwQKab5BNjURoFrn2DNwyU=
 github.com/emmansun/gmsm v0.29.6 h1:hbVHyihqutLkeQiIRwXq3cMy/Vo3xjDzJ2QYXF8a/n8=
 github.com/emmansun/gmsm v0.29.6/go.mod h1:72cc1bejYIaH0IHo1VATBceMcUXQJLh+OtrtzIYmMgw=
