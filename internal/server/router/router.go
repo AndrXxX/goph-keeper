@@ -44,7 +44,7 @@ func (mr *router) registerAPI(r *chi.Mux) {
 
 	r.Group(func(r chi.Router) {
 		r.Use(middlewares.CompressGzip().Handler)
-		ac := controllers.AuthController{US: mr.storage.US, HG: hg, TS: ts, UF: &requestjsonentity.Fetcher[entities2.User]{}}
+		ac := controllers.AuthController{US: mr.storage.US, HG: hg, TS: ts, UF: &requestjsonentity.Fetcher[entities2.User]{}, KeyPath: mr.config.c.PublicKeyPath}
 		r.Post("/api/user/register", ac.Register)
 		r.Post("/api/user/login", ac.Login)
 	})
