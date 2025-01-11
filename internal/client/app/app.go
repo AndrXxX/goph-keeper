@@ -97,7 +97,7 @@ func (a *App) Run(ctx context.Context) error {
 		}),
 	), tea.WithAltScreen())
 	a.ua.AfterAuth = func() {
-		a.TUI.Kill()
+		a.TUI.Quit()
 		if err := a.runFull(ctx); err != nil {
 			logger.Log.Error(err.Error())
 		}

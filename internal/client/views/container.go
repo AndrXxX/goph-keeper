@@ -73,7 +73,7 @@ func (m *container) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m *container) View() string {
 	if m.quitting {
-		return styles.Border.Render("")
+		return ""
 	}
 	if !m.loaded {
 		return styles.Border.Render("loading...")
