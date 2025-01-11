@@ -93,18 +93,20 @@ func (a *App) Run(ctx context.Context) error {
 		views.WithUpdateUser(a.ua),
 		views.WithAuth(a.ua),
 		views.WithQuit(func() {
+			a.TUI.Kill()
 			stop()
 		}),
-	), tea.WithAltScreen())
+	), tea.WithAltScreen(), tea.WithContext(ctx))
 	a.ua.AfterAuth = func() {
-		a.TUI.Quit()
+		a.TUI.Kill()
 		if err := a.runFull(ctx); err != nil {
 			logger.Log.Error(err.Error())
 		}
+		stop()
 	}
 	go a.runTIU()
 	<-ctx.Done()
-	return a.shutdown()
+	return nil
 }
 
 func (a *App) runFull(ctx context.Context) error {
@@ -146,12 +148,14 @@ func (a *App) runFull(ctx context.Context) error {
 		views.WithUploadItemUpdates(sm, a.QR),
 		views.WithQuit(func() {
 			stop()
+			a.TUI.Kill()
 		}),
 	), tea.WithAltScreen())
 
 	go a.runQueue(ctx)
 	go a.runTIU()
-	return nil
+	<-ctx.Done()
+	return a.shutdown()
 }
 
 func (a *App) runQueue(ctx context.Context) {
@@ -180,7 +184,7 @@ func (a *App) shutdown() error {
 		if err != nil {
 			logger.Log.Error("shutdown queue", zap.Error(err))
 		}
-		a.TUI.Quit()
+		a.TUI.Kill()
 		shutdown <- struct{}{}
 	}()
 
