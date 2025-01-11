@@ -25,9 +25,11 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 	"github.com/AndrXxX/goph-keeper/internal/enums/datatypes"
 	"github.com/AndrXxX/goph-keeper/pkg/hashgenerator"
+	"github.com/AndrXxX/goph-keeper/pkg/httpclient"
 	"github.com/AndrXxX/goph-keeper/pkg/logger"
 	"github.com/AndrXxX/goph-keeper/pkg/queue"
 	"github.com/AndrXxX/goph-keeper/pkg/requestsender"
+	"github.com/AndrXxX/goph-keeper/pkg/tlsconfig"
 	"github.com/AndrXxX/goph-keeper/pkg/urlbuilder"
 )
 
@@ -117,8 +119,13 @@ func (a *App) Run(ctx context.Context) error {
 
 func (a *App) runFull(ctx context.Context) error {
 	ctx, stop := context.WithCancel(ctx)
-
-	rs := requestsender.New(&http.Client{}, requestsender.WithToken(a.ua.GetUser().Token))
+	cp := httpclient.Provider{ConfProvider: tlsconfig.NewProvider(a.c.ServerKeyPath)}
+	client, err := cp.Fetch()
+	if err != nil {
+		stop()
+		return err
+	}
+	rs := requestsender.New(client, requestsender.WithToken(a.ua.GetUser().Token))
 	ub := urlbuilder.New(a.c.Host)
 	sa := storageadapters.Factory{}
 	sp := ormstorages.Factory()
