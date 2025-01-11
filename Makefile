@@ -15,6 +15,8 @@ GENERATOR_PATH=./cmd/keygen/main.go
 
 run: generate-keys run-server build-client run-client
 
+stop: clean
+
 generate-keys:
 	if [ -d ${KEYS_PATH} ]; then echo ""; else mkdir -p ${KEYS_PATH}; fi
 	go run -ldflags '-X main.privatePath=${PRIVATE_KEY_PATH} -X main.publicPath=${PUBLIC_KEY_PATH}' ${GENERATOR_PATH}
