@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"sync/atomic"
 
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
@@ -23,7 +24,7 @@ type container struct {
 	loaded   bool
 	current  names.ViewName
 	views    Map
-	quitting bool
+	quitting atomic.Bool
 	errors   sync.Map
 	messages sync.Map
 	uo       map[tea.Msg]UpdateOption
@@ -74,7 +75,7 @@ func (m *container) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *container) View() string {
-	if m.quitting {
+	if m.quitting.Load() {
 		return ""
 	}
 	if !m.loaded {

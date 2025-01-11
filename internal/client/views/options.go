@@ -28,7 +28,7 @@ func WithRepeatableJob(qr contract.QueueRunner, ri time.Duration, job queue.Job)
 	return func(c *container) {
 		go func() {
 			for {
-				if c.quitting {
+				if c.quitting.Load() {
 					return
 				}
 				time.Sleep(ri)
@@ -128,7 +128,7 @@ func WithUploadItemUpdates(sm contract.SyncManager, qr contract.QueueRunner) Opt
 func WithQuit(handler func()) Option {
 	return func(c *container) {
 		c.uo[getKeyType(messages.Quit{})] = func(v tea.Msg) (tea.Model, tea.Cmd) {
-			c.quitting = true
+			c.quitting.Store(true)
 			handler()
 			return c, tea.Quit
 		}
