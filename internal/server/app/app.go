@@ -16,6 +16,7 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/server/config"
 	"github.com/AndrXxX/goph-keeper/internal/server/router"
 	"github.com/AndrXxX/goph-keeper/pkg/logger"
+	"github.com/AndrXxX/goph-keeper/pkg/tlsconfig"
 )
 
 const shutdownTimeout = 5 * time.Second
@@ -38,14 +39,21 @@ func (a *app) Run(commonCtx context.Context) error {
 		US: a.storage.US,
 		IS: a.storage.IS,
 	})
-	srv := a.runServer(r.RegisterApi())
+	srv, err := a.runServer(r.RegisterApi())
+	if err != nil {
+		return err
+	}
 
 	<-commonCtx.Done()
 	return a.shutdown(srv)
 }
 
-func (a *app) runServer(r *chi.Mux) *http.Server {
-	srv := &http.Server{Addr: a.config.c.Host, Handler: r}
+func (a *app) runServer(r *chi.Mux) (*http.Server, error) {
+	tlsConfig, err := tlsconfig.NewProvider(a.config.c.PrivateCryptoKey).ForPrivateKey()
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch tls config: %w", err)
+	}
+	srv := &http.Server{Addr: a.config.c.Host, Handler: r, TLSConfig: tlsConfig}
 
 	go func() {
 		if err := srv.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
@@ -54,7 +62,7 @@ func (a *app) runServer(r *chi.Mux) *http.Server {
 	}()
 
 	logger.Log.Info("listening", zap.String("host", a.config.c.Host))
-	return srv
+	return srv, nil
 }
 
 func (a *app) shutdown(srv *http.Server) error {
