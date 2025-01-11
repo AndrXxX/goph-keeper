@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   goph-keeper-db:
     image: postgres:16.3
