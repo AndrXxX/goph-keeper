@@ -52,7 +52,7 @@ func NewApp(c *config.Config) *App {
 	}
 	ub := urlbuilder.New(c.Host)
 	ap := &auth.Provider{Sender: requestsender.New(&http.Client{}), UB: ub}
-	dbProvider := &dbprovider.DBProvider{}
+	dbProvider := &dbprovider.DBProvider{Path: c.DBPath}
 	sp := ormstorages.Factory()
 	sa := storageadapters.Factory{}
 	app.ua = &useraccessor.Accessor{

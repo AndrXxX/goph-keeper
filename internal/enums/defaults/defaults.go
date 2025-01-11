@@ -2,7 +2,7 @@ package defaults
 
 const RunAddress = "localhost:8080"
 const LogLevel = "info"
-const LogPath = "./client.log"
+const LogPath = "./data/client.log"
 
 // AuthKeyExpired - время в секундах (по умолчанию 1 час)
 const AuthKeyExpired = 1 * 60 * 60

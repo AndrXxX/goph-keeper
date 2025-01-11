@@ -10,5 +10,6 @@ func NewConfig() *Config {
 		Host:     defaults.RunAddress,
 		LogLevel: defaults.LogLevel,
 		LogPath:  defaults.LogPath,
+		DBPath:   "./data/client.db",
 	}
 }
