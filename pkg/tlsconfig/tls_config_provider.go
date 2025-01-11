@@ -19,7 +19,7 @@ func (p *provider) ForPrivateKey() (*tls.Config, error) {
 	if p.keyPath == "" {
 		return nil, nil
 	}
-	certPool, err := p.CertPool()
+	certPool, err := p.getCertPool()
 	if err != nil {
 		return nil, fmt.Errorf("failed to load cert pool: %w", err)
 	}
@@ -32,7 +32,7 @@ func (p *provider) ForPublicKey() (*tls.Config, error) {
 	if p.keyPath == "" {
 		return nil, nil
 	}
-	certPool, err := p.CertPool()
+	certPool, err := p.getCertPool()
 	if err != nil {
 		return nil, fmt.Errorf("failed to load cert pool: %w", err)
 	}
@@ -41,7 +41,7 @@ func (p *provider) ForPublicKey() (*tls.Config, error) {
 	}, nil
 }
 
-func (p *provider) CertPool() (*x509.CertPool, error) {
+func (p *provider) getCertPool() (*x509.CertPool, error) {
 	file, err := os.ReadFile(p.keyPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read crypto key file: %w", err)
