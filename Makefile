@@ -9,7 +9,7 @@ PUBLIC_KEY_PATH=${KEYS_PATH}public_crypto.key
 PRIVATE_KEY_PATH=${KEYS_PATH}private_crypto.key
 
 CLIENT_PATH=./cmd/client/main.go
-CLIENT_BINARY=client
+CLIENT_BINARY=clientapp
 
 GENERATOR_PATH=./cmd/keygen/main.go
 
