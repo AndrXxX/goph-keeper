@@ -40,8 +40,10 @@ func (m *container) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		var cmdList []tea.Cmd
 		m.help.Width = msg.Width - styles.InnerMargin
-		_, cmd := m.views[m.current].Update(msg)
-		cmdList = append(cmdList, cmd)
+		for i := range m.views {
+			_, cmd := m.views[i].Update(msg)
+			cmdList = append(cmdList, cmd)
+		}
 		m.loaded = true
 		return m, tea.Batch(cmdList...)
 
