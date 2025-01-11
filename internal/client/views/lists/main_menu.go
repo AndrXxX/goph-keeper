@@ -10,6 +10,7 @@ import (
 
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
+	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/menuitems"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/styles"
@@ -85,6 +86,8 @@ func (m *mainMenu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 				return nil
 			}
+		case key.Matches(msg, kb.Keys.Back):
+			return m, helpers.GenCmd(messages.Quit{})
 		}
 		m.list, cmd = m.list.Update(msg)
 		return m, cmd
