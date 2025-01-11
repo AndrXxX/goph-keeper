@@ -33,6 +33,12 @@ build-client:
 run-client: build-client
 	${DATA_DIR}${CLIENT_BINARY}
 
+test-coverage-total:
+	go test ./... -coverprofile cover.out > /dev/null && go tool cover -func cover.out | grep total && rm cover.out
+
+test-coverage-detail:
+	go test ./... -coverprofile cover.out > /dev/null && go tool cover -func cover.out && rm cover.out
+
 clean: stop-server
 	go clean
 	rm ${DATA_DIR}${CLIENT_BINARY}
