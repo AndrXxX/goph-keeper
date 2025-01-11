@@ -12,7 +12,6 @@ import (
 type Accessor struct {
 	User       *entities.User
 	SP         storageProvider[entities.User]
-	ST         setupToken
 	SDB        setupDb
 	HG         hashGeneratorFetcher
 	AfterAuth  func()
