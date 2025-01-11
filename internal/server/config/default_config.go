@@ -9,7 +9,6 @@ func NewConfig() *Config {
 	return &Config{
 		Host:           defaults.RunAddress,
 		LogLevel:       defaults.LogLevel,
-		DatabaseURI:    "",
 		AuthKey:        defaults.AuthKey,
 		AuthKeyExpired: defaults.AuthKeyExpired,
 		PasswordKey:    defaults.PasswordKey,

@@ -17,6 +17,8 @@ func (p Parser) Parse(c *config.Config) error {
 	fl.StringVar(&c.AuthKey, "ak", c.AuthKey, "Auth Key")
 	fl.IntVar(&c.AuthKeyExpired, "ake", c.AuthKeyExpired, "Auth Key expired")
 	fl.StringVar(&c.PasswordKey, "pk", c.PasswordKey, "Password Key")
+	fl.StringVar(&c.PrivateCryptoKey, "privateCK", c.PrivateCryptoKey, "Private crypto key path")
+	fl.StringVar(&c.PublicCryptoKey, "publicCK", c.PublicCryptoKey, "Public crypto key path")
 	fl.Parse()
 	return nil
 }
