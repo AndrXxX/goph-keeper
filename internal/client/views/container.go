@@ -12,6 +12,7 @@ import (
 
 	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
+	"github.com/AndrXxX/goph-keeper/internal/client/views/contract"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/styles"
@@ -26,6 +27,7 @@ type container struct {
 	errors   sync.Map
 	messages sync.Map
 	uo       map[tea.Msg]UpdateOption
+	bi       *contract.BuildInfo
 }
 
 func (m *container) Init() tea.Cmd {
@@ -36,13 +38,10 @@ func (m *container) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	cmdList := make([]tea.Cmd, 0)
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		var cmd tea.Cmd
 		var cmdList []tea.Cmd
 		m.help.Width = msg.Width - styles.InnerMargin
-		for i := range m.views {
-			_, cmd = m.views[i].Update(msg)
-			cmdList = append(cmdList, cmd)
-		}
+		_, cmd := m.views[m.current].Update(msg)
+		cmdList = append(cmdList, cmd)
 		m.loaded = true
 		return m, tea.Batch(cmdList...)
 
@@ -102,7 +101,14 @@ func (m *container) View() string {
 	if mes != "" {
 		mes = styles.Info.Render(mes)
 	}
-	return styles.Border.Render(lipgloss.JoinVertical(lipgloss.Left, board, err, mes))
+	var bottom string
+	if m.bi != nil {
+		bottom = lipgloss.JoinHorizontal(
+			lipgloss.Left,
+			styles.Blurred.Render(fmt.Sprintf("ver. %s [%s]", m.bi.Version, m.bi.Date)),
+		)
+	}
+	return styles.Border.Render(lipgloss.JoinVertical(lipgloss.Left, board, err, mes), bottom)
 }
 
 func (m *container) collectMessages(l *sync.Map) string {

@@ -85,6 +85,7 @@ func NewApp(c *config.Config) *App {
 func (a *App) Run(ctx context.Context) error {
 	ctx, stop := context.WithCancel(ctx)
 	a.TUI = tea.NewProgram(a.vf.Container(
+		views.WithBuildInfo(a.c),
 		views.WithStartView(names.AuthMenu),
 		views.WithMap(views.AuthMap(a.vf)),
 		views.WithShowMessage(msgTimeout),
@@ -137,6 +138,7 @@ func (a *App) runFull(ctx context.Context) error {
 	a.vf.S = &vContract.Storages{Password: ps, Note: ns, BankCard: bs}
 
 	a.TUI = tea.NewProgram(a.vf.Container(
+		views.WithBuildInfo(a.c),
 		views.WithStartView(names.MainMenu),
 		views.WithMap(views.NewMainMap(a.vf)),
 		views.WithShowMessage(msgTimeout),

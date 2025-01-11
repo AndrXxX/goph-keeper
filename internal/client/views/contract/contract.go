@@ -31,3 +31,8 @@ type UserAccessor interface {
 	SetMasterPass(mp string)
 	SetUser(user *entities.User)
 }
+
+type BuildInfo struct {
+	Version string
+	Date    string
+}

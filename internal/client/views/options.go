@@ -6,6 +6,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 
+	"github.com/AndrXxX/goph-keeper/internal/client/config"
 	"github.com/AndrXxX/goph-keeper/internal/client/jobs"
 	"github.com/AndrXxX/goph-keeper/internal/client/messages"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/contract"
@@ -18,6 +19,15 @@ type Option func(c *container)
 func WithMap(m Map) Option {
 	return func(c *container) {
 		c.views = m
+	}
+}
+
+func WithBuildInfo(cfg *config.Config) Option {
+	return func(c *container) {
+		c.bi = &contract.BuildInfo{
+			Version: cfg.BuildVersion,
+			Date:    cfg.BuildDate,
+		}
 	}
 }
 
