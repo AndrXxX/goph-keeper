@@ -12,3 +12,7 @@ type requestSender interface {
 type urlBuilder interface {
 	Build(endpoint string, params map[string]string) string
 }
+
+type keySaver interface {
+	Store(resp *http.Response) error
+}

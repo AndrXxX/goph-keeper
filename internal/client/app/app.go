@@ -54,7 +54,10 @@ func NewApp(c *config.Config) *App {
 		QR:    queue.NewRunner(queueTimeout).SetWorkersCount(5),
 	}
 	ub := urlbuilder.New(c.Host)
-	ap := &auth.Provider{Sender: requestsender.New(&http.Client{}), UB: ub}
+	ap := &auth.Provider{
+		Sender: requestsender.New(&http.Client{}), UB: ub,
+		KS: &auth.KeySaver{KeyPath: c.ServerKeyPath},
+	}
 	dbProvider := &dbprovider.DBProvider{Path: c.DBPath}
 	sp := ormstorages.Factory()
 	sa := storageadapters.Factory{}

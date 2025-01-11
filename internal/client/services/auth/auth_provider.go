@@ -6,8 +6,11 @@ import (
 	"net/http"
 	"strings"
 
+	"go.uber.org/zap"
+
 	"github.com/AndrXxX/goph-keeper/internal/client/entities"
 	"github.com/AndrXxX/goph-keeper/internal/enums/contenttypes"
+	"github.com/AndrXxX/goph-keeper/pkg/logger"
 )
 
 const (
@@ -24,6 +27,7 @@ var (
 type Provider struct {
 	Sender requestSender
 	UB     urlBuilder
+	KS     keySaver
 }
 
 func (p *Provider) Register(u *entities.User) (string, error) {
@@ -48,6 +52,9 @@ func (p *Provider) send(u *entities.User, url string) (string, error) {
 		token := p.getTokenFromHeaders(resp)
 		if token == "" {
 			return "", fmt.Errorf("token is empty")
+		}
+		if err := p.KS.Store(resp); err != nil {
+			logger.Log.Info("store server key", zap.Error(err))
 		}
 		return token, nil
 	case http.StatusUnauthorized:
