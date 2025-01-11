@@ -2,6 +2,7 @@ package logger
 
 import (
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 // Log переменная для доступа к логгеру
@@ -15,6 +16,7 @@ func Initialize(level string, output []string) error {
 	}
 	cfg := zap.NewProductionConfig()
 	cfg.Level = lvl
+	cfg.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 	if output != nil {
 		cfg.OutputPaths = output
 	}
