@@ -65,5 +65,7 @@ func (f *Factory) BankCardList() *bankCardList {
 }
 
 func (f *Factory) FileList() *fileList {
+	l := newFileList()
+	l.lr = &helpers.ListRefresher[entities.FileItem]{S: f.S.File, List: &l.list}
 	return newFileList()
 }
