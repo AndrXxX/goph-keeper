@@ -20,6 +20,7 @@ type Storages struct {
 	Password Storage[entities.PasswordItem]
 	Note     Storage[entities.NoteItem]
 	BankCard Storage[entities.BankCardItem]
+	File     Storage[entities.FileItem]
 }
 
 type QueueRunner interface {

@@ -134,6 +134,7 @@ func (a *App) runFull(ctx context.Context) error {
 	ps := sa.ORMPasswordsAdapter(sp.Password(ctx, a.State.DB))
 	ns := sa.ORMNotesAdapter(sp.Note(ctx, a.State.DB))
 	bs := sa.ORMBankCardAdapter(sp.BankCard(ctx, a.State.DB))
+	fs := sa.ORMFileAdapter(sp.File(ctx, a.State.DB))
 
 	sFactory := synchronize.Factory{
 		RS:       rs,
@@ -150,7 +151,7 @@ func (a *App) runFull(ctx context.Context) error {
 		_ = us.Update(a.ua.GetUser())
 		*rs = *requestsender.New(&http.Client{}, requestsender.WithToken(token))
 	}}
-	a.vf.S = &vContract.Storages{Password: ps, Note: ns, BankCard: bs}
+	a.vf.S = &vContract.Storages{Password: ps, Note: ns, BankCard: bs, File: fs}
 
 	a.TUI = tea.NewProgram(a.vf.Container(
 		views.WithBuildInfo(a.c),
