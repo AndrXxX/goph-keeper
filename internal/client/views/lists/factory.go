@@ -33,7 +33,7 @@ func (f *Factory) MainMenu() *mainMenu {
 		withMenuItem(menuitems.MainMenuItem{Name: "Passwords", Code: datatypes.Passwords, Desc: "Manage passwords"}),
 		withMenuItem(menuitems.MainMenuItem{Name: "Notes", Code: datatypes.Notes, Desc: "Manage notes"}),
 		withMenuItem(menuitems.MainMenuItem{Name: "Bank Cards", Code: datatypes.BankCards, Desc: "Manage bank cards"}),
-		//withMenuItem(menuitems.MainMenuItem{Name: "Files", Code: datatypes.Files, Desc: "Manage files"}),
+		withMenuItem(menuitems.MainMenuItem{Name: "Files", Code: datatypes.Files, Desc: "Manage files"}),
 	)
 }
 
