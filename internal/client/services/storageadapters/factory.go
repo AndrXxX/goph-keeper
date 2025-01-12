@@ -40,3 +40,11 @@ func (f Factory) ORMUserAdapter(s Storage[orm.User]) Storage[e.User] {
 		Storage:         s,
 	}
 }
+
+func (f Factory) ORMFileAdapter(s Storage[orm.FileItem]) Storage[e.FileItem] {
+	return &ORMAdapter[e.FileItem, orm.FileItem]{
+		ORMConvertor:    convertors.FileOrmEntityConvertor{},
+		EntityConvertor: convertors.FileEntityOrmConvertor{},
+		Storage:         s,
+	}
+}
