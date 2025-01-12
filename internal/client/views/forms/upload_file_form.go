@@ -2,6 +2,7 @@ package forms
 
 import (
 	"os"
+	"path"
 	"path/filepath"
 	"time"
 
@@ -49,6 +50,12 @@ func NewUploadFileForm(item *entities.FileItem, height int) *uploadFileForm {
 		height:     height,
 	}
 	m.filePicker.CurrentDirectory, _ = os.UserHomeDir()
+	if !m.creating {
+		if item.Path != "" {
+			m.filePicker.CurrentDirectory = path.Dir(item.Path)
+			m.selectedFile = item.Path
+		}
+	}
 	m.filePicker.AutoHeight = false
 	m.keys = &uploadFileFormKeys
 	if m.creating {
@@ -73,32 +80,23 @@ func (f *uploadFileForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, kb.Keys.Back):
-			return f, helpers.GenCmd(messages.ChangeView{
-				Name: names.FileList,
-			})
+			return f, helpers.GenCmd(messages.ChangeView{Name: names.FileList})
 		case key.Matches(msg, kb.Keys.Save):
-			var nMsg tea.Msg
-			if f.creating {
-				nMsg = messages.AddFile{Item: f.getFileItem()}
+			if f.selectedFile == "" {
+				return f, helpers.GenCmd(messages.ShowError{Err: "Для сохранения нужно выбрать файл"})
 			}
-			cmdList := []tea.Cmd{
-				helpers.GenCmd(messages.ChangeView{Name: names.FileList, Msg: nMsg}),
-				helpers.GenCmd(messages.ShowMessage{Message: "file saved"}),
-			}
-			return f, tea.Batch(cmdList...)
+			return f, helpers.GenCmd(messages.ChangeView{Name: names.UpdateFileForm, View: NewUpdateFileForm(f.getFileItem())})
 		}
-
 	}
 	fp, cmd := f.filePicker.Update(msg)
 	f.filePicker = fp
 	cmdList = append(cmdList, cmd)
-	if didSelect, path := f.filePicker.DidSelectDisabledFile(msg); didSelect {
+	if didSelect, filePath := f.filePicker.DidSelectDisabledFile(msg); didSelect {
 		f.selectedFile = ""
-		return f, helpers.GenCmd(messages.ShowError{Err: path + " is not valid"})
+		return f, helpers.GenCmd(messages.ShowError{Err: filePath + " is not valid"})
 	}
-	if didSelect, path := f.filePicker.DidSelectFile(msg); didSelect {
-		f.selectedFile = path
-		// TODO: upload file
+	if didSelect, filePath := f.filePicker.DidSelectFile(msg); didSelect {
+		f.selectedFile = filePath
 	}
 	return f, tea.Batch(cmdList...)
 }
