@@ -21,7 +21,7 @@ func TestWithToken(t *testing.T) {
 			name:    "Test with empty token",
 			token:   "",
 			params:  dto.ParamsDto{Headers: make(map[string]string)},
-			want:    map[string]string{"Authorization": "Bearer "},
+			want:    map[string]string{},
 			wantErr: false,
 		},
 		{

@@ -6,7 +6,9 @@ import (
 
 func WithToken(token string) Option {
 	return func(p *dto.ParamsDto) error {
-		p.Headers["Authorization"] = "Bearer " + token
+		if token != "" {
+			p.Headers["Authorization"] = "Bearer " + token
+		}
 		return nil
 	}
 }
