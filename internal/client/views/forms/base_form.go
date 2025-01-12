@@ -19,6 +19,7 @@ type baseForm struct {
 	inputs     []textinput.Model
 	fu         form.FieldsUpdater
 	keys       *kb.KeyMap
+	afterTitle []string
 }
 
 func NewBaseForm(title string, inputs []textinput.Model, fu form.FieldsUpdater) *baseForm {
@@ -77,6 +78,7 @@ func (f *baseForm) View() string {
 	vList := []string{
 		styles.Title.Margin(1).Render(f.title),
 	}
+	vList = append(vList, f.afterTitle...)
 	for i := range f.inputs {
 		vList = append(vList, f.inputs[i].View())
 	}
