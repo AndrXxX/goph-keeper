@@ -8,7 +8,7 @@ import (
 
 type FileItem struct {
 	StoredItem
-	Name string
+	Name string `json:"name" valid:"required"`
 	Path string
 }
 
