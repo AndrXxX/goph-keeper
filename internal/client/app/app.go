@@ -163,6 +163,7 @@ func (a *App) runFull(ctx context.Context) error {
 		views.WithRepeatableJob(a.QR, syncInterval, &jobs.SyncJob{Type: datatypes.Passwords, SyncManager: a.Sync}),
 		views.WithRepeatableJob(a.QR, syncInterval, &jobs.SyncJob{Type: datatypes.Notes, SyncManager: a.Sync}),
 		views.WithRepeatableJob(a.QR, syncInterval, &jobs.SyncJob{Type: datatypes.BankCards, SyncManager: a.Sync}),
+		views.WithRepeatableJob(a.QR, syncInterval, &jobs.SyncJob{Type: datatypes.Files, SyncManager: a.Sync}),
 		views.WithQuit(func() {
 			stop()
 			a.TUI.Kill()
