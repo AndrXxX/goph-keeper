@@ -81,28 +81,16 @@ func (m *container) View() string {
 	if !m.loaded {
 		return styles.Border.Render("loading...")
 	}
-	board := lipgloss.JoinHorizontal(
+	var items []string
+	items = append(items, lipgloss.JoinHorizontal(
 		lipgloss.Left,
 		m.views[m.current].View(),
-	)
-	eb := strings.Builder{}
-	mb := strings.Builder{}
-
-	m.errors.Range(func(_, v any) bool {
-		eb.WriteString(fmt.Sprintf("%s\n", v.(string)))
-		return true
-	})
-	m.messages.Range(func(_, v any) bool {
-		mb.WriteString(fmt.Sprintf("%s\n", v.(string)))
-		return true
-	})
-	err := m.collectMessages(&m.errors)
-	if err != "" {
-		err = styles.Error.Render(err)
+	))
+	if err := m.collectMessages(&m.errors); err != "" {
+		items = append(items, styles.Error.Render(err))
 	}
-	mes := m.collectMessages(&m.messages)
-	if mes != "" {
-		mes = styles.Info.Render(mes)
+	if mes := m.collectMessages(&m.messages); mes != "" {
+		items = append(items, styles.Info.Render(mes))
 	}
 	var bottom string
 	if m.bi != nil {
@@ -111,7 +99,7 @@ func (m *container) View() string {
 			styles.Blurred.Render(fmt.Sprintf("ver. %s [%s]", m.bi.Version, m.bi.Date)),
 		)
 	}
-	return styles.Border.Render(lipgloss.JoinVertical(lipgloss.Left, board, err, mes), bottom)
+	return styles.Border.Render(lipgloss.JoinVertical(lipgloss.Left, items...), bottom)
 }
 
 func (m *container) collectMessages(l *sync.Map) string {
