@@ -35,7 +35,6 @@ var noteFormKeys = kb.KeyMap{
 
 type noteForm struct {
 	item *entities.NoteItem
-	fu   form.FieldsUpdater
 	*baseForm
 }
 

@@ -39,7 +39,6 @@ var bankCardFormKeys = kb.KeyMap{
 type bankCardForm struct {
 	item     *entities.BankCardItem
 	creating bool
-	fu       form.FieldsUpdater
 	*baseForm
 }
 

@@ -36,7 +36,6 @@ var passwordFormKeys = kb.KeyMap{
 
 type passwordForm struct {
 	item *entities.PasswordItem
-	fu   form.FieldsUpdater
 	*baseForm
 }
 
