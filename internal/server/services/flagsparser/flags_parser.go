@@ -19,6 +19,7 @@ func (p Parser) Parse(c *config.Config) error {
 	fl.StringVar(&c.PasswordKey, "pk", c.PasswordKey, "Password Key")
 	fl.StringVar(&c.PrivateKeyPath, "privateCK", c.PrivateKeyPath, "Private crypto key path")
 	fl.StringVar(&c.PublicKeyPath, "publicCK", c.PublicKeyPath, "Public crypto key path")
+	fl.StringVar(&c.FileStoragePath, "fsp", c.FileStoragePath, "File storage path")
 	fl.Parse()
 	return nil
 }
