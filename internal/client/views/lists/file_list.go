@@ -56,12 +56,12 @@ func (pl *fileList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, kb.Keys.Edit, kb.Keys.Enter):
 			if len(pl.list.VisibleItems()) != 0 {
 				e := pl.list.SelectedItem().(entities.FileItem)
-				f := forms.NewFileForm(&e)
-				return f, helpers.GenCmd(messages.ChangeView{Name: names.FileForm, View: f})
+				f := forms.NewUploadFileForm(&e, pl.list.Height()*2)
+				return f, helpers.GenCmd(messages.ChangeView{Name: names.UploadFileForm, View: f})
 			}
 		case key.Matches(msg, kb.Keys.New):
-			f := forms.NewFileForm(nil)
-			return f, helpers.GenCmd(messages.ChangeView{Name: names.FileForm, View: f})
+			f := forms.NewUploadFileForm(nil, pl.list.Height()*2)
+			return f, helpers.GenCmd(messages.ChangeView{Name: names.UploadFileForm, View: f})
 		case key.Matches(msg, kb.Keys.Back):
 			return pl, helpers.GenCmd(messages.ChangeView{Name: names.MainMenu})
 		case key.Matches(msg, kb.Keys.Delete):

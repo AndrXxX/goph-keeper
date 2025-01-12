@@ -10,7 +10,7 @@ const (
 	BankCardList       = ViewName("bankCardList")
 	BankCardForm       = ViewName("bankCardForm")
 	FileList           = ViewName("fileList")
-	FileForm           = ViewName("fileForm")
+	UploadFileForm     = ViewName("uploadFileForm")
 	MainMenu           = ViewName("mainMenu")
 	AuthMenu           = ViewName("authMenu")
 	LoginForm          = ViewName("loginForm")
