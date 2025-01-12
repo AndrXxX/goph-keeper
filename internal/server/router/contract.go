@@ -2,6 +2,7 @@ package router
 
 import (
 	"context"
+	"io"
 
 	"github.com/google/uuid"
 	"github.com/vingarcia/ksql"
@@ -26,8 +27,15 @@ type itemsStorage interface {
 	Query(ctx context.Context, m *models.StoredItem) ([]models.StoredItem, error)
 }
 
+type fileStorage interface {
+	Store(src io.Reader, id uuid.UUID) error
+	Get(id uuid.UUID) (file io.ReadCloser, err error)
+	IsExist(id uuid.UUID) bool
+}
+
 type Storage struct {
 	DB ksql.Provider
 	US usersStorage
 	IS itemsStorage
+	FS fileStorage
 }

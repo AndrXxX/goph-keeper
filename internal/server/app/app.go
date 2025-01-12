@@ -38,6 +38,7 @@ func (a *app) Run(commonCtx context.Context) error {
 		DB: a.storage.DB,
 		US: a.storage.US,
 		IS: a.storage.IS,
+		FS: a.storage.FS,
 	})
 	srv, err := a.runServer(r.RegisterApi())
 	if err != nil {

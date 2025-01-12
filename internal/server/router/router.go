@@ -90,5 +90,12 @@ func (mr *router) registerAPI(r *chi.Mux) {
 		}
 		r.Post(fmt.Sprintf("/api/updates/%s", datatypes.Files), bc.StoreUpdates)
 		r.Get(fmt.Sprintf("/api/updates/%s", datatypes.Files), bc.FetchUpdates)
+
+		fc := controllers.FilesController{
+			Storage: mr.storage.IS,
+			FS:      mr.storage.FS,
+		}
+		r.Post("/api/files/upload/{id}", fc.Upload)
+		r.Get("/api/files/download/{id}", fc.Download)
 	})
 }

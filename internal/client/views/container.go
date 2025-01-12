@@ -62,6 +62,7 @@ func (m *container) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			_, cmd := m.views[m.current].Update(msg.Msg)
 			cmdList = append(cmdList, cmd)
 		}
+		//cmdList = append(cmdList, helpers.GenCmd(tea.WindowSize()))
 	default:
 		mgsK := fmt.Sprintf("%T", msg)
 		if f, ok := m.uo[mgsK]; ok {
