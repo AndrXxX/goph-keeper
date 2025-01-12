@@ -7,6 +7,7 @@ SERVER_PORT=8081
 KEYS_PATH=${DATA_DIR}server/
 PUBLIC_KEY_PATH=${KEYS_PATH}public_crypto.key
 PRIVATE_KEY_PATH=${KEYS_PATH}private_crypto.key
+SERVER_FILE_STORAGE_PATH=${DATA_DIR}server/files
 
 CLIENT_PATH=./cmd/client/main.go
 CLIENT_BINARY=clientapp
@@ -24,13 +25,16 @@ generate-keys:
 run-server:
 	GOPH_KEEPER_SERVER_PORT=${SERVER_PORT} PRIVATE_CRYPTO_KEY_PATH=${PRIVATE_KEY_PATH} \
 	PUBLIC_CRYPTO_KEY_PATH=${PUBLIC_KEY_PATH} BUILD_VERSION=${VERSION} BUILD_DATE=${DATE} \
+	FILE_STORAGE_PATH=${SERVER_FILE_STORAGE_PATH}
 	docker compose up -d
 
 stop-server:
 	docker compose down
 
 build-client:
-	go build -o ${DATA_DIR}${CLIENT_BINARY} -ldflags '-X main.buildVersion=${VERSION} -X main.buildDate=${DATE} -X main.serverHost=localhost:${SERVER_PORT}' ${CLIENT_PATH}
+	go build -o ${DATA_DIR}${CLIENT_BINARY} \
+	-ldflags '-X main.buildVersion=${VERSION} -X main.buildDate=${DATE} -X main.serverHost=localhost:${SERVER_PORT}' \
+ 	${CLIENT_PATH}
 
 run-client: build-client
 	${DATA_DIR}${CLIENT_BINARY}

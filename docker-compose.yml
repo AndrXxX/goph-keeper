@@ -34,6 +34,7 @@ services:
       - PASSWORD_SECRET_KEY=${PASSWORD_SECRET_KEY:-password-secret-key}
       - PRIVATE_CRYPTO_KEY_PATH=${PRIVATE_CRYPTO_KEY_PATH:-}
       - PUBLIC_CRYPTO_KEY_PATH=${PUBLIC_CRYPTO_KEY_PATH:-}
+      - FILE_STORAGE_PATH=${FILE_STORAGE_PATH:-}
     ports:
       - ${GOPH_KEEPER_SERVER_PORT:-8081}:8080
     entrypoint: go run -ldflags '-X main.buildVersion=${BUILD_VERSION} -X main.buildDate=${BUILD_DATE}' github.com/AndrXxX/goph-keeper/cmd/server
