@@ -21,5 +21,5 @@ func (f Factory) BankCard() ValueConvertor[entities2.BankCardItem, values.BankCa
 }
 
 func (f Factory) File() ValueConvertor[entities2.FileItem, values.FileValue] {
-	return &binaryValueConvertor{}
+	return &fileValueConvertor{}
 }

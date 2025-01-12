@@ -8,10 +8,10 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/server/entities/values"
 )
 
-type binaryValueConvertor struct {
+type fileValueConvertor struct {
 }
 
-func (c binaryValueConvertor) ToValue(v string) (*values.FileValue, error) {
+func (c fileValueConvertor) ToValue(v string) (*values.FileValue, error) {
 	var converted values.FileValue
 	err := json.Unmarshal([]byte(v), &converted)
 	if err != nil {
@@ -20,8 +20,8 @@ func (c binaryValueConvertor) ToValue(v string) (*values.FileValue, error) {
 	return &converted, nil
 }
 
-func (c binaryValueConvertor) ToString(item *entities.FileItem) (string, error) {
-	val, err := json.Marshal(values.FileValue{Data: item.Data})
+func (c fileValueConvertor) ToString(item *entities.FileItem) (string, error) {
+	val, err := json.Marshal(values.FileValue{Name: item.Name})
 	if err != nil {
 		return "", fmt.Errorf("marshal text value: %w", err)
 	}
