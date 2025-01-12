@@ -50,7 +50,6 @@ func NewUpdateFileForm(item *entities.FileItem) *updateFileForm {
 	}
 	m.baseForm.inputs[ffDesc].Prompt = locales.FIDescription
 	m.baseForm.inputs[ffDesc].SetValue(m.item.Desc)
-
 	return &m
 }
 
@@ -63,6 +62,9 @@ func (f *updateFileForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, kb.Keys.Back):
+			if !f.creating {
+				return f, helpers.GenCmd(messages.ChangeView{Name: names.FileList})
+			}
 			return f, helpers.GenCmd(messages.ChangeView{Name: names.UploadFileForm})
 		case key.Matches(msg, kb.Keys.Save):
 			item := f.getFileItem()
@@ -77,7 +79,8 @@ func (f *updateFileForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			)
 		}
 	}
-	return f, nil
+	_, cmd := f.baseForm.Update(msg)
+	return f, cmd
 }
 
 func (f *updateFileForm) getFileItem() *entities.FileItem {
