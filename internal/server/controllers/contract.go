@@ -46,3 +46,9 @@ type itemConvertor[E any] interface {
 type idItem interface {
 	GetID() uuid.UUID
 }
+
+type fileStorage interface {
+	Store(src io.Reader, id uuid.UUID) error
+	Get(id uuid.UUID) (file io.ReadCloser, err error)
+	IsExist(id uuid.UUID) bool
+}
