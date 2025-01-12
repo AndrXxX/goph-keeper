@@ -33,6 +33,10 @@ func (f *storagesFactory) BankCard(ctx context.Context, db *gorm.DB) Storage[orm
 	return getStorage[ormmodels.BankCardItem](ctx, db, new(ormmodels.BankCardItem))
 }
 
+func (f *storagesFactory) File(ctx context.Context, db *gorm.DB) Storage[ormmodels.FileItem] {
+	return getStorage[ormmodels.FileItem](ctx, db, new(ormmodels.FileItem))
+}
+
 func getStorage[T interface{}](ctx context.Context, db *gorm.DB, m *T) Storage[T] {
 	s := &ormStorage[T]{db}
 	err := s.init(ctx, m)
