@@ -7,10 +7,11 @@ import (
 // NewConfig возвращает конфигурацию со значениями по умолчанию
 func NewConfig() *Config {
 	return &Config{
-		Host:          defaults.RunAddress,
-		LogLevel:      defaults.LogLevel,
-		LogPath:       defaults.LogPath,
-		DBPath:        "./data/client.db",
-		ServerKeyPath: "./data/client/public_server.key",
+		Host:            defaults.RunAddress,
+		LogLevel:        defaults.LogLevel,
+		LogPath:         defaults.LogPath,
+		DBPath:          "./data/client.db",
+		ServerKeyPath:   "./data/client/public_server.key",
+		FileStoragePath: "./data/client/files/",
 	}
 }
