@@ -64,7 +64,7 @@ func (m *container) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		//cmdList = append(cmdList, helpers.GenCmd(tea.WindowSize()))
 	default:
-		mgsK := fmt.Sprintf("%T", msg)
+		mgsK := fmt.Sprintf("%T-Handler", msg)
 		if f, ok := m.uo[mgsK]; ok {
 			_, cmd := f(msg)
 			cmdList = append(cmdList, cmd)

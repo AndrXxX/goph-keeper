@@ -136,5 +136,5 @@ func WithQuit(handler func()) Option {
 }
 
 func getKeyType(v tea.Msg) string {
-	return fmt.Sprintf("%T", v)
+	return fmt.Sprintf("%T-Handler", v)
 }
