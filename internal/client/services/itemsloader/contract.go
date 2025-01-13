@@ -3,6 +3,8 @@ package itemsloader
 import (
 	"io"
 	"net/http"
+
+	"github.com/google/uuid"
 )
 
 type requestSender interface {
@@ -16,4 +18,10 @@ type urlBuilder interface {
 
 type sliceFetcher[T any] interface {
 	FetchSlice(r io.Reader) ([]T, error)
+}
+
+type fileStorage interface {
+	Store(src io.Reader, id uuid.UUID) error
+	Get(id uuid.UUID) (file io.ReadCloser, err error)
+	IsExist(id uuid.UUID) bool
 }

@@ -25,6 +25,7 @@ type Storages struct {
 	Password synchronizers.Storage[entities.PasswordItem]
 	Note     synchronizers.Storage[entities.NoteItem]
 	BankCard synchronizers.Storage[entities.BankCardItem]
+	File     synchronizers.Storage[entities.FileItem]
 }
 
 type tokenRefresher func()
