@@ -44,7 +44,7 @@ func (s *storage) Get(id uuid.UUID) (file io.ReadCloser, err error) {
 func (s *storage) IsExist(id uuid.UUID) bool {
 	fullPath := path.Join(s.path, s.FileId(id))
 	_, err := os.Stat(fullPath)
-	return os.IsExist(err)
+	return err == nil || !os.IsNotExist(err)
 }
 
 func (s *storage) Delete(id uuid.UUID) (err error) {
