@@ -15,6 +15,5 @@ func (c FileOrmEntityConvertor) Convert(m *ormmodels.FileItem) *entities.FileIte
 	return &entities.FileItem{
 		StoredItem: *ItemOrmEntityConvertor{}.Convert(&m.StoredItem),
 		Name:       m.Name,
-		Path:       m.Path,
 	}
 }
