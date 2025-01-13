@@ -8,8 +8,8 @@ import (
 
 type FileItem struct {
 	StoredItem
-	Name string `json:"name" valid:"required"`
-	Path string
+	Name     string `json:"name" valid:"required"`
+	TempPath string
 }
 
 func (i FileItem) FilterValue() string {

@@ -48,9 +48,9 @@ func NewUploadFileForm(item *entities.FileItem, height int) *uploadFileForm {
 		height:     height,
 	}
 	m.filePicker.CurrentDirectory, _ = os.UserHomeDir()
-	if item.Path != "" {
-		m.filePicker.CurrentDirectory = path.Dir(item.Path)
-		m.selectedFile = item.Path
+	if item.TempPath != "" {
+		m.filePicker.CurrentDirectory = path.Dir(item.TempPath)
+		m.selectedFile = item.TempPath
 	}
 	m.filePicker.AutoHeight = false
 	m.keys = &uploadFileFormKeys
@@ -96,7 +96,7 @@ func (f *uploadFileForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (f *uploadFileForm) getFileItem() *entities.FileItem {
 	f.item.Name = filepath.Base(f.selectedFile)
-	f.item.Path = f.selectedFile
+	f.item.TempPath = f.selectedFile
 	f.item.UpdatedAt = time.Now()
 	return f.item
 }
