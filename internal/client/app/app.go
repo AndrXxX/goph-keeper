@@ -24,6 +24,7 @@ import (
 	vContract "github.com/AndrXxX/goph-keeper/internal/client/views/contract"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 	"github.com/AndrXxX/goph-keeper/internal/enums/datatypes"
+	"github.com/AndrXxX/goph-keeper/pkg/filestorage"
 	"github.com/AndrXxX/goph-keeper/pkg/hashgenerator"
 	"github.com/AndrXxX/goph-keeper/pkg/httpclient"
 	"github.com/AndrXxX/goph-keeper/pkg/logger"
@@ -80,6 +81,7 @@ func NewApp(c *config.Config) *App {
 				return nil, err
 			}
 			app.State.DB = actDB
+			app.State.MasterPass = masterPass
 			return actDB, nil
 		},
 		HG: func(key string) useraccessor.HashGenerator {
@@ -135,11 +137,12 @@ func (a *App) runFull(ctx context.Context) error {
 	ns := sa.ORMNotesAdapter(sp.Note(ctx, a.State.DB))
 	bs := sa.ORMBankCardAdapter(sp.BankCard(ctx, a.State.DB))
 	fs := sa.ORMFileAdapter(sp.File(ctx, a.State.DB))
+	dfs := filestorage.New(a.c.FileStoragePath, hashgenerator.Factory().SHA256(a.State.MasterPass))
 
 	sFactory := synchronize.Factory{
 		RS:       rs,
 		UB:       ub,
-		Storages: &synchronize.Storages{Password: ps, Note: ns, BankCard: bs},
+		Storages: &synchronize.Storages{Password: ps, Note: ns, BankCard: bs, File: fs, FS: dfs},
 	}
 	a.Sync = &synchronize.SyncManager{Synchronizers: sFactory.Map(), TR: func() {
 		token, err := a.vf.Loginer.Login(a.ua.GetUser())

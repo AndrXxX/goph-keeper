@@ -38,7 +38,9 @@ func (c *FilesLoader) Download() (statusCode int, l []entities.FileItem) {
 		logger.Log.Error("failed to send request", zap.Error(sErr))
 		return resp.StatusCode, l
 	}
-
+	if resp.StatusCode != http.StatusOK {
+		logger.Log.Error("failed to send request", zap.Int("status_code", resp.StatusCode))
+	}
 	l, fErr := c.Fetcher.FetchSlice(resp.Body)
 	if fErr != nil {
 		logger.Log.Error("failed to fetch slice", zap.Error(fErr))
