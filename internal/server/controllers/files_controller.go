@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"io"
-	"mime/multipart"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -58,16 +57,8 @@ func (c *FilesController) Update(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *FilesController) Upload(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", contenttypes.FormUrlEncoded)
-
-	err := r.ParseMultipartForm(100 << 20)
-	if err != nil {
-		logger.Log.Info("ParseMultipartForm", zap.Error(err))
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	id := r.Form.Get("id")
+	w.Header().Set("Content-Type", contenttypes.OctetStream)
+	id := chi.URLParam(r, "id")
 	if id == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -94,17 +85,7 @@ func (c *FilesController) Upload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	f, _, err := r.FormFile("file")
-	if err != nil {
-		logger.Log.Info("FormFile", zap.Error(err))
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	defer func(f multipart.File) {
-		_ = f.Close()
-	}(f)
-
-	err = c.FS.Store(f, objId)
+	err = c.FS.Store(r.Body, objId)
 	if err != nil {
 		logger.Log.Info("Store", zap.Error(err))
 		w.WriteHeader(http.StatusInternalServerError)
@@ -147,8 +128,8 @@ func (c *FilesController) Download(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	w.Header().Set("Content-Type", contenttypes.OctetStream)
 	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/octet-stream")
 	_, err = io.Copy(w, file)
 	if err != nil {
 		logger.Log.Error("io.Copy", zap.Error(err))
