@@ -137,7 +137,11 @@ func (a *App) runFull(ctx context.Context) error {
 	ns := sa.ORMNotesAdapter(sp.Note(ctx, a.State.DB))
 	bs := sa.ORMBankCardAdapter(sp.BankCard(ctx, a.State.DB))
 	fs := sa.ORMFileAdapter(sp.File(ctx, a.State.DB))
-	dfs := filestorage.New(a.c.FileStoragePath, hashgenerator.Factory().SHA256(a.State.MasterPass))
+	dfs, err := filestorage.New(a.c.FileStoragePath, hashgenerator.Factory().SHA256(a.State.MasterPass))
+	if err != nil {
+		stop()
+		return fmt.Errorf("initialize file storage: %w", err)
+	}
 
 	sFactory := synchronize.Factory{
 		RS:       rs,

@@ -62,12 +62,11 @@ func initStorage(ctx context.Context, c *config.Config) (*app.Storage, error) {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
 	sf := postgressql.Factory{DB: db}
-	return &app.Storage{
-		DB: db,
-		US: sf.UsersStorage(),
-		IS: sf.StoredItemsStorage(),
-		FS: filestorage.New(c.FileStoragePath, hashgenerator.Factory().SHA256(c.PasswordKey)),
-	}, nil
+	fs, err := filestorage.New(c.FileStoragePath, hashgenerator.Factory().SHA256(c.PasswordKey))
+	if err != nil {
+		return nil, fmt.Errorf("initialize file storage: %w", err)
+	}
+	return &app.Storage{DB: db, US: sf.UsersStorage(), IS: sf.StoredItemsStorage(), FS: fs}, nil
 }
 
 func initBuildInfo() {

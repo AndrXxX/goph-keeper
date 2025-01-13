@@ -1,6 +1,7 @@
 package filestorage
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"path"
@@ -13,8 +14,12 @@ type storage struct {
 	hg   hashGenerator
 }
 
-func New(path string, hg hashGenerator) *storage {
-	return &storage{path, hg}
+func New(path string, hg hashGenerator) (*storage, error) {
+	err := os.MkdirAll(path, os.ModePerm)
+	if err != nil {
+		return nil, fmt.Errorf("make dir %w", err)
+	}
+	return &storage{path, hg}, nil
 }
 
 func (s *storage) Store(src io.Reader, id uuid.UUID) error {
