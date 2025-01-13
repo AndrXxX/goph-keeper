@@ -88,13 +88,15 @@ func (mr *router) registerAPI(r *chi.Mux) {
 			Storage:   mr.storage.IS,
 			Convertor: ecf.File(vcf.File()),
 		}
-		r.Post(fmt.Sprintf("/api/updates/%s", datatypes.Files), bc.StoreUpdates)
 		r.Get(fmt.Sprintf("/api/updates/%s", datatypes.Files), bc.FetchUpdates)
 
 		fc := controllers.FilesController{
-			Storage: mr.storage.IS,
-			FS:      mr.storage.FS,
+			Storage:   mr.storage.IS,
+			FS:        mr.storage.FS,
+			FF:        &requestjsonentity.Fetcher[entities.FileItem]{},
+			Convertor: ecf.File(vcf.File()),
 		}
+		r.Post("/api/files/update", fc.Update)
 		r.Post("/api/files/upload/{id}", fc.Upload)
 		r.Get("/api/files/download/{id}", fc.Download)
 	})
