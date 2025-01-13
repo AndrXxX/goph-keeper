@@ -41,13 +41,9 @@ type updateFileForm struct {
 func NewUpdateFileForm(item *entities.FileItem) *updateFileForm {
 	m := updateFileForm{
 		baseForm: NewBaseForm("File info", make([]textinput.Model, 1), form.FieldsUpdater{}),
-		creating: item == nil,
 		item:     item,
 	}
 	m.baseForm.keys = &updateFileFormKeys
-	if m.creating {
-		m.item = &entities.FileItem{}
-	}
 	m.baseForm.inputs[ffDesc].Prompt = locales.FIDescription
 	m.baseForm.inputs[ffDesc].SetValue(m.item.Desc)
 	return &m
@@ -62,7 +58,7 @@ func (f *updateFileForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, kb.Keys.Back):
-			if !f.creating {
+			if !f.item.IsStored() {
 				return f, helpers.GenCmd(messages.ChangeView{Name: names.FileList})
 			}
 			return f, helpers.GenCmd(messages.ChangeView{Name: names.UploadFileForm})

@@ -64,7 +64,7 @@ func (l *fileList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return f, helpers.GenCmd(messages.ChangeView{Name: names.UpdateFileForm, View: f})
 			}
 		case key.Matches(msg, kb.Keys.New):
-			f := forms.NewUploadFileForm(nil, l.list.Height()*2)
+			f := forms.NewUploadFileForm(&entities.FileItem{}, l.list.Height()*2)
 			return f, helpers.GenCmd(messages.ChangeView{Name: names.UploadFileForm, View: f})
 		case key.Matches(msg, kb.Keys.Back):
 			return l, helpers.GenCmd(messages.ChangeView{Name: names.MainMenu})

@@ -32,7 +32,6 @@ type uploadFileForm struct {
 	help         help.Model
 	title        string
 	item         *entities.FileItem
-	creating     bool
 	filePicker   filepicker.Model
 	selectedFile string
 	keys         *kb.KeyMap
@@ -44,23 +43,17 @@ func NewUploadFileForm(item *entities.FileItem, height int) *uploadFileForm {
 	m := uploadFileForm{
 		help:       help.New(),
 		title:      "Upload file",
-		creating:   item == nil,
 		item:       item,
 		filePicker: filepicker.New(),
 		height:     height,
 	}
 	m.filePicker.CurrentDirectory, _ = os.UserHomeDir()
-	if !m.creating {
-		if item.Path != "" {
-			m.filePicker.CurrentDirectory = path.Dir(item.Path)
-			m.selectedFile = item.Path
-		}
+	if item.Path != "" {
+		m.filePicker.CurrentDirectory = path.Dir(item.Path)
+		m.selectedFile = item.Path
 	}
 	m.filePicker.AutoHeight = false
 	m.keys = &uploadFileFormKeys
-	if m.creating {
-		m.item = &entities.FileItem{}
-	}
 	return &m
 }
 

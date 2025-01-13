@@ -15,3 +15,7 @@ type StoredItem struct {
 func (si StoredItem) GetID() uuid.UUID {
 	return si.ID
 }
+
+func (si StoredItem) IsStored() bool {
+	return si.ID != uuid.Nil
+}
