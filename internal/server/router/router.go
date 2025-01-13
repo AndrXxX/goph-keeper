@@ -97,7 +97,7 @@ func (mr *router) registerAPI(r *chi.Mux) {
 			Convertor: ecf.File(vcf.File()),
 		}
 		r.Post("/api/files/update", fc.Update)
-		r.Post("/api/files/upload/{id}", fc.Upload)
-		r.Get("/api/files/download/{id}", fc.Download)
+		r.Post("/api/files/upload/{id}/", fc.Upload)
+		r.Get("/api/files/download/{id}/", fc.Download)
 	})
 }

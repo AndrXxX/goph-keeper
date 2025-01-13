@@ -18,9 +18,9 @@ import (
 )
 
 const (
-	sendfileUpdateUrl = "/api/files/update"        // POST
-	uploadFileUrl     = "/api/files/upload/{id}"   // POST
-	downloadFileUrl   = "/api/files/download/{id}" // GET
+	sendfileUpdateUrl = "/api/files/update"         // POST
+	uploadFileUrl     = "/api/files/upload/{id}/"   // POST
+	downloadFileUrl   = "/api/files/download/{id}/" // GET
 )
 
 type FilesLoader struct {
@@ -109,9 +109,9 @@ func (c *FilesLoader) Upload(list []entities.FileItem) (statusCode int, err erro
 			return resp.StatusCode, fmt.Errorf("uuid parse %w", sErr)
 		}
 		list[i].ID = id
-		err = c.FS.Store(f, id)
+		err = c.UploadFile(list[i], f)
 		if err != nil {
-			return 0, fmt.Errorf("store file after upload: %w", err)
+			return 0, fmt.Errorf("upload file after upload data: %w", err)
 		}
 		res = append(res, list[i])
 	}
