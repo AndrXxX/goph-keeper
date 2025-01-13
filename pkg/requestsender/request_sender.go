@@ -1,7 +1,7 @@
 package requestsender
 
 import (
-	"bytes"
+	"io"
 	"net/http"
 
 	"github.com/AndrXxX/goph-keeper/pkg/requestsender/dto"
@@ -19,9 +19,9 @@ func New(c client, opts ...Option) *RequestSender {
 }
 
 // Post отправляет запрос методом Post
-func (s *RequestSender) Post(url string, contentType string, data []byte) (*http.Response, error) {
+func (s *RequestSender) Post(url string, contentType string, data io.Reader) (*http.Response, error) {
 	params := dto.ParamsDto{
-		Buf:     bytes.NewBuffer(data),
+		Buf:     data,
 		Headers: map[string]string{"Content-Type": contentType},
 	}
 	for _, opt := range s.opts {

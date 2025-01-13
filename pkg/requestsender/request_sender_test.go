@@ -173,7 +173,7 @@ func TestRequestSender_Post(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := New(tt.fields.c, WithGzip(tt.fields.comp), WithSHA256(hashgenerator.Factory().SHA256("test")))
-			_, err := s.Post(tt.url, "", tt.data)
+			_, err := s.Post(tt.url, "", bytes.NewBuffer(tt.data))
 			assert.Equal(t, tt.wantErr, err != nil)
 		})
 	}

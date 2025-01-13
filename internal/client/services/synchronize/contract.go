@@ -1,6 +1,7 @@
 package synchronize
 
 import (
+	"io"
 	"net/http"
 
 	"github.com/AndrXxX/goph-keeper/internal/client/entities"
@@ -13,7 +14,7 @@ type Synchronizer interface {
 
 type requestSender interface {
 	Get(url string, contentType string) (*http.Response, error)
-	Post(url string, contentType string, data []byte) (*http.Response, error)
+	Post(url string, contentType string, data io.Reader) (*http.Response, error)
 }
 
 type urlBuilder interface {

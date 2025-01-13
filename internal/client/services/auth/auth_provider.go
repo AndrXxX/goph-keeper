@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -43,7 +44,7 @@ func (p *Provider) send(u *entities.User, url string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("marshal user: %v", err)
 	}
-	resp, err := p.Sender.Post(url, contenttypes.ApplicationJSON, data)
+	resp, err := p.Sender.Post(url, contenttypes.ApplicationJSON, bytes.NewBuffer(data))
 	if err != nil {
 		return "", fmt.Errorf("send request: %v", err)
 	}
