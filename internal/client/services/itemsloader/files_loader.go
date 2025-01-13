@@ -104,7 +104,7 @@ func (c *FilesLoader) Upload(list []entities.FileItem) (statusCode int, err erro
 		if err != nil {
 			return resp.StatusCode, fmt.Errorf("read response %w", sErr)
 		}
-		id, err := uuid.FromBytes(rawId)
+		id, err := uuid.ParseBytes(rawId)
 		if err != nil {
 			return resp.StatusCode, fmt.Errorf("uuid parse %w", sErr)
 		}

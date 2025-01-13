@@ -63,7 +63,7 @@ func (c *FilesController) Upload(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	objId, err := uuid.FromBytes([]byte(id))
+	objId, err := uuid.ParseBytes([]byte(id))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -101,7 +101,7 @@ func (c *FilesController) Download(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	objId, err := uuid.FromBytes([]byte(id))
+	objId, err := uuid.ParseBytes([]byte(id))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
