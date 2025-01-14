@@ -22,35 +22,37 @@ func (k KeyMap) FullHelp() [][]key.Binding {
 }
 
 type KeyList struct {
-	New    key.Binding
-	Edit   key.Binding
-	Delete key.Binding
-	Up     key.Binding
-	Down   key.Binding
-	Right  key.Binding
-	Left   key.Binding
-	Enter  key.Binding
-	Help   key.Binding
-	Quit   key.Binding
-	Back   key.Binding
-	Copy   key.Binding
-	Save   key.Binding
+	New      key.Binding
+	Edit     key.Binding
+	Delete   key.Binding
+	Up       key.Binding
+	Down     key.Binding
+	Right    key.Binding
+	Left     key.Binding
+	Enter    key.Binding
+	Help     key.Binding
+	Quit     key.Binding
+	Back     key.Binding
+	Copy     key.Binding
+	Save     key.Binding
+	Download key.Binding
 }
 
 var Keys = KeyList{
-	New:    New,
-	Edit:   Edit,
-	Delete: Delete,
-	Up:     Up,
-	Down:   Down,
-	Right:  Right,
-	Left:   Left,
-	Enter:  Enter,
-	Help:   Help,
-	Quit:   Quit,
-	Back:   Back,
-	Copy:   Copy,
-	Save:   Save,
+	New:      New,
+	Edit:     Edit,
+	Delete:   Delete,
+	Up:       Up,
+	Down:     Down,
+	Right:    Right,
+	Left:     Left,
+	Enter:    Enter,
+	Help:     Help,
+	Quit:     Quit,
+	Back:     Back,
+	Copy:     Copy,
+	Save:     Save,
+	Download: Download,
 }
 
 var New = key.NewBinding(
@@ -104,4 +106,8 @@ var Copy = key.NewBinding(
 var Save = key.NewBinding(
 	key.WithKeys("ctrl+s"),
 	key.WithHelp("ctrl+s", "save form"),
+)
+var Download = key.NewBinding(
+	key.WithKeys("ctrl+d"),
+	key.WithHelp("ctrl+d", "download file"),
 )
