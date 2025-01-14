@@ -58,7 +58,7 @@ func (f *updateFileForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, kb.Keys.Back):
-			if !f.item.IsStored() {
+			if f.item.IsStored() {
 				return f, helpers.GenCmd(messages.ChangeView{Name: names.FileList})
 			}
 			return f, helpers.GenCmd(messages.ChangeView{Name: names.UploadFileForm})
