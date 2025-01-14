@@ -11,6 +11,7 @@ const (
 	BankCardForm       = ViewName("bankCardForm")
 	FileList           = ViewName("fileList")
 	UploadFileForm     = ViewName("uploadFileForm")
+	DownloadFileForm   = ViewName("downloadFileForm")
 	UpdateFileForm     = ViewName("updateFileForm")
 	MainMenu           = ViewName("mainMenu")
 	AuthMenu           = ViewName("authMenu")
