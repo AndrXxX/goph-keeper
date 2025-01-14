@@ -17,7 +17,7 @@ import (
 )
 
 var fileListKeys = kb.KeyMap{
-	Short: []key.Binding{kb.Back, kb.Edit, kb.Delete, kb.New},
+	Short: []key.Binding{kb.Back, kb.Edit, kb.Delete, kb.New, kb.Download},
 	Full: [][]key.Binding{
 		{kb.Edit, kb.Delete, kb.New, kb.Quit},
 		{kb.Up, kb.Down, kb.Enter, kb.Back},
@@ -66,6 +66,12 @@ func (l *fileList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, kb.Keys.New):
 			f := forms.NewUploadFileForm(&entities.FileItem{}, l.list.Height()*2)
 			return f, helpers.GenCmd(messages.ChangeView{Name: names.UploadFileForm, View: f})
+		case key.Matches(msg, kb.Keys.Download):
+			if len(l.list.VisibleItems()) != 0 {
+				e := l.list.SelectedItem().(entities.FileItem)
+				f := forms.NewDownloadFileForm(&e, l.list.Height()*2)
+				return f, helpers.GenCmd(messages.ChangeView{Name: names.DownloadFileForm, View: f})
+			}
 		case key.Matches(msg, kb.Keys.Back):
 			return l, helpers.GenCmd(messages.ChangeView{Name: names.MainMenu})
 		case key.Matches(msg, kb.Keys.Delete):
