@@ -73,12 +73,21 @@ func (f *uploadFileForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, kb.Keys.Back):
-			return f, helpers.GenCmd(messages.ChangeView{Name: names.FileList})
+			return f, tea.Sequence(
+				helpers.GenCmd(messages.ChangeView{Name: names.FileList}),
+				tea.WindowSize(),
+			)
 		case key.Matches(msg, kb.Keys.Save):
 			if f.selectedFile == "" {
-				return f, helpers.GenCmd(messages.ShowError{Err: "Для сохранения нужно выбрать файл"})
+				return f, tea.Sequence(
+					helpers.GenCmd(messages.ShowError{Err: "Для сохранения нужно выбрать файл"}),
+					tea.WindowSize(),
+				)
 			}
-			return f, helpers.GenCmd(messages.ChangeView{Name: names.UpdateFileForm, View: NewUpdateFileForm(f.getFileItem())})
+			return f, tea.Sequence(
+				helpers.GenCmd(messages.ChangeView{Name: names.UpdateFileForm, View: NewUpdateFileForm(f.getFileItem())}),
+				tea.WindowSize(),
+			)
 		}
 	}
 	fp, cmd := f.filePicker.Update(msg)
@@ -91,7 +100,7 @@ func (f *uploadFileForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if didSelect, filePath := f.filePicker.DidSelectFile(msg); didSelect {
 		f.selectedFile = filePath
 	}
-	return f, tea.Batch(cmdList...)
+	return f, tea.Sequence(cmdList...)
 }
 
 func (f *uploadFileForm) getFileItem() *entities.FileItem {

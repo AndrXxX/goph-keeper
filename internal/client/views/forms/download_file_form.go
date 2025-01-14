@@ -71,7 +71,10 @@ func (f *downloadFileForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return f, helpers.GenCmd(messages.ChangeView{Name: names.FileList})
 		case key.Matches(msg, kb.Keys.Download):
 			if f.selectedPath == "" {
-				return f, helpers.GenCmd(messages.ShowError{Err: "Для скачивания нужно выбрать путь"})
+				return f, tea.Sequence(
+					helpers.GenCmd(messages.ShowError{Err: "Для скачивания нужно выбрать путь"}),
+					tea.WindowSize(),
+				)
 			}
 			return f, tea.Sequence(
 				helpers.GenCmd(messages.DownloadFile{Path: f.selectedPath, Item: f.item}),
