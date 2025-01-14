@@ -2,6 +2,9 @@ package views
 
 import (
 	"fmt"
+	"io"
+	"os"
+	"path"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -131,6 +134,27 @@ func WithQuit(handler func()) Option {
 			c.quitting.Store(true)
 			handler()
 			return c, tea.Quit
+		}
+	}
+}
+
+func WithDownloadFile(fs contract.FileStorage) Option {
+	return func(c *container) {
+		c.uo[getKeyType(messages.DownloadFile{})] = func(v tea.Msg) (tea.Model, tea.Cmd) {
+			msg := v.(messages.DownloadFile)
+			src, err := fs.Get(msg.Item.ID)
+			if err != nil {
+				return c, helpers.GenCmd(messages.ShowError{Err: "Ошибка при скачивании файла: " + err.Error()})
+			}
+			dst, err := os.OpenFile(path.Join(msg.Path, msg.Item.Name), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, os.ModePerm)
+			if err != nil {
+				return c, helpers.GenCmd(messages.ShowError{Err: "Ошибка при скачивании файла: " + err.Error()})
+			}
+			_, err = io.Copy(dst, src)
+			if err != nil {
+				return c, helpers.GenCmd(messages.ShowError{Err: "Ошибка при скачивании файла: " + err.Error()})
+			}
+			return c, helpers.GenCmd(messages.ShowMessage{Message: "Файл " + msg.Item.Name + " сохранен"})
 		}
 	}
 }

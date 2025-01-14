@@ -1,6 +1,10 @@
 package contract
 
 import (
+	"io"
+
+	"github.com/google/uuid"
+
 	"github.com/AndrXxX/goph-keeper/internal/client/entities"
 	"github.com/AndrXxX/goph-keeper/pkg/queue"
 )
@@ -36,4 +40,8 @@ type UserAccessor interface {
 type BuildInfo struct {
 	Version string
 	Date    string
+}
+
+type FileStorage interface {
+	Get(id uuid.UUID) (file io.ReadCloser, err error)
 }
