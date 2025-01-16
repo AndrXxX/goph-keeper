@@ -23,7 +23,7 @@ import (
 
 type Option func(c *container)
 
-func WithMap(m Map) Option {
+func WithViews(m Map) Option {
 	return func(c *container) {
 		c.views = m
 	}
