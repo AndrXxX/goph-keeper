@@ -84,7 +84,7 @@ func (l *fileList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (l *fileList) View() string {
-	return lipgloss.JoinVertical(lipgloss.Left, l.list.View(), l.help.View(fileListKeys))
+	return lipgloss.JoinVertical(lipgloss.Left, l.list.View(), styles.Help.Render(l.help.View(fileListKeys)))
 }
 
 func (l *fileList) DeleteCurrent() tea.Cmd {

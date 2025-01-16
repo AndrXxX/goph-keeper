@@ -107,7 +107,7 @@ func (f *downloadFileForm) View() string {
 	}
 	vList = append(vList, f.filePicker.View())
 	if f.keys != nil {
-		vList = append(vList, f.help.View(*f.keys))
+		vList = append(vList, styles.Help.Render(f.help.View(*f.keys)))
 	}
 	return lipgloss.JoinVertical(lipgloss.Left, vList...)
 }

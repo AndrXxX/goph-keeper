@@ -78,7 +78,7 @@ func (l *noteList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (l *noteList) View() string {
-	return lipgloss.JoinVertical(lipgloss.Left, l.list.View(), l.help.View(noteListKeys))
+	return lipgloss.JoinVertical(lipgloss.Left, l.list.View(), styles.Help.Render(l.help.View(noteListKeys)))
 }
 
 func (l *noteList) DeleteCurrent() tea.Cmd {

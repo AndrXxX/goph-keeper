@@ -78,7 +78,7 @@ func (l *bankCardList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (l *bankCardList) View() string {
-	return lipgloss.JoinVertical(lipgloss.Left, l.list.View(), l.help.View(bankCardListKeys))
+	return lipgloss.JoinVertical(lipgloss.Left, l.list.View(), styles.Help.Render(l.help.View(bankCardListKeys)))
 }
 
 func (l *bankCardList) DeleteCurrent() tea.Cmd {

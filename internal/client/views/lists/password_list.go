@@ -78,7 +78,7 @@ func (l *passwordList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (l *passwordList) View() string {
-	return lipgloss.JoinVertical(lipgloss.Left, l.list.View(), l.help.View(passwordListKeys))
+	return lipgloss.JoinVertical(lipgloss.Left, l.list.View(), styles.Help.Render(l.help.View(passwordListKeys)))
 }
 
 func (l *passwordList) DeleteCurrent() tea.Cmd {

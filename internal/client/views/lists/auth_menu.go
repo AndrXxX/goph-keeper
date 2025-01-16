@@ -85,5 +85,5 @@ func (m *authMenu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *authMenu) View() string {
-	return lipgloss.JoinVertical(lipgloss.Left, m.list.View(), m.help.View(authMenuKeys))
+	return lipgloss.JoinVertical(lipgloss.Left, m.list.View(), styles.Help.Render(m.help.View(authMenuKeys)))
 }

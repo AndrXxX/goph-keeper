@@ -9,7 +9,7 @@ var (
 	Blurred = lipgloss.NewStyle().Foreground(lipgloss.Color("240"))
 	Cursor  = Focused
 	Empty   = lipgloss.NewStyle()
-	Help    = Blurred
+	Help    = Blurred.Margin(1, 0, 0)
 	Error   = lipgloss.NewStyle().
 		Background(lipgloss.Color("#f12929")).
 		Foreground(lipgloss.Color("#ffffff")).
