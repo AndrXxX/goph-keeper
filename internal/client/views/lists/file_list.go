@@ -17,9 +17,9 @@ import (
 )
 
 var fileListKeys = kb.KeyMap{
-	Short: []key.Binding{kb.Back, kb.Edit, kb.Delete, kb.New, kb.Download},
+	Short: []key.Binding{kb.Back, kb.Edit, kb.New, kb.Download},
 	Full: [][]key.Binding{
-		{kb.Edit, kb.Delete, kb.New, kb.Quit},
+		{kb.Edit, kb.New, kb.Quit},
 		{kb.Up, kb.Down, kb.Enter, kb.Back},
 	},
 }

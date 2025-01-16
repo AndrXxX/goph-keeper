@@ -17,9 +17,9 @@ import (
 )
 
 var passwordListKeys = kb.KeyMap{
-	Short: []key.Binding{kb.Back, kb.Edit, kb.Delete, kb.New},
+	Short: []key.Binding{kb.Back, kb.Edit, kb.New},
 	Full: [][]key.Binding{
-		{kb.Edit, kb.Delete, kb.New, kb.Quit},
+		{kb.Edit, kb.New, kb.Quit},
 		{kb.Up, kb.Down, kb.Enter, kb.Back},
 	},
 }
