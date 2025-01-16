@@ -100,6 +100,7 @@ func (a *App) Run(ctx context.Context) error {
 		views.WithMap(views.AuthMap(a.vf)),
 		views.WithShowMessage(msgTimeout),
 		views.WithShowError(msgTimeout),
+		views.WithValidityError(msgTimeout),
 		views.WithUpdateUser(a.ua),
 		views.WithAuth(a.ua),
 		views.WithQuit(func() {
@@ -166,6 +167,7 @@ func (a *App) runFull(ctx context.Context) error {
 		views.WithMap(views.NewMainMap(a.vf)),
 		views.WithShowMessage(msgTimeout),
 		views.WithShowError(msgTimeout),
+		views.WithValidityError(msgTimeout),
 		views.WithUploadItemUpdates(a.Sync, a.QR),
 		views.WithRepeatableJob(a.QR, syncInterval, &jobs.SyncJob{Type: datatypes.Passwords, SyncManager: a.Sync}),
 		views.WithRepeatableJob(a.QR, syncInterval, &jobs.SyncJob{Type: datatypes.Notes, SyncManager: a.Sync}),

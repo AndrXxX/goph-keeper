@@ -1,12 +1,14 @@
 package views
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
 	"path"
 	"time"
 
+	"github.com/asaskevich/govalidator"
 	tea "github.com/charmbracelet/bubbletea"
 
 	"github.com/AndrXxX/goph-keeper/internal/client/config"
@@ -76,6 +78,28 @@ func WithShowError(timeout time.Duration) Option {
 			msg := v.(messages.ShowError)
 			c.errors.Store(msg.Err)
 			c.errors.DeleteAfter(msg.Err, timeout)
+			return c, nil
+		}
+	}
+}
+
+func WithValidityError(timeout time.Duration) Option {
+	return func(c *container) {
+		c.uo[getKeyType(messages.ValidityError{})] = func(v tea.Msg) (tea.Model, tea.Cmd) {
+			msg := v.(messages.ValidityError)
+			var errs govalidator.Errors
+			if errors.As(msg.Error, &errs) {
+				err := "Ошибка валидации"
+				c.errors.Store(err)
+				c.errors.DeleteAfter(err, timeout)
+				for _, e := range errs {
+					c.errors.Store(e.Error())
+					c.errors.DeleteAfter(e.Error(), timeout)
+				}
+				return c, nil
+			}
+			c.errors.Store(msg.Error.Error())
+			c.errors.DeleteAfter(msg.Error.Error(), timeout)
 			return c, nil
 		}
 	}
