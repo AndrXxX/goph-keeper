@@ -2,6 +2,7 @@ package views
 
 import (
 	"github.com/charmbracelet/bubbles/help"
+	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 
 	"github.com/AndrXxX/goph-keeper/internal/client/views/contract"
@@ -17,8 +18,9 @@ type Factory struct {
 
 func (f *Factory) Container(opts ...Option) *container {
 	c := &container{
-		help: help.New(),
-		uo:   make(map[tea.Msg]UpdateOption),
+		help:    help.New(),
+		uo:      make(map[tea.Msg]UpdateOption),
+		spinner: spinner.New(spinner.WithSpinner(spinner.Dot)),
 	}
 	for _, opt := range opts {
 		opt(c)

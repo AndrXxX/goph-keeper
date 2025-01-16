@@ -7,6 +7,7 @@ import (
 
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
+	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
@@ -29,10 +30,12 @@ type container struct {
 	uo             map[tea.Msg]UpdateOption
 	bi             *contract.BuildInfo
 	updateInterval time.Duration
+	syncCnt        atomic.Int32
+	spinner        spinner.Model
 }
 
 func (m *container) Init() tea.Cmd {
-	return m.Tick()
+	return tea.Batch(m.Tick(), m.spinner.Tick)
 }
 
 func (m *container) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -49,6 +52,10 @@ func (m *container) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, tea.Batch(cmdList...)
 	case messages.Tick:
 		cmdList = append(cmdList, m.Tick())
+	case spinner.TickMsg:
+		var cmd tea.Cmd
+		m.spinner, cmd = m.spinner.Update(msg)
+		return m, cmd
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, kb.Keys.Quit):
@@ -92,6 +99,9 @@ func (m *container) View() string {
 	}
 	if mes := m.messages.Join("\n"); mes != "" {
 		items = append(items, styles.Info.Render(mes))
+	}
+	if m.syncCnt.Load() > 0 {
+		items = append(items, styles.Spinner.Render(m.spinner.View(), " Выполняется синхронизация"))
 	}
 	if m.bi != nil {
 		ver := fmt.Sprintf("ver. %s [%s]", m.bi.Version, m.bi.Date)

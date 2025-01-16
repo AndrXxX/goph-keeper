@@ -37,6 +37,11 @@ func WithRepeatableJob(qr contract.QueueRunner, ri time.Duration, job queue.Job)
 					return
 				}
 				time.Sleep(ri)
+				c.syncCnt.Add(1)
+				go func() {
+					time.Sleep(time.Second)
+					c.syncCnt.Add(-1)
+				}()
 				if err := qr.AddJob(job); err != nil {
 					logger.Log.Error(err.Error())
 					return
@@ -133,6 +138,11 @@ func WithUploadItemUpdates(sm contract.SyncManager, qr contract.QueueRunner) Opt
 	return func(c *container) {
 		c.uo[helpers.GenMsgKey(messages.UploadItemUpdates{})] = func(v tea.Msg) (tea.Model, tea.Cmd) {
 			msg := v.(messages.UploadItemUpdates)
+			c.syncCnt.Add(1)
+			go func() {
+				time.Sleep(time.Second)
+				c.syncCnt.Add(-1)
+			}()
 			err := qr.AddJob(&jobs.UploadItemsUpdatesJob{
 				Type:        msg.Type,
 				Items:       msg.Items,
