@@ -91,6 +91,7 @@ func (a *App) Run(ctx context.Context) error {
 	a.TUI = tea.NewProgram(a.vf.Container(
 		views.WithBuildInfo(a.c),
 		views.WithStartView(names.AuthMenu),
+		views.WithUpdateInterval(a.c.ViewRefreshInterval),
 		views.WithMap(views.AuthMap(a.vf)),
 		views.WithShowMessage(a.c.ShowMsgTimeout),
 		views.WithShowError(a.c.ShowMsgTimeout),
@@ -158,6 +159,7 @@ func (a *App) runFull(ctx context.Context) error {
 	a.TUI = tea.NewProgram(a.vf.Container(
 		views.WithBuildInfo(a.c),
 		views.WithStartView(names.MainMenu),
+		views.WithUpdateInterval(a.c.ViewRefreshInterval),
 		views.WithMap(views.NewMainMap(a.vf)),
 		views.WithShowMessage(a.c.ShowMsgTimeout),
 		views.WithShowError(a.c.ShowMsgTimeout),

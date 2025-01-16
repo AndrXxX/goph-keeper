@@ -176,3 +176,9 @@ func WithDownloadFile(fs contract.FileStorage) Option {
 		}
 	}
 }
+
+func WithUpdateInterval(i time.Duration) Option {
+	return func(c *container) {
+		c.updateInterval = i
+	}
+}

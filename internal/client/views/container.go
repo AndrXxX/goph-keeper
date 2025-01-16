@@ -3,6 +3,7 @@ package views
 import (
 	"fmt"
 	"sync/atomic"
+	"time"
 
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
@@ -18,19 +19,20 @@ import (
 )
 
 type container struct {
-	help     help.Model
-	loaded   bool
-	current  names.ViewName
-	views    Map
-	quitting atomic.Bool
-	errors   helpers.MsgList
-	messages helpers.MsgList
-	uo       map[tea.Msg]UpdateOption
-	bi       *contract.BuildInfo
+	help           help.Model
+	loaded         bool
+	current        names.ViewName
+	views          Map
+	quitting       atomic.Bool
+	errors         helpers.MsgList
+	messages       helpers.MsgList
+	uo             map[tea.Msg]UpdateOption
+	bi             *contract.BuildInfo
+	updateInterval time.Duration
 }
 
 func (m *container) Init() tea.Cmd {
-	return nil
+	return m.Tick()
 }
 
 func (m *container) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -45,7 +47,8 @@ func (m *container) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		m.loaded = true
 		return m, tea.Batch(cmdList...)
-
+	case messages.Tick:
+		cmdList = append(cmdList, m.Tick())
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, kb.Keys.Quit):
@@ -96,4 +99,10 @@ func (m *container) View() string {
 		items = append(items, styles.Blurred.Margin(1, 0, 0).Render(ver))
 	}
 	return styles.Border.Render(lipgloss.JoinVertical(lipgloss.Center, items...))
+}
+
+func (m *container) Tick() tea.Cmd {
+	return tea.Tick(m.updateInterval, func(t time.Time) tea.Msg {
+		return messages.Tick(t)
+	})
 }
