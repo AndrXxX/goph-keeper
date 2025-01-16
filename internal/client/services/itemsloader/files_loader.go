@@ -52,7 +52,7 @@ func (c *FilesLoader) Download() (statusCode int, l []entities.FileItem) {
 			res = append(res, l[i])
 			continue
 		}
-		if err := c.DownloadFile(l[i]); err != nil {
+		if err := c.downloadFile(l[i]); err != nil {
 			logger.Log.Error("failed to download file", zap.Error(err))
 			continue
 		}
@@ -60,14 +60,14 @@ func (c *FilesLoader) Download() (statusCode int, l []entities.FileItem) {
 	return resp.StatusCode, res
 }
 
-func (c *FilesLoader) DownloadFile(item entities.FileItem) error {
+func (c *FilesLoader) downloadFile(item entities.FileItem) error {
 	url := c.URLBuilder.Build(downloadFileUrl, map[string]string{"id": item.ID.String()})
 	resp, sErr := c.Sender.Get(url, contenttypes.OctetStream)
 	if sErr != nil {
-		return fmt.Errorf("DownloadFile request %w", sErr)
+		return fmt.Errorf("download file request %w", sErr)
 	}
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("DownloadFile request status %s", resp.Status)
+		return fmt.Errorf("download file request status %s", resp.Status)
 	}
 	err := c.FS.Store(resp.Body, item.ID)
 	if err != nil {
@@ -84,32 +84,18 @@ func (c *FilesLoader) Upload(list []entities.FileItem) (statusCode int, err erro
 		}
 		f, err := os.OpenFile(list[i].TempPath, os.O_RDONLY, os.ModePerm)
 		if err != nil {
-			return 0, fmt.Errorf("failed to open file: %w", err)
+			return 0, fmt.Errorf("open file: %w", err)
 		}
-		data, mErr := json.Marshal(list[i])
-		if mErr != nil {
-			return 0, fmt.Errorf("marshal data %w", mErr)
+		resp, uErr := c.uploadFileUpdate(list[i])
+		if uErr != nil {
+			return 0, fmt.Errorf("upload file update %w", uErr)
 		}
-
-		url := c.URLBuilder.Build(sendfileUpdateUrl, map[string]string{})
-		resp, sErr := c.Sender.Post(url, contenttypes.ApplicationJSON, bytes.NewReader(data))
-		if sErr != nil {
-			return 0, fmt.Errorf("post request %w", sErr)
-		}
-		if resp.StatusCode != http.StatusOK {
-			return resp.StatusCode, fmt.Errorf("upload file request status %s", resp.Status)
-		}
-		rawId, err := io.ReadAll(resp.Body)
-		_ = resp.Body.Close()
+		id, err := c.fetchId(resp.Body)
 		if err != nil {
-			return resp.StatusCode, fmt.Errorf("read response %w", sErr)
-		}
-		id, err := uuid.ParseBytes(rawId)
-		if err != nil {
-			return resp.StatusCode, fmt.Errorf("uuid parse %w", sErr)
+			return resp.StatusCode, fmt.Errorf("fetch id %w", err)
 		}
 		list[i].ID = id
-		err = c.UploadFile(list[i], f)
+		err = c.uploadFile(list[i], f)
 		if err != nil {
 			return 0, fmt.Errorf("upload file after upload data: %w", err)
 		}
@@ -118,14 +104,42 @@ func (c *FilesLoader) Upload(list []entities.FileItem) (statusCode int, err erro
 	return http.StatusOK, nil
 }
 
-func (c *FilesLoader) UploadFile(item entities.FileItem, data io.Reader) error {
+func (c *FilesLoader) uploadFileUpdate(item entities.FileItem) (*http.Response, error) {
+	data, mErr := json.Marshal(item)
+	if mErr != nil {
+		return nil, fmt.Errorf("marshal data %w", mErr)
+	}
+	url := c.URLBuilder.Build(sendfileUpdateUrl, map[string]string{})
+	resp, err := c.Sender.Post(url, contenttypes.ApplicationJSON, bytes.NewReader(data))
+	if resp != nil && resp.StatusCode != http.StatusOK {
+		return resp, fmt.Errorf("upload file request status %s", resp.Status)
+	}
+	return resp, err
+}
+
+func (c *FilesLoader) fetchId(data io.ReadCloser) (uuid.UUID, error) {
+	rawId, rErr := io.ReadAll(data)
+	defer func(data io.ReadCloser) {
+		_ = data.Close()
+	}(data)
+	if rErr != nil {
+		return uuid.UUID{}, fmt.Errorf("read response %w", rErr)
+	}
+	id, pErr := uuid.ParseBytes(rawId)
+	if pErr != nil {
+		return uuid.UUID{}, fmt.Errorf("uuid parse %w", pErr)
+	}
+	return id, nil
+}
+
+func (c *FilesLoader) uploadFile(item entities.FileItem, data io.Reader) error {
 	url := c.URLBuilder.Build(uploadFileUrl, map[string]string{"id": item.ID.String()})
 	resp, sErr := c.Sender.Post(url, contenttypes.OctetStream, data)
 	if sErr != nil {
-		return fmt.Errorf("UploadFile request %w", sErr)
+		return fmt.Errorf("upload file request %w", sErr)
 	}
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("UploadFile request status %s", resp.Status)
+		return fmt.Errorf("upload file request status %s", resp.Status)
 	}
 	return nil
 }
