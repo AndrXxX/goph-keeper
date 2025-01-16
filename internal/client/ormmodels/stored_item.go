@@ -9,5 +9,5 @@ import (
 type StoredItem struct {
 	ID        uuid.UUID
 	Desc      string
-	UpdatedAt time.Time
+	UpdatedAt time.Time `gorm:"autoUpdateTime:false"`
 }
