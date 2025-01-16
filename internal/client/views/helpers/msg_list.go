@@ -1,28 +1,37 @@
 package helpers
 
 import (
-	"fmt"
+	"slices"
 	"strings"
 	"sync"
 	"time"
 )
 
 type MsgList struct {
-	sync.Map
+	vals []string
+	m    sync.Mutex
 }
 
-func (l *MsgList) DeleteAfter(msg string, timeout time.Duration) {
+func (l *MsgList) DeleteAfter(val string, timeout time.Duration) {
 	go func() {
 		time.Sleep(timeout)
-		l.Delete(msg)
+		l.m.Lock()
+		defer l.m.Unlock()
+		pos := slices.Index(l.vals, val)
+		if pos != -1 {
+			l.vals = append(l.vals[:pos], l.vals[pos+1:]...)
+		}
 	}()
 }
 
 func (l *MsgList) Join(separator string) string {
-	b := strings.Builder{}
-	l.Range(func(_, v any) bool {
-		b.WriteString(fmt.Sprintf("%s%s", v.(string), separator))
-		return true
-	})
-	return b.String()
+	l.m.Lock()
+	defer l.m.Unlock()
+	return strings.Join(l.vals, separator)
+}
+
+func (l *MsgList) Store(v string) {
+	l.m.Lock()
+	l.vals = append(l.vals, v)
+	l.m.Unlock()
 }

@@ -63,7 +63,7 @@ func WithShowMessage(timeout time.Duration) Option {
 	return func(c *container) {
 		c.uo[getKeyType(messages.ShowMessage{})] = func(v tea.Msg) (tea.Model, tea.Cmd) {
 			msg := v.(messages.ShowMessage)
-			c.messages.Store(msg.Message, msg.Message)
+			c.messages.Store(msg.Message)
 			c.messages.DeleteAfter(msg.Message, timeout)
 			return c, nil
 		}
@@ -74,7 +74,7 @@ func WithShowError(timeout time.Duration) Option {
 	return func(c *container) {
 		c.uo[getKeyType(messages.ShowError{})] = func(v tea.Msg) (tea.Model, tea.Cmd) {
 			msg := v.(messages.ShowError)
-			c.errors.Store(msg.Err, msg.Err)
+			c.errors.Store(msg.Err)
 			c.errors.DeleteAfter(msg.Err, timeout)
 			return c, nil
 		}
