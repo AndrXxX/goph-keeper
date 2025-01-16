@@ -95,6 +95,7 @@ func (m *container) View() string {
 	}
 	if m.bi != nil {
 		ver := fmt.Sprintf("ver. %s [%s]", m.bi.Version, m.bi.Date)
+		items = []string{lipgloss.JoinVertical(lipgloss.Left, items...)}
 		items = append(items, styles.Blurred.Margin(1, 0, 0).Render(ver))
 	}
 	return styles.Border.Render(lipgloss.JoinVertical(lipgloss.Center, items...))
