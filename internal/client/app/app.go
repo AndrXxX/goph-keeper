@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"go.uber.org/zap"
@@ -34,11 +33,6 @@ import (
 	"github.com/AndrXxX/goph-keeper/pkg/urlbuilder"
 )
 
-const queueTimeout = 1 * time.Second
-const msgTimeout = 2 * time.Second
-const shutdownTimeout = 5 * time.Second
-const syncInterval = 10 * time.Second
-
 type App struct {
 	TUI   *tea.Program
 	State *state.AppState
@@ -54,7 +48,7 @@ func NewApp(c *config.Config) *App {
 	app := App{
 		State: &state.AppState{},
 		c:     c,
-		QR:    queue.NewRunner(queueTimeout).SetWorkersCount(5),
+		QR:    queue.NewRunner(c.QueueTimeout).SetWorkersCount(c.QueueWorkersCnt),
 	}
 	ub := urlbuilder.New(c.Host)
 	ap := &auth.Provider{
@@ -98,9 +92,9 @@ func (a *App) Run(ctx context.Context) error {
 		views.WithBuildInfo(a.c),
 		views.WithStartView(names.AuthMenu),
 		views.WithMap(views.AuthMap(a.vf)),
-		views.WithShowMessage(msgTimeout),
-		views.WithShowError(msgTimeout),
-		views.WithValidityError(msgTimeout),
+		views.WithShowMessage(a.c.ShowMsgTimeout),
+		views.WithShowError(a.c.ShowMsgTimeout),
+		views.WithValidityError(a.c.ShowMsgTimeout),
 		views.WithUpdateUser(a.ua),
 		views.WithAuth(a.ua),
 		views.WithQuit(func() {
@@ -165,14 +159,14 @@ func (a *App) runFull(ctx context.Context) error {
 		views.WithBuildInfo(a.c),
 		views.WithStartView(names.MainMenu),
 		views.WithMap(views.NewMainMap(a.vf)),
-		views.WithShowMessage(msgTimeout),
-		views.WithShowError(msgTimeout),
-		views.WithValidityError(msgTimeout),
+		views.WithShowMessage(a.c.ShowMsgTimeout),
+		views.WithShowError(a.c.ShowMsgTimeout),
+		views.WithValidityError(a.c.ShowMsgTimeout),
 		views.WithUploadItemUpdates(a.Sync, a.QR),
-		views.WithRepeatableJob(a.QR, syncInterval, &jobs.SyncJob{Type: datatypes.Passwords, SyncManager: a.Sync}),
-		views.WithRepeatableJob(a.QR, syncInterval, &jobs.SyncJob{Type: datatypes.Notes, SyncManager: a.Sync}),
-		views.WithRepeatableJob(a.QR, syncInterval, &jobs.SyncJob{Type: datatypes.BankCards, SyncManager: a.Sync}),
-		views.WithRepeatableJob(a.QR, syncInterval, &jobs.SyncJob{Type: datatypes.Files, SyncManager: a.Sync}),
+		views.WithRepeatableJob(a.QR, a.c.SyncInterval, &jobs.SyncJob{Type: datatypes.Passwords, SyncManager: a.Sync}),
+		views.WithRepeatableJob(a.QR, a.c.SyncInterval, &jobs.SyncJob{Type: datatypes.Notes, SyncManager: a.Sync}),
+		views.WithRepeatableJob(a.QR, a.c.SyncInterval, &jobs.SyncJob{Type: datatypes.BankCards, SyncManager: a.Sync}),
+		views.WithRepeatableJob(a.QR, a.c.SyncInterval, &jobs.SyncJob{Type: datatypes.Files, SyncManager: a.Sync}),
 		views.WithDownloadFile(dfs),
 		views.WithQuit(func() {
 			stop()
@@ -203,7 +197,7 @@ func (a *App) runTIU() {
 func (a *App) shutdown() error {
 	logger.Log.Info("shutting down client gracefully")
 
-	shutdownCtx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), a.c.ShutdownTimeout)
 	defer cancel()
 
 	shutdown := make(chan struct{}, 1)
