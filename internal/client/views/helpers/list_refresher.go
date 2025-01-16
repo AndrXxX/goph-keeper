@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/charmbracelet/bubbles/list"
-	"golang.org/x/tools/container/intsets"
 )
 
 type ListRefresher[T list.Item] struct {
@@ -20,10 +19,11 @@ func (l *ListRefresher[T]) Refresh() {
 	}
 	l.refreshing.Store(true)
 	items := l.S.FindAll(nil)
-	l.List.SetItems([]list.Item{})
+	conv := make([]list.Item, len(items))
 	for i := range items {
-		l.List.InsertItem(intsets.MaxInt, items[i])
+		conv[i] = items[i]
 	}
+	l.List.SetItems(conv)
 	l.refreshing.Store(false)
 }
 
