@@ -2,8 +2,6 @@ package views
 
 import (
 	"fmt"
-	"strings"
-	"sync"
 	"sync/atomic"
 
 	"github.com/charmbracelet/bubbles/help"
@@ -25,8 +23,8 @@ type container struct {
 	current  names.ViewName
 	views    Map
 	quitting atomic.Bool
-	errors   sync.Map
-	messages sync.Map
+	errors   helpers.MsgList
+	messages helpers.MsgList
 	uo       map[tea.Msg]UpdateOption
 	bi       *contract.BuildInfo
 }
@@ -87,10 +85,10 @@ func (m *container) View() string {
 		lipgloss.Left,
 		m.views[m.current].View(),
 	))
-	if err := m.collectMessages(&m.errors); err != "" {
+	if err := m.errors.Join("\n"); err != "" {
 		items = append(items, styles.Error.Render(err))
 	}
-	if mes := m.collectMessages(&m.messages); mes != "" {
+	if mes := m.messages.Join("\n"); mes != "" {
 		items = append(items, styles.Info.Render(mes))
 	}
 	if m.bi != nil {
@@ -99,13 +97,4 @@ func (m *container) View() string {
 		items = append(items, styles.Blurred.Margin(1, 0, 0).Render(ver))
 	}
 	return styles.Border.Render(lipgloss.JoinVertical(lipgloss.Center, items...))
-}
-
-func (m *container) collectMessages(l *sync.Map) string {
-	b := strings.Builder{}
-	l.Range(func(_, v any) bool {
-		b.WriteString(fmt.Sprintf("%s\n", v.(string)))
-		return true
-	})
-	return b.String()
 }
