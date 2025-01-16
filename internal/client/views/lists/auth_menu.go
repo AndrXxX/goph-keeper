@@ -44,6 +44,7 @@ func newAuthMenu(opts ...amOption) *authMenu {
 		help: help.New(),
 	}
 	m.list.SetShowHelp(false)
+	m.list.SetShowStatusBar(false)
 	m.list.Title = "Goph Keeper"
 	m.list.Styles.Title = styles.Title
 	for _, opt := range opts {

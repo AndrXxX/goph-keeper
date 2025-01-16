@@ -42,6 +42,7 @@ func newMainMenu(opts ...mmOption) *mainMenu {
 		list: list.New([]list.Item{}, list.NewDefaultDelegate(), 0, 0),
 		help: help.New(),
 	}
+	m.list.SetShowStatusBar(false)
 	m.list.SetShowHelp(false)
 	m.list.Title = "Menu"
 	m.list.Styles.Title = styles.Title
