@@ -84,7 +84,7 @@ func (f *bankCardForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, kb.Keys.Save):
 			item := f.getBankCardItem()
 			if _, err := govalidator.ValidateStruct(item); err != nil {
-				return f, helpers.GenCmd(messages.ShowError{Err: fmt.Sprintf("Ошибка при обновлении: %s", err)})
+				return f, helpers.GenCmd(messages.ValidityError{Error: err})
 			}
 			return f, tea.Batch(
 				helpers.GenCmd(messages.UploadItemUpdates{Type: datatypes.BankCards, Items: []any{*item}}),
