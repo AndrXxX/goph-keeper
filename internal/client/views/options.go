@@ -63,7 +63,7 @@ func WithStartView(view names.ViewName) Option {
 
 func WithShowMessage(timeout time.Duration) Option {
 	return func(c *container) {
-		c.uo[getKeyType(messages.ShowMessage{})] = func(v tea.Msg) (tea.Model, tea.Cmd) {
+		c.uo[helpers.GenMsgKey(messages.ShowMessage{})] = func(v tea.Msg) (tea.Model, tea.Cmd) {
 			msg := v.(messages.ShowMessage)
 			c.messages.Store(msg.Message)
 			c.messages.DeleteAfter(msg.Message, timeout)
@@ -74,7 +74,7 @@ func WithShowMessage(timeout time.Duration) Option {
 
 func WithShowError(timeout time.Duration) Option {
 	return func(c *container) {
-		c.uo[getKeyType(messages.ShowError{})] = func(v tea.Msg) (tea.Model, tea.Cmd) {
+		c.uo[helpers.GenMsgKey(messages.ShowError{})] = func(v tea.Msg) (tea.Model, tea.Cmd) {
 			msg := v.(messages.ShowError)
 			c.errors.Store(msg.Err)
 			c.errors.DeleteAfter(msg.Err, timeout)
@@ -85,7 +85,7 @@ func WithShowError(timeout time.Duration) Option {
 
 func WithValidityError(timeout time.Duration) Option {
 	return func(c *container) {
-		c.uo[getKeyType(messages.ValidityError{})] = func(v tea.Msg) (tea.Model, tea.Cmd) {
+		c.uo[helpers.GenMsgKey(messages.ValidityError{})] = func(v tea.Msg) (tea.Model, tea.Cmd) {
 			msg := v.(messages.ValidityError)
 			var errs govalidator.Errors
 			if errors.As(msg.Error, &errs) {
@@ -107,7 +107,7 @@ func WithValidityError(timeout time.Duration) Option {
 
 func WithUpdateUser(a contract.UserAccessor) Option {
 	return func(c *container) {
-		c.uo[getKeyType(messages.UpdateUser{})] = func(v tea.Msg) (tea.Model, tea.Cmd) {
+		c.uo[helpers.GenMsgKey(messages.UpdateUser{})] = func(v tea.Msg) (tea.Model, tea.Cmd) {
 			msg := v.(messages.UpdateUser)
 			a.SetUser(msg.User)
 			return c, nil
@@ -117,7 +117,7 @@ func WithUpdateUser(a contract.UserAccessor) Option {
 
 func WithAuth(a contract.UserAccessor) Option {
 	return func(c *container) {
-		c.uo[getKeyType(messages.Auth{})] = func(v tea.Msg) (tea.Model, tea.Cmd) {
+		c.uo[helpers.GenMsgKey(messages.Auth{})] = func(v tea.Msg) (tea.Model, tea.Cmd) {
 			msg := v.(messages.Auth)
 			a.SetMasterPass(msg.MasterPass)
 			err := a.Auth()
@@ -131,7 +131,7 @@ func WithAuth(a contract.UserAccessor) Option {
 
 func WithUploadItemUpdates(sm contract.SyncManager, qr contract.QueueRunner) Option {
 	return func(c *container) {
-		c.uo[getKeyType(messages.UploadItemUpdates{})] = func(v tea.Msg) (tea.Model, tea.Cmd) {
+		c.uo[helpers.GenMsgKey(messages.UploadItemUpdates{})] = func(v tea.Msg) (tea.Model, tea.Cmd) {
 			msg := v.(messages.UploadItemUpdates)
 			err := qr.AddJob(&jobs.UploadItemsUpdatesJob{
 				Type:        msg.Type,
@@ -148,7 +148,7 @@ func WithUploadItemUpdates(sm contract.SyncManager, qr contract.QueueRunner) Opt
 
 func WithQuit(handler func()) Option {
 	return func(c *container) {
-		c.uo[getKeyType(messages.Quit{})] = func(v tea.Msg) (tea.Model, tea.Cmd) {
+		c.uo[helpers.GenMsgKey(messages.Quit{})] = func(v tea.Msg) (tea.Model, tea.Cmd) {
 			c.quitting.Store(true)
 			handler()
 			return c, tea.Quit
@@ -158,7 +158,7 @@ func WithQuit(handler func()) Option {
 
 func WithDownloadFile(fs contract.FileStorage) Option {
 	return func(c *container) {
-		c.uo[getKeyType(messages.DownloadFile{})] = func(v tea.Msg) (tea.Model, tea.Cmd) {
+		c.uo[helpers.GenMsgKey(messages.DownloadFile{})] = func(v tea.Msg) (tea.Model, tea.Cmd) {
 			msg := v.(messages.DownloadFile)
 			src, err := fs.Get(msg.Item.ID)
 			if err != nil {
@@ -175,8 +175,4 @@ func WithDownloadFile(fs contract.FileStorage) Option {
 			return c, helpers.GenCmd(messages.ShowMessage{Message: "Файл " + msg.Item.Name + " сохранен"})
 		}
 	}
-}
-
-func getKeyType(v tea.Msg) string {
-	return fmt.Sprintf("%T-Handler", v)
 }
