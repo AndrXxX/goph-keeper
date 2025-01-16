@@ -51,7 +51,7 @@ func (l *passwordList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		l.list.SetSize(msg.Width/styles.InnerMargin, msg.Height/2)
+		l.list.SetSize(msg.Width, msg.Height/2)
 	case messages.AddPassword:
 		l.lr.Refresh()
 		return l, nil

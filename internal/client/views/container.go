@@ -93,14 +93,11 @@ func (m *container) View() string {
 	if mes := m.collectMessages(&m.messages); mes != "" {
 		items = append(items, styles.Info.Render(mes))
 	}
-	var bottom string
 	if m.bi != nil {
-		bottom = lipgloss.JoinHorizontal(
-			lipgloss.Left,
-			styles.Blurred.Render(fmt.Sprintf("ver. %s [%s]", m.bi.Version, m.bi.Date)),
-		)
+		ver := fmt.Sprintf("ver. %s [%s]", m.bi.Version, m.bi.Date)
+		items = append(items, styles.Blurred.Margin(1, 0, 0).Render(ver))
 	}
-	return styles.Border.Render(lipgloss.JoinVertical(lipgloss.Left, items...), bottom)
+	return styles.Border.Render(lipgloss.JoinVertical(lipgloss.Center, items...))
 }
 
 func (m *container) collectMessages(l *sync.Map) string {

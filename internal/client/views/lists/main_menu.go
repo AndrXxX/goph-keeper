@@ -60,7 +60,7 @@ func (m *mainMenu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		m.list.SetSize(msg.Width/styles.InnerMargin, msg.Height/2)
+		m.list.SetSize(msg.Width, msg.Height/2)
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, kb.Keys.Enter):
