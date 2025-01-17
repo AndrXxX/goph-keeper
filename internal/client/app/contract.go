@@ -5,6 +5,7 @@ import (
 
 	"gorm.io/gorm"
 
+	"github.com/AndrXxX/goph-keeper/internal/client/entities"
 	"github.com/AndrXxX/goph-keeper/pkg/queue"
 )
 
@@ -21,4 +22,25 @@ type syncManager interface {
 type dbProvider interface {
 	DB(key string) (*gorm.DB, error)
 	RemoveDB() error
+}
+
+type Loginer interface {
+	Login(u *entities.User) (string, error)
+}
+
+type Storage[T any] interface {
+	Find(*T) *T
+	Create(*T) (*T, error)
+	Update(*T) error
+	FindAll(*T) []T
+}
+
+type userAccessor interface {
+	Auth() error
+	SetMasterPass(mp string)
+	SetUser(user *entities.User)
+	GetUser() *entities.User
+	GetToken() string
+	SetToken(t string)
+	AfterAuth(f func())
 }

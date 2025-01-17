@@ -14,7 +14,7 @@ type Accessor struct {
 	SP         storageProvider[entities.User]
 	DBI        dbInitializer
 	HG         hashGeneratorFetcher
-	AfterAuth  func()
+	afterAuth  func()
 	masterPass string
 }
 
@@ -52,16 +52,20 @@ func (a *Accessor) Auth() error {
 			return fmt.Errorf("error saving user: %w", err)
 		}
 		a.User = created
-		a.AfterAuth()
+		a.afterAuth()
 		return nil
 	}
 	list := storage.FindAll(nil)
 	for i := range list {
 		if list[i].MasterPassword == a.User.MasterPassword {
 			a.User = &list[i]
-			a.AfterAuth()
+			a.afterAuth()
 			return nil
 		}
 	}
 	return fmt.Errorf("пользователь с такими данными не найден")
+}
+
+func (a *Accessor) AfterAuth(f func()) {
+	a.afterAuth = f
 }

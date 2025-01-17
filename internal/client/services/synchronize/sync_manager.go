@@ -26,7 +26,10 @@ func (m SyncManager) Sync(dataType string, updates []any) error {
 	}
 	err := s.Sync(updates)
 	if errors.Is(err, syncerr.UnauthorizedError) {
-		m.TR()
+		rtErr := m.TR.Refresh()
+		if rtErr != nil {
+			return rtErr
+		}
 		err = s.Sync(updates)
 	}
 	return err

@@ -37,4 +37,6 @@ type Storages struct {
 	FS       fileStorage
 }
 
-type tokenRefresher func()
+type tokenRefresher interface {
+	Refresh() error
+}

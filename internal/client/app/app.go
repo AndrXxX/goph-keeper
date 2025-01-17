@@ -41,7 +41,7 @@ type App struct {
 	//crypto *CryptoManager
 	c  *config.Config
 	vf *views.Factory
-	ua *useraccessor.Accessor
+	ua userAccessor
 }
 
 func NewApp(c *config.Config) *App {
@@ -89,13 +89,13 @@ func (a *App) Run(ctx context.Context) error {
 			stop()
 		}),
 	), tea.WithAltScreen(), tea.WithContext(ctx))
-	a.ua.AfterAuth = func() {
+	a.ua.AfterAuth(func() {
 		a.TUI.Kill()
 		if err := a.runFull(ctx); err != nil {
 			logger.Log.Error(err.Error())
 		}
 		stop()
-	}
+	})
 	go a.runTIU()
 	<-ctx.Done()
 	return nil
@@ -134,15 +134,10 @@ func (a *App) runFull(ctx context.Context) error {
 		UB:       ub,
 		Storages: &synchronize.Storages{Password: ps, Note: ns, BankCard: bs, File: fs, FS: dfs},
 	}
-	a.Sync = &synchronize.SyncManager{Synchronizers: sFactory.Map(), TR: func() {
-		token, err := a.vf.Loginer.Login(a.ua.GetUser())
-		if err != nil {
-			logger.Log.Error("failed to refresh token", zap.Error(err))
-			return
-		}
-		a.ua.SetToken(token)
-		_ = us.Update(a.ua.GetUser())
-	}}
+	a.Sync = &synchronize.SyncManager{
+		Synchronizers: sFactory.Map(),
+		TR:            &tokenRefresher{ua: a.ua, l: a.vf.Loginer, us: us},
+	}
 	a.vf.S = &vContract.Storages{Password: ps, Note: ns, BankCard: bs, File: fs}
 
 	a.TUI = tea.NewProgram(a.vf.Container(
