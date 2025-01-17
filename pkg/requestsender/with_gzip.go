@@ -10,6 +10,8 @@ import (
 
 func WithGzip(comp dataCompressor) Option {
 	return func(p *dto.ParamsDto) error {
+		// TODO: починить работу
+		return nil
 		if p.Buf == nil {
 			return nil
 		}

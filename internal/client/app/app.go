@@ -1,9 +1,9 @@
 package app
 
 import (
+	"bytes"
 	"context"
 	"fmt"
-	"net/http"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"go.uber.org/zap"
@@ -26,6 +26,7 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 	"github.com/AndrXxX/goph-keeper/internal/enums/datatypes"
 	"github.com/AndrXxX/goph-keeper/pkg/filestorage"
+	"github.com/AndrXxX/goph-keeper/pkg/gzipcompressor"
 	"github.com/AndrXxX/goph-keeper/pkg/hashgenerator"
 	"github.com/AndrXxX/goph-keeper/pkg/httpclient"
 	"github.com/AndrXxX/goph-keeper/pkg/logger"
@@ -44,18 +45,14 @@ type App struct {
 	c  *config.Config
 	vf *views.Factory
 	ua userAccessor
+	rs requestSender
 }
 
-func NewApp(c *config.Config) *App {
+func NewApp(c *config.Config) (*App, error) {
 	app := App{
 		State: &state.AppState{},
 		c:     c,
 		QR:    queue.NewRunner(c.QueueTimeout).SetWorkersCount(c.QueueWorkersCnt),
-	}
-	ub := urlbuilder.New(c.Host)
-	ap := &auth.Provider{
-		Sender: requestsender.New(&http.Client{}), UB: ub,
-		KS: &auth.KeySaver{KeyPath: c.ServerKeyPath},
 	}
 	dbProvider := &dbprovider.DBProvider{Path: c.DBPath}
 	sp := ormstorages.Factory()
@@ -70,8 +67,22 @@ func NewApp(c *config.Config) *App {
 			return hashgenerator.Factory().SHA256(key)
 		},
 	}
+	cp := httpclient.Provider{ConfProvider: tlsconfig.NewProvider(c.ServerKeyPath)}
+	client, err := cp.Fetch()
+	if err != nil {
+		return nil, err
+	}
+	app.rs = requestsender.New(
+		client,
+		requestsender.WithToken(app.ua),
+		requestsender.WithGzip(gzipcompressor.GzipCompressor{Buff: bytes.NewBuffer(nil)}),
+	)
+	ap := &auth.Provider{
+		Sender: app.rs, UB: urlbuilder.New(c.Host),
+		KS: &auth.KeySaver{KeyPath: c.ServerKeyPath},
+	}
 	app.vf = &views.Factory{Loginer: ap, Registerer: ap}
-	return &app
+	return &app, nil
 }
 
 func (a *App) Run(ctx context.Context) error {
@@ -105,17 +116,6 @@ func (a *App) Run(ctx context.Context) error {
 
 func (a *App) runFull(ctx context.Context) error {
 	ctx, stop := context.WithCancel(ctx)
-	cp := httpclient.Provider{ConfProvider: tlsconfig.NewProvider(a.c.ServerKeyPath)}
-	client, err := cp.Fetch()
-	if err != nil {
-		stop()
-		return err
-	}
-	rs := requestsender.New(
-		client,
-		requestsender.WithToken(a.ua),
-		//requestsender.WithGzip(gzipcompressor.GzipCompressor{Buff: bytes.NewBuffer(nil)}),
-	)
 	ub := urlbuilder.New(a.c.Host)
 	sa := storageadapters.Factory{}
 	sp := ormstorages.Factory()
@@ -132,7 +132,7 @@ func (a *App) runFull(ctx context.Context) error {
 	}
 
 	sFactory := synchronize.Factory{
-		RS:       rs,
+		RS:       a.rs,
 		UB:       ub,
 		Storages: &synchronize.Storages{Password: ps, Note: ns, BankCard: bs, File: fs, FS: dfs},
 	}
