@@ -1,6 +1,7 @@
 package requestsender
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 
@@ -27,12 +28,12 @@ func (s *RequestSender) Post(url string, contentType string, data io.Reader) (*h
 	for _, opt := range s.opts {
 		err := opt(&params)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("request sender set options before request: %w", err)
 		}
 	}
 	r, err := http.NewRequest("POST", url, params.Buf)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("request sender creating request: %w", err)
 	}
 	for k, v := range params.Headers {
 		r.Header.Set(k, v)
@@ -40,14 +41,14 @@ func (s *RequestSender) Post(url string, contentType string, data io.Reader) (*h
 
 	resp, err := s.c.Do(r)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("request sender do request: %w", err)
 	}
 	params.Response = resp
 	params.Buf = nil
 	for _, opt := range s.opts {
 		err := opt(&params)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("request sender set options after request: %w", err)
 		}
 	}
 	return resp, nil
