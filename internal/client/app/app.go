@@ -63,21 +63,7 @@ func NewApp(c *config.Config) *App {
 		SP: func(db *gorm.DB) useraccessor.Storage[entities.User] {
 			return sa.ORMUserAdapter(sp.User(context.Background(), db))
 		},
-		SDB: func(masterPass string, recreate bool) (*gorm.DB, error) {
-			if recreate {
-				err := dbProvider.RemoveDB()
-				if err != nil {
-					return nil, err
-				}
-			}
-			actDB, err := dbProvider.DB(masterPass)
-			if err != nil {
-				return nil, err
-			}
-			app.State.DB = actDB
-			app.State.MasterPass = masterPass
-			return actDB, nil
-		},
+		DBI: &dbInitializer{dbProvider: dbProvider, state: app.State},
 		HG: func(key string) useraccessor.HashGenerator {
 			return hashgenerator.Factory().SHA256(key)
 		},

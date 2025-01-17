@@ -12,7 +12,7 @@ import (
 type Accessor struct {
 	User       *entities.User
 	SP         storageProvider[entities.User]
-	SDB        setupDb
+	DBI        dbInitializer
 	HG         hashGeneratorFetcher
 	AfterAuth  func()
 	masterPass string
@@ -40,7 +40,7 @@ func (a *Accessor) SetMasterPass(mp string) {
 }
 
 func (a *Accessor) Auth() error {
-	db, err := a.SDB(a.masterPass, a.User.Login != "")
+	db, err := a.DBI.Init(a.masterPass, a.User.Login != "")
 	if err != nil {
 		logger.Log.Info("неверный мастер пароль", zap.Error(err))
 		return fmt.Errorf("неверный мастер пароль")

@@ -3,6 +3,8 @@ package app
 import (
 	"context"
 
+	"gorm.io/gorm"
+
 	"github.com/AndrXxX/goph-keeper/pkg/queue"
 )
 
@@ -14,4 +16,9 @@ type queueRunner interface {
 
 type syncManager interface {
 	Sync(dataType string, updates []any) error
+}
+
+type dbProvider interface {
+	DB(key string) (*gorm.DB, error)
+	RemoveDB() error
 }

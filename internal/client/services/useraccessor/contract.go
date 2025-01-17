@@ -11,7 +11,9 @@ type Storage[T any] interface {
 	FindAll(*T) []T
 }
 
-type setupDb func(masterPass string, recreate bool) (*gorm.DB, error)
+type dbInitializer interface {
+	Init(masterPass string, recreate bool) (*gorm.DB, error)
+}
 
 type HashGenerator interface {
 	Generate(data []byte) string
