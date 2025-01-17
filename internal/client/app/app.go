@@ -17,6 +17,7 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/client/services/ormstorages"
 	"github.com/AndrXxX/goph-keeper/internal/client/services/storageadapters"
 	"github.com/AndrXxX/goph-keeper/internal/client/services/synchronize"
+	"github.com/AndrXxX/goph-keeper/internal/client/services/tokenrefresher"
 	"github.com/AndrXxX/goph-keeper/internal/client/services/useraccessor"
 	"github.com/AndrXxX/goph-keeper/internal/client/state"
 	"github.com/AndrXxX/goph-keeper/internal/client/views"
@@ -136,7 +137,7 @@ func (a *App) runFull(ctx context.Context) error {
 	}
 	a.Sync = &synchronize.SyncManager{
 		Synchronizers: sFactory.Map(),
-		TR:            &tokenRefresher{ua: a.ua, l: a.vf.Loginer, us: us},
+		TR:            &tokenrefresher.TokenRefresher{UserAccessor: a.ua, Loginer: a.vf.Loginer, Storage: us},
 	}
 	a.vf.S = &vContract.Storages{Password: ps, Note: ns, BankCard: bs, File: fs}
 

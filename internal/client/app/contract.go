@@ -24,17 +24,6 @@ type dbProvider interface {
 	RemoveDB() error
 }
 
-type Loginer interface {
-	Login(u *entities.User) (string, error)
-}
-
-type Storage[T any] interface {
-	Find(*T) *T
-	Create(*T) (*T, error)
-	Update(*T) error
-	FindAll(*T) []T
-}
-
 type userAccessor interface {
 	Auth() error
 	SetMasterPass(mp string)
