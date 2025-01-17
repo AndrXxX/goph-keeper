@@ -2,6 +2,7 @@ package queue
 
 import (
 	"context"
+	"fmt"
 
 	"go.uber.org/zap"
 
@@ -20,7 +21,7 @@ func (w *worker) Process(ctx context.Context, jobs <-chan Job) {
 	case job := <-jobs:
 		err := job.Execute()
 		if err != nil {
-			logger.Log.Error("failed to execute runner job", zap.Error(err), zap.Any("job", job))
+			logger.Log.Error("failed to execute runner job", zap.Error(err), zap.Any("job", fmt.Sprintf("%T", job)))
 		}
 	}
 }
