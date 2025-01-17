@@ -7,6 +7,10 @@ import (
 	"github.com/AndrXxX/goph-keeper/pkg/requestsender/dto"
 )
 
+type tokenProvider interface {
+	GetToken() string
+}
+
 type client interface {
 	Do(req *http.Request) (*http.Response, error)
 }

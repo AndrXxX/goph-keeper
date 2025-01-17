@@ -41,7 +41,7 @@ type dataCompressorMock struct {
 	mock.Mock
 }
 
-func (m *dataCompressorMock) Compress(in []byte) (io.Reader, error) {
+func (m *dataCompressorMock) Compress(in io.Reader) (io.Reader, error) {
 	args := m.Called(in)
 	resp, _ := args.Get(0).(io.Reader)
 	return resp, args.Error(1)

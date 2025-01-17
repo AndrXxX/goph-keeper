@@ -22,6 +22,10 @@ func (a *Accessor) GetUser() *entities.User {
 	return a.User
 }
 
+func (a *Accessor) GetToken() string {
+	return a.User.Token
+}
+
 func (a *Accessor) SetUser(user *entities.User) {
 	a.User = user
 }

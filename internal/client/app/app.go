@@ -123,7 +123,11 @@ func (a *App) runFull(ctx context.Context) error {
 		stop()
 		return err
 	}
-	rs := requestsender.New(client, requestsender.WithToken(a.ua.GetUser().Token))
+	rs := requestsender.New(
+		client,
+		requestsender.WithToken(a.ua),
+		//requestsender.WithGzip(gzipcompressor.GzipCompressor{Buff: bytes.NewBuffer(nil)}),
+	)
 	ub := urlbuilder.New(a.c.Host)
 	sa := storageadapters.Factory{}
 	sp := ormstorages.Factory()
@@ -152,7 +156,6 @@ func (a *App) runFull(ctx context.Context) error {
 		}
 		a.ua.SetToken(token)
 		_ = us.Update(a.ua.GetUser())
-		*rs = *requestsender.New(&http.Client{}, requestsender.WithToken(token))
 	}}
 	a.vf.S = &vContract.Storages{Password: ps, Note: ns, BankCard: bs, File: fs}
 
