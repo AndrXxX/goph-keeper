@@ -10,15 +10,9 @@ import (
 	"github.com/AndrXxX/goph-keeper/pkg/logger"
 )
 
-type state struct {
-	running  bool
-	stopping bool
-}
-
 type runner struct {
 	si       time.Duration
 	workers  []*worker
-	s        state
 	jobs     chan Job
 	running  atomic.Bool
 	stopping atomic.Bool
