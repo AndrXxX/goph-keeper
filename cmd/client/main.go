@@ -2,77 +2,35 @@ package main
 
 import (
 	"context"
-	"net/http"
-	"time"
-
-	tea "github.com/charmbracelet/bubbletea"
-	"go.uber.org/zap"
+	"os/signal"
+	"syscall"
 
 	"github.com/AndrXxX/goph-keeper/internal/client/app"
-	"github.com/AndrXxX/goph-keeper/internal/client/entities"
-	"github.com/AndrXxX/goph-keeper/internal/client/services/auth"
-	"github.com/AndrXxX/goph-keeper/internal/client/services/dbprovider"
-	"github.com/AndrXxX/goph-keeper/internal/client/services/ormstorages"
-	"github.com/AndrXxX/goph-keeper/internal/client/services/storageadapters"
-	"github.com/AndrXxX/goph-keeper/internal/client/services/synchronize"
-	"github.com/AndrXxX/goph-keeper/internal/client/state"
-	"github.com/AndrXxX/goph-keeper/internal/client/views"
+	"github.com/AndrXxX/goph-keeper/internal/client/config"
 	"github.com/AndrXxX/goph-keeper/pkg/logger"
-	"github.com/AndrXxX/goph-keeper/pkg/queue"
-	"github.com/AndrXxX/goph-keeper/pkg/requestsender"
-	"github.com/AndrXxX/goph-keeper/pkg/urlbuilder"
+	_ "github.com/AndrXxX/goph-keeper/pkg/validators"
 )
 
+var buildVersion string
+var buildDate string
+var serverHost string
+
 func main() {
-	_ = logger.Initialize("debug", []string{"./client.log"})
-	ub := urlbuilder.New("http://localhost:8081")
-	ap := &auth.Provider{Sender: requestsender.New(&http.Client{}), UB: ub}
-	ctx := context.Background()
-	dbProvider := &dbprovider.DBProvider{}
-	db, err := dbProvider.DB()
+	cfg := config.NewConfig()
+	cfg.Host = serverHost
+	cfg.BuildVersion = buildVersion
+	cfg.BuildDate = buildDate
+	_ = logger.Initialize("debug", []string{cfg.LogPath})
+
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
+	defer stop()
+
+	a, err := app.NewApp(cfg)
 	if err != nil {
-		logger.Log.Fatal("failed to connect to database", zap.Error(err))
+		logger.Log.Fatal(err.Error())
+		return
 	}
-	sp := ormstorages.Factory()
-	sa := storageadapters.Factory{}
-	rs := requestsender.New(&http.Client{})
-	appState := &state.AppState{
-		User:       &entities.User{},
-		DBProvider: dbProvider,
-		Storages: &state.Storages{
-			User:     sa.ORMUserAdapter(sp.User(ctx, db)),
-			Password: sa.ORMPasswordsAdapter(sp.Password(ctx, db)),
-			Note:     sa.ORMNotesAdapter(sp.Note(ctx, db)),
-			BankCard: sa.ORMBankCardAdapter(sp.BankCard(ctx, db)),
-		},
-		AS: func(u *entities.User) {
-			*rs = *requestsender.New(&http.Client{}, requestsender.WithToken(u.Token))
-		},
-	}
-	sFactory := synchronize.Factory{RS: rs, UB: ub, Storages: (*synchronize.Storages)(appState.Storages)}
-	sm := &synchronize.SyncManager{Synchronizers: sFactory.Map(), TR: func() {
-		token, err := ap.Login(appState.User)
-		if err != nil {
-			logger.Log.Error("failed to refresh token", zap.Error(err))
-			return
-		}
-		appState.User.Token = token
-		_ = appState.Storages.User.Update(appState.User)
-		*rs = *requestsender.New(&http.Client{}, requestsender.WithToken(token))
-	}}
-	viewsFactory := views.Factory{
-		AppState:   appState,
-		Loginer:    ap,
-		Registerer: ap,
-		SM:         sm,
-	}
-	application := app.App{
-		TUI:   tea.NewProgram(views.NewContainer(views.NewMap(viewsFactory)), tea.WithAltScreen()),
-		State: appState,
-		Sync:  sm,
-		QR:    queue.NewRunner(1 * time.Second),
-	}
-	if err := application.Run(); err != nil {
-		logger.Log.Fatal("failed to start application", zap.Error(err))
+	if err := a.Run(ctx); err != nil {
+		logger.Log.Fatal(err.Error())
 	}
 }

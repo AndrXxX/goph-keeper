@@ -1,13 +1,17 @@
 package entities
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type StoredItem struct {
-	ID        uint      `json:"id"`
+	ID        uuid.UUID `json:"id"`
 	Desc      string    `json:"description"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-func (si StoredItem) GetID() uint {
+func (si StoredItem) GetID() uuid.UUID {
 	return si.ID
 }

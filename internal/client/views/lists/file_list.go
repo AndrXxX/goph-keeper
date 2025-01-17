@@ -8,18 +8,18 @@ import (
 	"github.com/charmbracelet/lipgloss"
 
 	"github.com/AndrXxX/goph-keeper/internal/client/entities"
-	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
-	"github.com/AndrXxX/goph-keeper/internal/client/messages"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/forms"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
+	kb "github.com/AndrXxX/goph-keeper/internal/client/views/keyboard"
+	"github.com/AndrXxX/goph-keeper/internal/client/views/messages"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/styles"
 )
 
 var fileListKeys = kb.KeyMap{
-	Short: []key.Binding{kb.Back, kb.Edit, kb.Delete, kb.New},
+	Short: []key.Binding{kb.Back, kb.Edit, kb.New, kb.Download},
 	Full: [][]key.Binding{
-		{kb.Edit, kb.Delete, kb.New, kb.Quit},
+		{kb.Edit, kb.New, kb.Quit},
 		{kb.Up, kb.Down, kb.Enter, kb.Back},
 	},
 }
@@ -27,6 +27,7 @@ var fileListKeys = kb.KeyMap{
 type fileList struct {
 	list list.Model
 	help help.Model
+	lr   refresher
 }
 
 func newFileList() *fileList {
@@ -37,51 +38,61 @@ func newFileList() *fileList {
 	return &fileList{list: defaultList, help: help.New()}
 }
 
-func (pl *fileList) Init() tea.Cmd {
+func (l *fileList) Init() tea.Cmd {
+	l.lr.Refresh()
 	return nil
 }
 
-func (pl *fileList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (l *fileList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	if len(l.list.Items()) == 0 {
+		l.lr.Refresh()
+	}
+	l.lr.RefreshIn(refreshListInterval)
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		pl.list.SetSize(msg.Width/styles.InnerMargin, msg.Height/2)
+		l.list.SetSize(msg.Width, msg.Height/2)
 	case messages.AddFile:
-		pl.list.InsertItem(-1, msg.Item)
-		pl.View()
-		return pl, nil
+		l.lr.Refresh()
+		return l, nil
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, kb.Keys.Edit, kb.Keys.Enter):
-			if len(pl.list.VisibleItems()) != 0 {
-				e := pl.list.SelectedItem().(entities.FileItem)
-				f := forms.NewFileForm(&e)
-				return f, helpers.GenCmd(messages.ChangeView{Name: names.FileForm, View: f})
+			if len(l.list.VisibleItems()) != 0 {
+				e := l.list.SelectedItem().(entities.FileItem)
+				f := forms.NewUpdateFileForm(&e)
+				return f, helpers.GenCmd(messages.ChangeView{Name: names.UpdateFileForm, View: f})
 			}
 		case key.Matches(msg, kb.Keys.New):
-			f := forms.NewFileForm(nil)
-			return f, helpers.GenCmd(messages.ChangeView{Name: names.FileForm, View: f})
+			f := forms.NewUploadFileForm(&entities.FileItem{}, l.list.Height()*2)
+			return f, helpers.GenCmd(messages.ChangeView{Name: names.UploadFileForm, View: f})
+		case key.Matches(msg, kb.Keys.Download):
+			if len(l.list.VisibleItems()) != 0 {
+				e := l.list.SelectedItem().(entities.FileItem)
+				f := forms.NewDownloadFileForm(&e, l.list.Height()*2)
+				return f, helpers.GenCmd(messages.ChangeView{Name: names.DownloadFileForm, View: f})
+			}
 		case key.Matches(msg, kb.Keys.Back):
-			return pl, helpers.GenCmd(messages.ChangeView{Name: names.MainMenu})
+			return l, helpers.GenCmd(messages.ChangeView{Name: names.MainMenu})
 		case key.Matches(msg, kb.Keys.Delete):
 			// TODO: approve + action
-			return pl, pl.DeleteCurrent()
+			return l, l.DeleteCurrent()
 		}
 	}
-	pl.list, cmd = pl.list.Update(msg)
-	return pl, cmd
+	l.list, cmd = l.list.Update(msg)
+	return l, cmd
 }
 
-func (pl *fileList) View() string {
-	return lipgloss.JoinVertical(lipgloss.Left, pl.list.View(), pl.help.View(fileListKeys))
+func (l *fileList) View() string {
+	return lipgloss.JoinVertical(lipgloss.Left, l.list.View(), styles.Help.Render(l.help.View(fileListKeys)))
 }
 
-func (pl *fileList) DeleteCurrent() tea.Cmd {
-	if len(pl.list.VisibleItems()) > 0 {
-		pl.list.RemoveItem(pl.list.Index())
+func (l *fileList) DeleteCurrent() tea.Cmd {
+	if len(l.list.VisibleItems()) > 0 {
+		l.list.RemoveItem(l.list.Index())
 	}
 
 	var cmd tea.Cmd
-	pl.list, cmd = pl.list.Update(nil)
+	l.list, cmd = l.list.Update(nil)
 	return cmd
 }

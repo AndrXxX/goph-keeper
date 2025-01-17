@@ -8,7 +8,7 @@ import (
 
 type NoteItem struct {
 	StoredItem
-	Text string `json:"text"`
+	Text string `json:"text" valid:"required"`
 }
 
 func (i NoteItem) FilterValue() string {
@@ -16,7 +16,10 @@ func (i NoteItem) FilterValue() string {
 }
 
 func (i NoteItem) Title() string {
-	return string(i.Text[0:min(10, len(i.Text))]) + " ..."
+	if len(i.Text) > 10 {
+		return string(i.Text[0:min(10, len(i.Text))]) + " ..."
+	}
+	return i.Text
 }
 
 func (i NoteItem) Description() string {

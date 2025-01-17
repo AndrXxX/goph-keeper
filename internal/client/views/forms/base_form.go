@@ -7,8 +7,8 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
-	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/form"
+	kb "github.com/AndrXxX/goph-keeper/internal/client/views/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/styles"
 )
 
@@ -19,6 +19,7 @@ type baseForm struct {
 	inputs     []textinput.Model
 	fu         form.FieldsUpdater
 	keys       *kb.KeyMap
+	afterTitle []string
 }
 
 func NewBaseForm(title string, inputs []textinput.Model, fu form.FieldsUpdater) *baseForm {
@@ -77,11 +78,12 @@ func (f *baseForm) View() string {
 	vList := []string{
 		styles.Title.Margin(1).Render(f.title),
 	}
+	vList = append(vList, f.afterTitle...)
 	for i := range f.inputs {
 		vList = append(vList, f.inputs[i].View())
 	}
 	if f.keys != nil {
-		vList = append(vList, f.help.View(*f.keys))
+		vList = append(vList, styles.Help.Render(f.help.View(*f.keys)))
 	}
 	return lipgloss.JoinVertical(lipgloss.Left, vList...)
 }

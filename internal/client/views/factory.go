@@ -1,31 +1,43 @@
 package views
 
 import (
-	"github.com/AndrXxX/goph-keeper/internal/client/state"
+	"github.com/charmbracelet/bubbles/help"
+	"github.com/charmbracelet/bubbles/spinner"
+	tea "github.com/charmbracelet/bubbletea"
+
 	"github.com/AndrXxX/goph-keeper/internal/client/views/contract"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/forms"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/lists"
 )
 
 type Factory struct {
-	AppState   *state.AppState
 	Loginer    forms.Loginer
 	Registerer forms.Registerer
-	SM         contract.SyncManager
+	S          *contract.Storages
+}
+
+func (f *Factory) Container(opts ...Option) *container {
+	c := &container{
+		help:    help.New(),
+		uo:      make(map[tea.Msg]UpdateOption),
+		spinner: spinner.New(spinner.WithSpinner(spinner.Dot)),
+	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 func (f *Factory) FormsFactory() *forms.Factory {
 	return &forms.Factory{
-		AppState:   f.AppState,
 		Loginer:    f.Loginer,
 		Registerer: f.Registerer,
-		SM:         f.SM,
 	}
 }
 
 func (f *Factory) MenusFactory() *lists.Factory {
 	return &lists.Factory{
 		FF: f.FormsFactory(),
-		SM: f.SM,
+		S:  f.S,
 	}
 }

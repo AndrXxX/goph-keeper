@@ -7,6 +7,10 @@ import (
 	"github.com/AndrXxX/goph-keeper/pkg/requestsender/dto"
 )
 
+type tokenProvider interface {
+	GetToken() string
+}
+
 type client interface {
 	Do(req *http.Request) (*http.Response, error)
 }
@@ -16,7 +20,7 @@ type hashGenerator interface {
 }
 
 type dataCompressor interface {
-	Compress(in []byte) (io.Reader, error)
+	Compress(in io.Reader) (io.Reader, error)
 }
 
 type Option func(*dto.ParamsDto) error

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/vingarcia/ksql"
 
 	"github.com/AndrXxX/goph-keeper/pkg/storages/postgressql/models"
@@ -25,7 +26,7 @@ func (s *storedItemsStorage) Insert(ctx context.Context, m *models.StoredItem) (
 }
 
 // QueryOneById извлекает одну запись
-func (s *storedItemsStorage) QueryOneById(ctx context.Context, id uint) (*models.StoredItem, error) {
+func (s *storedItemsStorage) QueryOneById(ctx context.Context, id uuid.UUID) (*models.StoredItem, error) {
 	res := models.StoredItem{}
 	err := s.db.QueryOne(ctx, &res, "FROM stored_items WHERE id = $1", id)
 	if err != nil {

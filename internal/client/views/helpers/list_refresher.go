@@ -1,30 +1,30 @@
 package helpers
 
 import (
+	"sync/atomic"
 	"time"
 
 	"github.com/charmbracelet/bubbles/list"
-
-	"github.com/AndrXxX/goph-keeper/internal/client/interfaces"
 )
 
 type ListRefresher[T list.Item] struct {
-	S          interfaces.Storage[T]
+	S          Storage[T]
 	List       *list.Model
-	refreshing bool
+	refreshing atomic.Bool
 }
 
 func (l *ListRefresher[T]) Refresh() {
-	if l.refreshing || l.S == nil {
+	if l.refreshing.Load() || l.S == nil {
 		return
 	}
-	l.refreshing = true
+	l.refreshing.Store(true)
 	items := l.S.FindAll(nil)
-	l.List.SetItems([]list.Item{})
+	conv := make([]list.Item, len(items))
 	for i := range items {
-		l.List.InsertItem(-1, items[i])
+		conv[i] = items[i]
 	}
-	l.refreshing = false
+	l.List.SetItems(conv)
+	l.refreshing.Store(false)
 }
 
 func (l *ListRefresher[T]) RefreshIn(t time.Duration) {

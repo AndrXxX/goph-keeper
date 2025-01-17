@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"os"
 
 	"go.uber.org/zap"
 
@@ -12,10 +13,11 @@ import (
 )
 
 type AuthController struct {
-	US usersStorage
-	HG hashGenerator
-	TS tokenService
-	UF fetcher[entities.User]
+	US      usersStorage
+	HG      hashGenerator
+	TS      tokenService
+	UF      fetcher[entities.User]
+	KeyPath string
 }
 
 func (c *AuthController) Register(w http.ResponseWriter, r *http.Request) {
@@ -43,6 +45,10 @@ func (c *AuthController) Register(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	err = c.writePublicKey(w)
+	if err != nil {
+		logger.Log.Info("failed to writePublicKey", zap.Error(err))
+	}
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -69,6 +75,10 @@ func (c *AuthController) Login(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	err = c.writePublicKey(w)
+	if err != nil {
+		logger.Log.Info("failed to writePublicKey", zap.Error(err))
+	}
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -80,5 +90,18 @@ func (c *AuthController) setAuthToken(w http.ResponseWriter, user *models.User) 
 	}
 	w.Header().Set("Authorization", "Bearer "+token)
 	http.SetCookie(w, &http.Cookie{Name: enums.AuthToken, Value: token})
+	return err
+}
+
+func (c *AuthController) writePublicKey(w http.ResponseWriter) error {
+	if c.KeyPath == "" {
+		return nil
+	}
+	data, err := os.ReadFile(c.KeyPath)
+	if err != nil {
+		logger.Log.Info("failed to read cryptoKey", zap.Error(err), zap.String("keyPath", c.KeyPath))
+		return nil
+	}
+	_, err = w.Write(data)
 	return err
 }

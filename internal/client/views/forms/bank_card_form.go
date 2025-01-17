@@ -4,17 +4,18 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/tiagomelo/go-clipboard/clipboard"
 
 	"github.com/AndrXxX/goph-keeper/internal/client/entities"
-	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
-	"github.com/AndrXxX/goph-keeper/internal/client/messages"
-	"github.com/AndrXxX/goph-keeper/internal/client/views/contract"
+	"github.com/AndrXxX/goph-keeper/internal/client/locales"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/form"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
+	kb "github.com/AndrXxX/goph-keeper/internal/client/views/keyboard"
+	"github.com/AndrXxX/goph-keeper/internal/client/views/messages"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 	"github.com/AndrXxX/goph-keeper/internal/enums/datatypes"
 )
@@ -38,36 +39,33 @@ var bankCardFormKeys = kb.KeyMap{
 type bankCardForm struct {
 	item     *entities.BankCardItem
 	creating bool
-	fu       form.FieldsUpdater
 	*baseForm
-	sm contract.SyncManager
 }
 
-func NewBankCardForm(item *entities.BankCardItem, sm contract.SyncManager) *bankCardForm {
+func NewBankCardForm(item *entities.BankCardItem) *bankCardForm {
 	m := bankCardForm{
 		baseForm: NewBaseForm("Create/edit bank card", make([]textinput.Model, 5), form.FieldsUpdater{}),
 		creating: item == nil,
 		item:     item,
-		sm:       sm,
 	}
 	m.baseForm.keys = &bankCardFormKeys
 	if m.creating {
 		m.item = &entities.BankCardItem{}
 	}
 
-	m.baseForm.inputs[bcNumber].Prompt = "Number: "
+	m.baseForm.inputs[bcNumber].Prompt = locales.FINumber
 	m.baseForm.inputs[bcNumber].SetValue(m.item.Number)
 
-	m.baseForm.inputs[bcCVC].Prompt = "CVCCode: "
+	m.baseForm.inputs[bcCVC].Prompt = locales.FICVCCode
 	m.baseForm.inputs[bcCVC].SetValue(m.item.CVCCode)
 
-	m.baseForm.inputs[bcValidity].Prompt = "Validity: "
+	m.baseForm.inputs[bcValidity].Prompt = locales.FIValidity
 	m.baseForm.inputs[bcValidity].SetValue(m.item.Validity)
 
-	m.baseForm.inputs[bcHolder].Prompt = "Cardholder: "
+	m.baseForm.inputs[bcHolder].Prompt = locales.FICardholder
 	m.baseForm.inputs[bcHolder].SetValue(m.item.Cardholder)
 
-	m.baseForm.inputs[bcDesc].Prompt = "Description: "
+	m.baseForm.inputs[bcDesc].Prompt = locales.FIDescription
 	m.baseForm.inputs[bcDesc].SetValue(m.item.Desc)
 
 	return &m
@@ -84,14 +82,15 @@ func (f *bankCardForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, kb.Keys.Back):
 			return f, helpers.GenCmd(messages.ChangeView{Name: names.BankCardList})
 		case key.Matches(msg, kb.Keys.Save):
-			err := f.sm.Sync(datatypes.BankCards, []any{*f.getBankCardItem()})
-			if err != nil {
-				return f, helpers.GenCmd(messages.ShowError{Err: fmt.Sprintf("Ошибка при обновлении: %s", err)})
+			item := f.getBankCardItem()
+			if _, err := govalidator.ValidateStruct(item); err != nil {
+				return f, helpers.GenCmd(messages.ValidityError{Error: err})
 			}
 			return f, tea.Batch(
+				helpers.GenCmd(messages.UploadItemUpdates{Type: datatypes.BankCards, Items: []any{*item}}),
 				helpers.GenCmd(messages.ChangeView{Name: names.BankCardList}),
-				helpers.GenCmd(messages.AddBankCard{Item: f.getBankCardItem()}),
-				helpers.GenCmd(messages.ShowMessage{Message: "Изменения сохранены"}),
+				helpers.GenCmd(messages.AddBankCard{Item: item}),
+				helpers.GenCmd(messages.ShowMessage{Message: "Выполняется синхронизация изменений"}),
 			)
 		case key.Matches(msg, kb.Keys.Copy):
 			c := clipboard.New()

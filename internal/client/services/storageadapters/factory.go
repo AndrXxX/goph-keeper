@@ -2,7 +2,6 @@ package storageadapters
 
 import (
 	e "github.com/AndrXxX/goph-keeper/internal/client/entities"
-	"github.com/AndrXxX/goph-keeper/internal/client/interfaces"
 	orm "github.com/AndrXxX/goph-keeper/internal/client/ormmodels"
 	"github.com/AndrXxX/goph-keeper/internal/client/services/convertors"
 )
@@ -10,7 +9,7 @@ import (
 type Factory struct {
 }
 
-func (f Factory) ORMPasswordsAdapter(s interfaces.Storage[orm.PasswordItem]) interfaces.Storage[e.PasswordItem] {
+func (f Factory) ORMPasswordsAdapter(s Storage[orm.PasswordItem]) Storage[e.PasswordItem] {
 	return &ORMAdapter[e.PasswordItem, orm.PasswordItem]{
 		ORMConvertor:    convertors.PasswordOrmEntityConvertor{},
 		EntityConvertor: convertors.PasswordEntityOrmConvertor{},
@@ -18,7 +17,7 @@ func (f Factory) ORMPasswordsAdapter(s interfaces.Storage[orm.PasswordItem]) int
 	}
 }
 
-func (f Factory) ORMNotesAdapter(s interfaces.Storage[orm.NoteItem]) interfaces.Storage[e.NoteItem] {
+func (f Factory) ORMNotesAdapter(s Storage[orm.NoteItem]) Storage[e.NoteItem] {
 	return &ORMAdapter[e.NoteItem, orm.NoteItem]{
 		ORMConvertor:    convertors.NoteOrmEntityConvertor{},
 		EntityConvertor: convertors.NoteEntityOrmConvertor{},
@@ -26,7 +25,7 @@ func (f Factory) ORMNotesAdapter(s interfaces.Storage[orm.NoteItem]) interfaces.
 	}
 }
 
-func (f Factory) ORMBankCardAdapter(s interfaces.Storage[orm.BankCardItem]) interfaces.Storage[e.BankCardItem] {
+func (f Factory) ORMBankCardAdapter(s Storage[orm.BankCardItem]) Storage[e.BankCardItem] {
 	return &ORMAdapter[e.BankCardItem, orm.BankCardItem]{
 		ORMConvertor:    convertors.BankCardOrmEntityConvertor{},
 		EntityConvertor: convertors.BankCardEntityOrmConvertor{},
@@ -34,10 +33,18 @@ func (f Factory) ORMBankCardAdapter(s interfaces.Storage[orm.BankCardItem]) inte
 	}
 }
 
-func (f Factory) ORMUserAdapter(s interfaces.Storage[orm.User]) interfaces.Storage[e.User] {
+func (f Factory) ORMUserAdapter(s Storage[orm.User]) Storage[e.User] {
 	return &ORMAdapter[e.User, orm.User]{
 		ORMConvertor:    &convertors.UserOrmEntityConvertor{},
 		EntityConvertor: &convertors.UserEntityOrmConvertor{},
+		Storage:         s,
+	}
+}
+
+func (f Factory) ORMFileAdapter(s Storage[orm.FileItem]) Storage[e.FileItem] {
+	return &ORMAdapter[e.FileItem, orm.FileItem]{
+		ORMConvertor:    convertors.FileOrmEntityConvertor{},
+		EntityConvertor: convertors.FileEntityOrmConvertor{},
 		Storage:         s,
 	}
 }

@@ -16,7 +16,6 @@ type ormStorage[T any] struct {
 func (s *ormStorage[T]) Find(m *T) *T {
 	result := s.db.Where(m).First(m)
 	if result.Error != nil {
-		logger.Log.Info("failed to find Order", zap.Error(result.Error), zap.Any("order", m))
 		return nil
 	}
 	return m
@@ -42,7 +41,7 @@ func (s *ormStorage[T]) Update(m *T) error {
 
 func (s *ormStorage[T]) FindAll(m *T) []T {
 	var list []T
-	result := s.db.Where(m).Order("created_at desc").Find(&list)
+	result := s.db.Where(m).Order("updated_at desc").Find(&list)
 	if result.Error != nil {
 		logger.Log.Info("failed to find all models", zap.Error(result.Error), zap.Any("model", m))
 		return make([]T, 0)

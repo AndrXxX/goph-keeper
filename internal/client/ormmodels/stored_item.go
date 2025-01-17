@@ -2,10 +2,12 @@ package ormmodels
 
 import (
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type StoredItem struct {
-	ID        uint
+	ID        uuid.UUID
 	Desc      string
-	UpdatedAt time.Time
+	UpdatedAt time.Time `gorm:"autoUpdateTime:false"`
 }

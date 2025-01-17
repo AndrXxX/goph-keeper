@@ -6,10 +6,16 @@ import (
 
 type Map map[names.ViewName]View
 
-func NewMap(f Factory) Map {
+func AuthViewsMap(f *Factory) Map {
 	mf := f.MenusFactory()
 	return Map{
-		names.AuthMenu:     mf.AuthMenu(),
+		names.AuthMenu: mf.AuthMenu(),
+	}
+}
+
+func MainViewsMap(f *Factory) Map {
+	mf := f.MenusFactory()
+	return Map{
 		names.MainMenu:     mf.MainMenu(),
 		names.PasswordList: mf.PasswordList(),
 		names.NotesList:    mf.NoteList(),

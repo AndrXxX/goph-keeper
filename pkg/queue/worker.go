@@ -1,6 +1,9 @@
 package queue
 
 import (
+	"context"
+	"fmt"
+
 	"go.uber.org/zap"
 
 	"github.com/AndrXxX/goph-keeper/pkg/logger"
@@ -9,11 +12,16 @@ import (
 type worker struct {
 }
 
-func (w *worker) Process(jobs <-chan Job) {
-	for job := range jobs {
+func (w *worker) Process(ctx context.Context, jobs <-chan Job) {
+	select {
+	// if context was canceled.
+	case <-ctx.Done():
+		return
+	// if job received.
+	case job := <-jobs:
 		err := job.Execute()
 		if err != nil {
-			logger.Log.Error("failed to execute runner job", zap.Error(err), zap.Any("job", job))
+			logger.Log.Error("failed to execute runner job", zap.Error(err), zap.Any("job", fmt.Sprintf("%T", job)))
 		}
 	}
 }

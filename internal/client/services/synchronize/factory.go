@@ -45,10 +45,24 @@ func (f *Factory) BankCardSynchronizer() *synchronizers.BankCardSynchronizer {
 	}
 }
 
+func (f *Factory) FileSynchronizer() *synchronizers.FileSynchronizer {
+	return &synchronizers.FileSynchronizer{
+		LC: convertors.ListConvertor[entities.FileItem]{},
+		L: &itemsloader.FilesLoader{
+			Sender:     f.RS,
+			URLBuilder: f.UB,
+			Fetcher:    &requestjsonentity.Fetcher[entities.FileItem]{},
+			FS:         f.Storages.FS,
+		},
+		S: f.Storages.File,
+	}
+}
+
 func (f *Factory) Map() map[string]Synchronizer {
 	return map[string]Synchronizer{
 		datatypes.Passwords: f.PasswordSynchronizer(),
 		datatypes.Notes:     f.NotesSynchronizer(),
 		datatypes.BankCards: f.BankCardSynchronizer(),
+		datatypes.Files:     f.FileSynchronizer(),
 	}
 }

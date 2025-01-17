@@ -1,10 +1,13 @@
 package synchronize
 
 import (
+	"io"
 	"net/http"
 
+	"github.com/google/uuid"
+
 	"github.com/AndrXxX/goph-keeper/internal/client/entities"
-	"github.com/AndrXxX/goph-keeper/internal/client/interfaces"
+	"github.com/AndrXxX/goph-keeper/internal/client/services/synchronize/synchronizers"
 )
 
 type Synchronizer interface {
@@ -13,18 +16,27 @@ type Synchronizer interface {
 
 type requestSender interface {
 	Get(url string, contentType string) (*http.Response, error)
-	Post(url string, contentType string, data []byte) (*http.Response, error)
+	Post(url string, contentType string, data io.Reader) (*http.Response, error)
 }
 
 type urlBuilder interface {
 	Build(endpoint string, params map[string]string) string
 }
 
-type Storages struct {
-	User     interfaces.Storage[entities.User]
-	Password interfaces.Storage[entities.PasswordItem]
-	Note     interfaces.Storage[entities.NoteItem]
-	BankCard interfaces.Storage[entities.BankCardItem]
+type fileStorage interface {
+	Store(src io.Reader, id uuid.UUID) error
+	Get(id uuid.UUID) (file io.ReadCloser, err error)
+	IsExist(id uuid.UUID) bool
 }
 
-type tokenRefresher func()
+type Storages struct {
+	Password synchronizers.Storage[entities.PasswordItem]
+	Note     synchronizers.Storage[entities.NoteItem]
+	BankCard synchronizers.Storage[entities.BankCardItem]
+	File     synchronizers.Storage[entities.FileItem]
+	FS       fileStorage
+}
+
+type tokenRefresher interface {
+	Refresh() error
+}

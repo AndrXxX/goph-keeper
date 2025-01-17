@@ -8,19 +8,18 @@ import (
 	"github.com/charmbracelet/lipgloss"
 
 	"github.com/AndrXxX/goph-keeper/internal/client/entities"
-	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
-	"github.com/AndrXxX/goph-keeper/internal/client/messages"
-	"github.com/AndrXxX/goph-keeper/internal/client/views/contract"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/forms"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
+	kb "github.com/AndrXxX/goph-keeper/internal/client/views/keyboard"
+	"github.com/AndrXxX/goph-keeper/internal/client/views/messages"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/styles"
 )
 
 var passwordListKeys = kb.KeyMap{
-	Short: []key.Binding{kb.Back, kb.Edit, kb.Delete, kb.New},
+	Short: []key.Binding{kb.Back, kb.Edit, kb.New},
 	Full: [][]key.Binding{
-		{kb.Edit, kb.Delete, kb.New, kb.Quit},
+		{kb.Edit, kb.New, kb.Quit},
 		{kb.Up, kb.Down, kb.Enter, kb.Back},
 	},
 }
@@ -28,7 +27,6 @@ var passwordListKeys = kb.KeyMap{
 type passwordList struct {
 	list list.Model
 	help help.Model
-	sm   contract.SyncManager
 	lr   refresher
 }
 
@@ -53,7 +51,7 @@ func (l *passwordList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		l.list.SetSize(msg.Width/styles.InnerMargin, msg.Height/2)
+		l.list.SetSize(msg.Width, msg.Height/2)
 	case messages.AddPassword:
 		l.lr.Refresh()
 		return l, nil
@@ -62,11 +60,11 @@ func (l *passwordList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, kb.Keys.Edit, kb.Keys.Enter):
 			if len(l.list.VisibleItems()) != 0 {
 				e := l.list.SelectedItem().(entities.PasswordItem)
-				f := forms.NewPasswordForm(&e, l.sm)
+				f := forms.NewPasswordForm(&e)
 				return f, helpers.GenCmd(messages.ChangeView{Name: names.PasswordForm, View: f})
 			}
 		case key.Matches(msg, kb.Keys.New):
-			f := forms.NewPasswordForm(nil, l.sm)
+			f := forms.NewPasswordForm(nil)
 			return f, helpers.GenCmd(messages.ChangeView{Name: names.PasswordForm, View: f})
 		case key.Matches(msg, kb.Keys.Back):
 			return l, helpers.GenCmd(messages.ChangeView{Name: names.MainMenu})
@@ -80,7 +78,7 @@ func (l *passwordList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (l *passwordList) View() string {
-	return lipgloss.JoinVertical(lipgloss.Left, l.list.View(), l.help.View(passwordListKeys))
+	return lipgloss.JoinVertical(lipgloss.Left, l.list.View(), styles.Help.Render(l.help.View(passwordListKeys)))
 }
 
 func (l *passwordList) DeleteCurrent() tea.Cmd {

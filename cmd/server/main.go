@@ -16,6 +16,8 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/server/services/flagsparser"
 	"github.com/AndrXxX/goph-keeper/pkg/buildformatter"
 	"github.com/AndrXxX/goph-keeper/pkg/configprovider"
+	"github.com/AndrXxX/goph-keeper/pkg/filestorage"
+	"github.com/AndrXxX/goph-keeper/pkg/hashgenerator"
 	"github.com/AndrXxX/goph-keeper/pkg/logger"
 	"github.com/AndrXxX/goph-keeper/pkg/storages/postgressql"
 )
@@ -60,11 +62,11 @@ func initStorage(ctx context.Context, c *config.Config) (*app.Storage, error) {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
 	sf := postgressql.Factory{DB: db}
-	return &app.Storage{
-		DB: db,
-		US: sf.UsersStorage(),
-		IS: sf.StoredItemsStorage(),
-	}, nil
+	fs, err := filestorage.New(c.FileStoragePath, hashgenerator.Factory().SHA256(c.PasswordKey))
+	if err != nil {
+		return nil, fmt.Errorf("initialize file storage: %w", err)
+	}
+	return &app.Storage{DB: db, US: sf.UsersStorage(), IS: sf.StoredItemsStorage(), FS: fs}, nil
 }
 
 func initBuildInfo() {

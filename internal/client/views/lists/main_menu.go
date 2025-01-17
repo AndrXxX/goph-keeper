@@ -6,10 +6,12 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"golang.org/x/tools/container/intsets"
 
-	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
-	"github.com/AndrXxX/goph-keeper/internal/client/messages"
+	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
+	kb "github.com/AndrXxX/goph-keeper/internal/client/views/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/menuitems"
+	"github.com/AndrXxX/goph-keeper/internal/client/views/messages"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/styles"
 	"github.com/AndrXxX/goph-keeper/internal/enums/datatypes"
@@ -27,17 +29,27 @@ type mainMenu struct {
 	help help.Model
 }
 
-func newMainMenu() *mainMenu {
-	defaultList := list.New([]list.Item{
-		menuitems.MainMenuItem{Name: "Passwords", Code: datatypes.Passwords, Desc: "Manage passwords"},
-		menuitems.MainMenuItem{Name: "Notes", Code: datatypes.Notes, Desc: "Manage notes"},
-		menuitems.MainMenuItem{Name: "Bank Cards", Code: datatypes.BankCards, Desc: "Manage bank cards"},
-		//menuitems.MainMenuItem{Name: "Files", Code: datatypes.Files, Desc: "Manage files"},
-	}, list.NewDefaultDelegate(), 0, 0)
-	defaultList.SetShowHelp(false)
-	defaultList.Title = "Menu"
-	defaultList.Styles.Title = styles.Title
-	return &mainMenu{list: defaultList, help: help.New()}
+type mmOption func(a *mainMenu)
+
+func withMenuItem(i menuitems.MainMenuItem) mmOption {
+	return func(a *mainMenu) {
+		a.list.InsertItem(intsets.MaxInt, i)
+	}
+}
+
+func newMainMenu(opts ...mmOption) *mainMenu {
+	m := &mainMenu{
+		list: list.New([]list.Item{}, list.NewDefaultDelegate(), 0, 0),
+		help: help.New(),
+	}
+	m.list.SetShowStatusBar(false)
+	m.list.SetShowHelp(false)
+	m.list.Title = "Menu"
+	m.list.Styles.Title = styles.Title
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
 }
 
 func (m *mainMenu) Init() tea.Cmd {
@@ -48,7 +60,7 @@ func (m *mainMenu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		m.list.SetSize(msg.Width/styles.InnerMargin, msg.Height/2)
+		m.list.SetSize(msg.Width, msg.Height/2)
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, kb.Keys.Enter):
@@ -67,14 +79,15 @@ func (m *mainMenu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return messages.ChangeView{
 						Name: names.BankCardList,
 					}
-					// TODO
-					//case datatypes.Files:
-					//	return messages.ChangeView{
-					//		Name: names.FileList,
-					//	}
+				case datatypes.Files:
+					return messages.ChangeView{
+						Name: names.FileList,
+					}
 				}
 				return nil
 			}
+		case key.Matches(msg, kb.Keys.Back):
+			return m, helpers.GenCmd(messages.Quit{})
 		}
 		m.list, cmd = m.list.Update(msg)
 		return m, cmd
@@ -83,5 +96,5 @@ func (m *mainMenu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *mainMenu) View() string {
-	return lipgloss.JoinVertical(lipgloss.Left, m.list.View(), m.help.View(mainMenuKeys))
+	return lipgloss.JoinVertical(lipgloss.Left, m.list.View(), styles.Help.Render(m.help.View(mainMenuKeys)))
 }

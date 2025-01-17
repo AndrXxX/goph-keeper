@@ -1,6 +1,7 @@
 package itemsloader
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 
@@ -43,7 +44,7 @@ func (c *ItemsLoader[T]) Upload(itemType string, list []T) (statusCode int, err 
 		return 0, fmt.Errorf("marshal data with itemType (%s) %w", itemType, mErr)
 	}
 
-	resp, sErr := c.Sender.Post(url, contenttypes.ApplicationJSON, data)
+	resp, sErr := c.Sender.Post(url, contenttypes.ApplicationJSON, bytes.NewBuffer(data))
 	if sErr != nil {
 		return 0, fmt.Errorf("post request with itemType (%s) %w", itemType, sErr)
 	}

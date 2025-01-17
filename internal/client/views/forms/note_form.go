@@ -4,17 +4,18 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/tiagomelo/go-clipboard/clipboard"
 
 	"github.com/AndrXxX/goph-keeper/internal/client/entities"
-	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
-	"github.com/AndrXxX/goph-keeper/internal/client/messages"
-	"github.com/AndrXxX/goph-keeper/internal/client/views/contract"
+	"github.com/AndrXxX/goph-keeper/internal/client/locales"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/form"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
+	kb "github.com/AndrXxX/goph-keeper/internal/client/views/keyboard"
+	"github.com/AndrXxX/goph-keeper/internal/client/views/messages"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 	"github.com/AndrXxX/goph-keeper/internal/enums/datatypes"
 )
@@ -34,26 +35,23 @@ var noteFormKeys = kb.KeyMap{
 
 type noteForm struct {
 	item *entities.NoteItem
-	fu   form.FieldsUpdater
 	*baseForm
-	sm contract.SyncManager
 }
 
-func NewNoteForm(item *entities.NoteItem, sm contract.SyncManager) *noteForm {
+func NewNoteForm(item *entities.NoteItem) *noteForm {
 	m := noteForm{
-		baseForm: NewBaseForm("Create a new note", make([]textinput.Model, 2), form.FieldsUpdater{}),
+		baseForm: NewBaseForm("Create/edit note", make([]textinput.Model, 2), form.FieldsUpdater{}),
 		item:     item,
-		sm:       sm,
 	}
 	m.baseForm.keys = &noteFormKeys
 	if m.item == nil {
 		m.item = &entities.NoteItem{}
 	}
 
-	m.baseForm.inputs[nfText].Prompt = "Text: "
+	m.baseForm.inputs[nfText].Prompt = locales.FIText
 	m.baseForm.inputs[nfText].SetValue(m.item.Text)
 
-	m.baseForm.inputs[nfDesc].Prompt = "Description: "
+	m.baseForm.inputs[nfDesc].Prompt = locales.FIDescription
 	m.baseForm.inputs[nfDesc].SetValue(m.item.Desc)
 
 	return &m
@@ -70,14 +68,15 @@ func (f *noteForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, kb.Keys.Back):
 			return f, helpers.GenCmd(messages.ChangeView{Name: names.NotesList})
 		case key.Matches(msg, kb.Keys.Save):
-			err := f.sm.Sync(datatypes.Notes, []any{*f.getNoteItem()})
-			if err != nil {
-				return f, helpers.GenCmd(messages.ShowError{Err: fmt.Sprintf("Ошибка при обновлении: %s", err)})
+			item := f.getNoteItem()
+			if _, err := govalidator.ValidateStruct(item); err != nil {
+				return f, helpers.GenCmd(messages.ValidityError{Error: err})
 			}
 			return f, tea.Batch(
+				helpers.GenCmd(messages.UploadItemUpdates{Type: datatypes.Notes, Items: []any{*item}}),
 				helpers.GenCmd(messages.ChangeView{Name: names.NotesList}),
-				helpers.GenCmd(messages.AddNote{Item: f.getNoteItem()}),
-				helpers.GenCmd(messages.ShowMessage{Message: "Изменения сохранены"}),
+				helpers.GenCmd(messages.AddNote{Item: item}),
+				helpers.GenCmd(messages.ShowMessage{Message: "Выполняется синхронизация изменений"}),
 			)
 		case key.Matches(msg, kb.Keys.Copy):
 			c := clipboard.New()

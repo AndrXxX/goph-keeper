@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/mock"
 
 	"github.com/AndrXxX/goph-keeper/pkg/hashgenerator"
+	"github.com/AndrXxX/goph-keeper/pkg/requestsender/dto"
 )
 
 type closableReadableBodyMock struct {
@@ -40,7 +41,7 @@ type dataCompressorMock struct {
 	mock.Mock
 }
 
-func (m *dataCompressorMock) Compress(in []byte) (io.Reader, error) {
+func (m *dataCompressorMock) Compress(in io.Reader) (io.Reader, error) {
 	args := m.Called(in)
 	resp, _ := args.Get(0).(io.Reader)
 	return resp, args.Error(1)
@@ -172,31 +173,58 @@ func TestRequestSender_Post(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := New(tt.fields.c, WithGzip(tt.fields.comp), WithSHA256(hashgenerator.Factory().SHA256("test")))
-			_, err := s.Post(tt.url, "", tt.data)
+			_, err := s.Post(tt.url, "", bytes.NewBuffer(tt.data))
 			assert.Equal(t, tt.wantErr, err != nil)
 		})
 	}
 }
 
-func TestNewRequestSender(t *testing.T) {
-	type args struct {
-		c client
-	}
+func TestRequestSender_Get(t *testing.T) {
 	tests := []struct {
-		name string
-		args args
-		want *RequestSender
+		name    string
+		c       client
+		opts    []Option
+		url     string
+		wantErr bool
 	}{
 		{
-			name: "Test New RequestSender #1 (Alloc)",
-			args: args{c: http.DefaultClient},
-			want: &RequestSender{c: http.DefaultClient},
+			name: "Test with error on run option",
+			opts: []Option{
+				func(dto *dto.ParamsDto) error {
+					return errors.New("error")
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name:    "Error on create request",
+			url:     string(rune(0x1B)),
+			wantErr: true,
+		},
+		{
+			name: "Positive test #1",
+			c: func() *mockClient {
+				c := mockClient{}
+				c.On("Do", mock.Anything).Return(nil, nil)
+				return &c
+			}(),
+			wantErr: false,
+		},
+		{
+			name: "Error on do request",
+			c: func() *mockClient {
+				c := mockClient{}
+				c.On("Do", mock.Anything).Return(nil, errors.New("error from web server"))
+				return &c
+			}(),
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			rs := New(tt.args.c)
-			assert.Equal(t, tt.want, rs)
+			s := New(tt.c, tt.opts...)
+			_, err := s.Get(tt.url, "")
+			assert.Equal(t, tt.wantErr, err != nil)
 		})
 	}
 }

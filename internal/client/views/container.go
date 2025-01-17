@@ -2,132 +2,117 @@ package views
 
 import (
 	"fmt"
-	"strings"
-	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
+	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
-	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
-	"github.com/AndrXxX/goph-keeper/internal/client/messages"
+	"github.com/AndrXxX/goph-keeper/internal/client/views/contract"
+	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
+	kb "github.com/AndrXxX/goph-keeper/internal/client/views/keyboard"
+	"github.com/AndrXxX/goph-keeper/internal/client/views/messages"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/styles"
 )
 
-const errorsTimeout = 2 * time.Second
-
-type Container struct {
-	help     help.Model
-	loaded   bool
-	current  names.ViewName
-	views    Map
-	quitting bool
-	errors   sync.Map
-	messages sync.Map
+type container struct {
+	help           help.Model
+	loaded         bool
+	current        names.ViewName
+	views          Map
+	quitting       atomic.Bool
+	errors         helpers.MsgList
+	messages       helpers.MsgList
+	uo             map[tea.Msg]UpdateOption
+	bi             *contract.BuildInfo
+	updateInterval time.Duration
+	syncCnt        atomic.Int32
+	spinner        spinner.Model
 }
 
-func NewContainer(cols Map) *Container {
-	return &Container{help: help.New(), views: cols, errors: sync.Map{}}
+func (m *container) Init() tea.Cmd {
+	return tea.Batch(m.Tick(), m.spinner.Tick)
 }
 
-func (m *Container) Init() tea.Cmd {
-	m.current = names.AuthMenu
-	return nil
-}
-
-func (m *Container) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	var cmd tea.Cmd
+func (m *container) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	cmdList := make([]tea.Cmd, 0)
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		var cmd tea.Cmd
 		var cmdList []tea.Cmd
 		m.help.Width = msg.Width - styles.InnerMargin
 		for i := range m.views {
-			_, cmd = m.views[i].Update(msg)
+			_, cmd := m.views[i].Update(msg)
 			cmdList = append(cmdList, cmd)
 		}
 		m.loaded = true
 		return m, tea.Batch(cmdList...)
-
+	case messages.Tick:
+		cmdList = append(cmdList, m.Tick())
+	case spinner.TickMsg:
+		var cmd tea.Cmd
+		m.spinner, cmd = m.spinner.Update(msg)
+		return m, cmd
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, kb.Keys.Quit):
-			m.quitting = true
-			return m, tea.Quit
+			return m, helpers.GenCmd(messages.Quit{})
 		}
-	case messages.ShowError:
-		m.errors.Store(msg.Err, msg.Err)
-		go func() {
-			time.Sleep(errorsTimeout)
-			m.errors.Delete(msg.Err)
-		}()
-	case messages.ShowMessage:
-		m.messages.Store(msg.Message, msg.Message)
-		go func() {
-			time.Sleep(errorsTimeout)
-			m.messages.Delete(msg.Message)
-		}()
 	case messages.ChangeView:
 		m.current = msg.Name
 		if msg.View != nil {
 			m.views[m.current] = msg.View
 		}
 		if msg.Msg != nil {
-			_, cmd = m.views[m.current].Update(msg.Msg)
+			_, cmd := m.views[m.current].Update(msg.Msg)
+			cmdList = append(cmdList, cmd)
+		}
+		//cmdList = append(cmdList, helpers.GenCmd(tea.WindowSize()))
+	default:
+		if f, ok := m.uo[helpers.GenMsgKey(msg)]; ok {
+			_, cmd := f(msg)
+			cmdList = append(cmdList, cmd)
 		}
 	}
-	_, cmd = m.views[m.current].Update(msg)
-	return m, cmd
+	_, cmd := m.views[m.current].Update(msg)
+	cmdList = append(cmdList, cmd)
+	return m, tea.Batch(cmdList...)
 }
 
-func (m *Container) View() string {
-	if m.quitting {
-		return m.getStyle().Render("")
+func (m *container) View() string {
+	if m.quitting.Load() {
+		return ""
 	}
 	if !m.loaded {
-		return m.getStyle().Render("loading...")
+		return styles.Border.Render("loading...")
 	}
-	board := lipgloss.JoinHorizontal(
+	var items []string
+	items = append(items, lipgloss.JoinHorizontal(
 		lipgloss.Left,
 		m.views[m.current].View(),
-	)
-	eb := strings.Builder{}
-	mb := strings.Builder{}
-
-	m.errors.Range(func(_, v any) bool {
-		eb.WriteString(fmt.Sprintf("%s\n", v.(string)))
-		return true
-	})
-	m.messages.Range(func(_, v any) bool {
-		mb.WriteString(fmt.Sprintf("%s\n", v.(string)))
-		return true
-	})
-	err := m.collectMessages(&m.errors)
-	if err != "" {
-		err = styles.Error.Render(err)
+	))
+	if err := m.errors.Join("\n"); err != "" {
+		items = append(items, styles.Error.Render(err))
 	}
-	mes := m.collectMessages(&m.messages)
-	if mes != "" {
-		mes = styles.Info.Render(mes)
+	if mes := m.messages.Join("\n"); mes != "" {
+		items = append(items, styles.Info.Render(mes))
 	}
-	return m.getStyle().Render(lipgloss.JoinVertical(lipgloss.Left, board, err, mes))
+	if m.syncCnt.Load() > 0 {
+		items = append(items, styles.Spinner.Render(m.spinner.View(), " Выполняется синхронизация"))
+	}
+	if m.bi != nil {
+		ver := fmt.Sprintf("ver. %s [%s]", m.bi.Version, m.bi.Date)
+		items = []string{lipgloss.JoinVertical(lipgloss.Left, items...)}
+		items = append(items, styles.Blurred.Margin(1, 0, 0).Render(ver))
+	}
+	return styles.Border.Render(lipgloss.JoinVertical(lipgloss.Center, items...))
 }
 
-func (m *Container) collectMessages(l *sync.Map) string {
-	b := strings.Builder{}
-	l.Range(func(_, v any) bool {
-		b.WriteString(fmt.Sprintf("%s\n", v.(string)))
-		return true
+func (m *container) Tick() tea.Cmd {
+	return tea.Tick(m.updateInterval, func(t time.Time) tea.Msg {
+		return messages.Tick(t)
 	})
-	return b.String()
-}
-
-func (m *Container) getStyle() lipgloss.Style {
-	return lipgloss.NewStyle().
-		Padding(1, 2).
-		Border(lipgloss.RoundedBorder()).
-		BorderForeground(lipgloss.Color("62"))
 }

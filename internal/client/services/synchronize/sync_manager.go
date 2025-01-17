@@ -4,7 +4,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/AndrXxX/goph-keeper/internal/client/services/synchronize/e"
+	"github.com/asaskevich/govalidator"
+
+	"github.com/AndrXxX/goph-keeper/internal/client/services/synchronize/syncerr"
 )
 
 type SyncManager struct {
@@ -17,9 +19,17 @@ func (m SyncManager) Sync(dataType string, updates []any) error {
 	if !ok {
 		return fmt.Errorf("unknown data type: %s", dataType)
 	}
+	for _, item := range updates {
+		if _, err := govalidator.ValidateStruct(item); err != nil {
+			return err
+		}
+	}
 	err := s.Sync(updates)
-	if errors.Is(err, e.UnauthorizedError) {
-		m.TR()
+	if errors.Is(err, syncerr.UnauthorizedError) {
+		rtErr := m.TR.Refresh()
+		if rtErr != nil {
+			return rtErr
+		}
 		err = s.Sync(updates)
 	}
 	return err
