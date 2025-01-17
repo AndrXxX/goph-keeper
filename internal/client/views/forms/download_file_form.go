@@ -68,7 +68,10 @@ func (f *downloadFileForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, kb.Keys.Back):
-			return f, helpers.GenCmd(messages.ChangeView{Name: names.FileList})
+			return f, tea.Sequence(
+				helpers.GenCmd(messages.ChangeView{Name: names.FileList}),
+				tea.WindowSize(),
+			)
 		case key.Matches(msg, kb.Keys.Download):
 			if f.selectedPath == "" {
 				return f, tea.Sequence(
