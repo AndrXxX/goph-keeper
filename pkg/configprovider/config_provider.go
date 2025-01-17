@@ -15,11 +15,11 @@ type configProvider[T any] struct {
 func (p *configProvider[T]) Fetch() (*T, error) {
 	for _, pr := range p.parsers {
 		if err := pr.Parse(p.defaultConfig); err != nil {
-			return nil, fmt.Errorf("failed to parse config: %w", err)
+			return nil, fmt.Errorf("parse config: %w", err)
 		}
 	}
 	if _, err := govalidator.ValidateStruct(p.defaultConfig); err != nil {
-		return nil, fmt.Errorf("failed to validate env vars: %w", err)
+		return nil, fmt.Errorf("validate config: %w", err)
 	}
 	return p.defaultConfig, nil
 }
