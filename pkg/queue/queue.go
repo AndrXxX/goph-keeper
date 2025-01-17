@@ -10,10 +10,6 @@ import (
 	"github.com/AndrXxX/goph-keeper/pkg/logger"
 )
 
-type Job interface {
-	Execute() error
-}
-
 type state struct {
 	running  bool
 	stopping bool
