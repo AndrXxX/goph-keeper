@@ -26,7 +26,7 @@ func (s *NotesSynchronizer) Sync(updates []any) error {
 		return syncerr.UnauthorizedError
 	}
 	if uErr != nil {
-		return fmt.Errorf("upload note updates: %w", cErr)
+		return fmt.Errorf("upload note updates: %w", uErr)
 	}
 	if code != http.StatusOK {
 		return fmt.Errorf("upload note updates - unexpected code: %v", code)

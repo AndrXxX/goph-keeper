@@ -26,7 +26,7 @@ func (s *PasswordSynchronizer) Sync(updates []any) error {
 		return syncerr.UnauthorizedError
 	}
 	if uErr != nil {
-		return fmt.Errorf("upload password updates: %w", cErr)
+		return fmt.Errorf("upload password updates: %w", uErr)
 	}
 	if code != http.StatusOK {
 		return fmt.Errorf("upload password updates - unexpected code: %v", code)

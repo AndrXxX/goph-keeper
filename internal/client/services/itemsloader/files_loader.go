@@ -82,22 +82,22 @@ func (c *FilesLoader) Upload(list []entities.FileItem) (statusCode int, err erro
 		if list[i].TempPath == "" {
 			return 0, fmt.Errorf("file not selected")
 		}
-		f, err := os.OpenFile(list[i].TempPath, os.O_RDONLY, os.ModePerm)
-		if err != nil {
-			return 0, fmt.Errorf("open file: %w", err)
+		f, ofErr := os.OpenFile(list[i].TempPath, os.O_RDONLY, os.ModePerm)
+		if ofErr != nil {
+			return 0, fmt.Errorf("open file: %w", ofErr)
 		}
-		resp, uErr := c.uploadFileUpdate(list[i])
-		if uErr != nil {
-			return 0, fmt.Errorf("upload file update %w", uErr)
+		resp, ufuErr := c.uploadFileUpdate(list[i])
+		if ufuErr != nil {
+			return 0, fmt.Errorf("upload file update %w", ufuErr)
 		}
-		id, err := c.fetchId(resp.Body)
-		if err != nil {
-			return resp.StatusCode, fmt.Errorf("fetch id %w", err)
+		id, fidErr := c.fetchId(resp.Body)
+		if fidErr != nil {
+			return resp.StatusCode, fmt.Errorf("fetch id %w", fidErr)
 		}
 		list[i].ID = id
-		err = c.uploadFile(list[i], f)
-		if err != nil {
-			return 0, fmt.Errorf("upload file after upload data: %w", err)
+		uErr := c.uploadFile(list[i], f)
+		if uErr != nil {
+			return 0, fmt.Errorf("upload file after upload data: %w", uErr)
 		}
 		res = append(res, list[i])
 	}

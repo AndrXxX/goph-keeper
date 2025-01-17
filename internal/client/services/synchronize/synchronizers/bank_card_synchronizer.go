@@ -26,7 +26,7 @@ func (s *BankCardSynchronizer) Sync(updates []any) error {
 		return syncerr.UnauthorizedError
 	}
 	if uErr != nil {
-		return fmt.Errorf("upload bank card updates: %w", cErr)
+		return fmt.Errorf("upload bank card updates: %w", uErr)
 	}
 	if code != http.StatusOK {
 		return fmt.Errorf("upload bank card updates - unexpected code: %v", code)
