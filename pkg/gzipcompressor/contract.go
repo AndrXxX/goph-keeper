@@ -1,4 +1,4 @@
-package compressor
+package gzipcompressor
 
 import "io"
 

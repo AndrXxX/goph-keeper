@@ -42,6 +42,14 @@ func (s *RequestSender) Post(url string, contentType string, data io.Reader) (*h
 	if err != nil {
 		return nil, err
 	}
+	params.Response = resp
+	params.Buf = nil
+	for _, opt := range s.opts {
+		err := opt(&params)
+		if err != nil {
+			return nil, err
+		}
+	}
 	return resp, nil
 }
 
@@ -65,5 +73,12 @@ func (s *RequestSender) Get(url string, contentType string) (*http.Response, err
 	}
 
 	resp, err := s.c.Do(r)
+	params.Response = resp
+	for _, opt := range s.opts {
+		err := opt(&params)
+		if err != nil {
+			return nil, err
+		}
+	}
 	return resp, err
 }

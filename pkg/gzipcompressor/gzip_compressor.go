@@ -1,4 +1,4 @@
-package compressor
+package gzipcompressor
 
 import (
 	"compress/gzip"
@@ -10,12 +10,12 @@ type GzipCompressor struct {
 	Buff buffer
 }
 
-func (c GzipCompressor) Compress(data []byte) (io.Reader, error) {
+func (c GzipCompressor) Compress(data io.Reader) (io.Reader, error) {
 	if data == nil {
-		return c.Buff, nil
+		return data, nil
 	}
 	w := gzip.NewWriter(c.Buff)
-	_, err := w.Write(data)
+	_, err := io.Copy(w, data)
 	if err != nil {
 		return nil, fmt.Errorf("failed write data to compress temporary buffer: %v", err)
 	}
