@@ -13,6 +13,7 @@ import (
 	"github.com/AndrXxX/goph-keeper/internal/client/entities"
 	"github.com/AndrXxX/goph-keeper/internal/client/jobs"
 	"github.com/AndrXxX/goph-keeper/internal/client/services/auth"
+	"github.com/AndrXxX/goph-keeper/internal/client/services/dbinitializer"
 	"github.com/AndrXxX/goph-keeper/internal/client/services/dbprovider"
 	"github.com/AndrXxX/goph-keeper/internal/client/services/ormstorages"
 	"github.com/AndrXxX/goph-keeper/internal/client/services/storageadapters"
@@ -64,7 +65,7 @@ func NewApp(c *config.Config) *App {
 		SP: func(db *gorm.DB) useraccessor.Storage[entities.User] {
 			return sa.ORMUserAdapter(sp.User(context.Background(), db))
 		},
-		DBI: &dbInitializer{dbProvider: dbProvider, state: app.State},
+		DBI: &dbinitializer.Initializer{Provider: dbProvider, State: app.State},
 		HG: func(key string) useraccessor.HashGenerator {
 			return hashgenerator.Factory().SHA256(key)
 		},
