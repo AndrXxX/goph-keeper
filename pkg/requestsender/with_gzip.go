@@ -2,6 +2,7 @@ package requestsender
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/AndrXxX/goph-keeper/pkg/gzipcompressor"
 	"github.com/AndrXxX/goph-keeper/pkg/requestsender/dto"
@@ -21,6 +22,11 @@ func WithGzip(comp dataCompressor) Option {
 		p.Headers["Accept-Encoding"] = "gzip"
 
 		if p.Response == nil {
+			return nil
+		}
+		contentEncoding := p.Response.Header.Get("Content-Encoding")
+		sendsGzip := strings.Contains(contentEncoding, "gzip")
+		if !sendsGzip {
 			return nil
 		}
 		cr, err := gzipcompressor.NewCompressReader(p.Response.Body)
