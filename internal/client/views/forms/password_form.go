@@ -41,7 +41,7 @@ type passwordForm struct {
 
 func NewPasswordForm(item *entities.PasswordItem) *passwordForm {
 	m := passwordForm{
-		baseForm: NewBaseForm("Create a new password", make([]textinput.Model, 3), form.FieldsUpdater{}),
+		baseForm: NewBaseForm("Create/edit password", make([]textinput.Model, 3), form.FieldsUpdater{}),
 		item:     item,
 	}
 	m.baseForm.keys = &passwordFormKeys

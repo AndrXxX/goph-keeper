@@ -40,7 +40,7 @@ type noteForm struct {
 
 func NewNoteForm(item *entities.NoteItem) *noteForm {
 	m := noteForm{
-		baseForm: NewBaseForm("Create a new note", make([]textinput.Model, 2), form.FieldsUpdater{}),
+		baseForm: NewBaseForm("Create/edit note", make([]textinput.Model, 2), form.FieldsUpdater{}),
 		item:     item,
 	}
 	m.baseForm.keys = &noteFormKeys
