@@ -65,7 +65,7 @@ func (r *runner) process(ctx context.Context) {
 	for i := range r.workers {
 		r.wg.Add(1)
 		go func(id int) {
-			r.workers[i].Process(ctx, r.jobs)
+			r.workers[id].Process(ctx, r.jobs)
 			r.wg.Done()
 		}(i)
 	}
