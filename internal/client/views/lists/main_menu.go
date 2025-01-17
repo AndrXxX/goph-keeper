@@ -8,8 +8,8 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"golang.org/x/tools/container/intsets"
 
-	kb "github.com/AndrXxX/goph-keeper/internal/client/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/helpers"
+	kb "github.com/AndrXxX/goph-keeper/internal/client/views/keyboard"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/menuitems"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/messages"
 	"github.com/AndrXxX/goph-keeper/internal/client/views/names"
